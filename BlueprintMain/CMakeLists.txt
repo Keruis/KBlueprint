@@ -2,12 +2,14 @@
 target_sources(Blueprint PRIVATE
         include/BlueprintClass.h
         include/BlueprintPort.h
+        include/BlueprintFont.h
 )
 
 # CPP
 target_sources(Blueprint PRIVATE
         src/BlueprintClass.cpp
         src/BlueprintPort.cpp
+        src/BlueprintFont.cpp
 )
 
 # UI

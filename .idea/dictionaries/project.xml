@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>blueprintclass</w>
+      <w>blueprintfont</w>
       <w>blueprintport</w>
       <w>mainwindow</w>
     </words>

@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.31)
 project(Blueprint)
 
 set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+#set(CMAKE_CXX_MODULE_STD ON)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -24,3 +28,5 @@ add_subdirectory(BlueprintMain)
 target_link_libraries(Blueprint
         Qt6::Core Qt6::Widgets Qt6::Gui
 )
+
+#target_compile_options(Blueprint PRIVATE -fmodules)
