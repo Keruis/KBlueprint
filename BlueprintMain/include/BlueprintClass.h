@@ -3,6 +3,9 @@
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QFile>
+#include <QMenu>
+#include <QWheelEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BlueprintClass; }
@@ -17,6 +20,9 @@ public:
 
     void Initialization() noexcept ;
     void Shutdown() noexcept ;
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
     Ui::BlueprintClass *m_ui;

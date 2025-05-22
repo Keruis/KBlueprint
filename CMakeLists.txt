@@ -25,7 +25,11 @@ add_executable(Blueprint
 
 add_subdirectory(BlueprintMain)
 
-target_link_libraries(Blueprint
+qt_add_resources(
+        RESOURCE_FILES ${QRC_RESOURCE}
+)
+
+target_link_libraries(Blueprint PRIVATE
         Qt6::Core Qt6::Widgets Qt6::Gui
 )
 

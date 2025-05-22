@@ -17,9 +17,20 @@ target_sources(Blueprint PRIVATE
         ui/BlueprintClass.ui
 )
 
+# QRC
+target_sources(Blueprint PRIVATE
+        resources.qrc
+)
+
 # IXX
 target_sources(Blueprint PRIVATE
         FILE_SET CXX_MODULES
         FILES
         Module/BlueprintPortType.ixx
 )
+
+set(RESOURCE_FILES
+    resources.qrc
+)
+
+set(QRC_RESOURCE ${RESOURCE_FILES} PARENT_SCOPE)

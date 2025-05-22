@@ -19,7 +19,7 @@ public:
     void Shutdown() noexcept ;
 
 private:
-    Ui::MainWindow *m_ui;
+    Ui::MainWindow* m_ui;
     BlueprintClass* m_blueprint;
 };
 

@@ -1,0 +1,54 @@
+QMenu {
+    background-color: #353535;
+    color: white;
+    border: 2px solid #5A5A5A;
+    border-radius: 8px;
+}
+
+QMenu::item:selected {
+    background-color: #2A82DA;
+    color: white;
+    border-radius: 4px;
+}
+
+/* Input 类菜单样式 */
+QMenu#InputMenu {
+    background-color: #DFFFD6;
+    color: black;
+    border: 2px solid green;
+    border-radius: 8px;
+}
+
+QMenu#InputMenu::item:selected {
+    background-color: #8CD98C;
+    color: black;
+    border-radius: 4px;
+}
+
+/* Output 类菜单样式 */
+QMenu#OutputMenu {
+    background-color: #FFD6D6;
+    color: black;
+    border: 2px solid red;
+    border-radius: 8px;
+}
+
+QMenu#OutputMenu::item:selected {
+    background-color: #FF7A7A;
+    color: black;
+    border-radius: 4px;
+}
+
+/* 其他类菜单样式 */
+QMenu#OtherMenu {
+    background-color: #D6E6FF;
+    color: black;
+    border: 2px solid blue;
+    border-radius: 8px;
+}
+
+QMenu#OtherMenu::item:selected {
+    background-color: #7A9EFF;
+    color: black;
+    border-radius: 4px;
+}
