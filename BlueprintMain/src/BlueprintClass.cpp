@@ -26,6 +26,7 @@ void BlueprintClass::Shutdown() noexcept {
     m_ui = nullptr;
 }
 
+# TEST
 void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
     // 获取鼠标在场景中的位置
     QPointF scenePos = mapToScene(event->pos());
