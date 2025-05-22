@@ -12,14 +12,14 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(Blueprint main.cpp
+add_executable(Blueprint
+    main.cpp
         MainWindow.cpp
         MainWindow.h
         MainWindow.ui
-        BlueprintMain/BlueprintClass.cpp
-        BlueprintMain/BlueprintClass.h
-        BlueprintMain/BlueprintClass.ui
 )
+
+add_subdirectory(BlueprintMain)
 
 target_link_libraries(Blueprint
         Qt6::Core Qt6::Widgets Qt6::Gui

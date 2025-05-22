@@ -2,7 +2,7 @@
 #define BLUEPRINT_MAINWINDOW_H
 
 #include <QMainWindow>
-#include "./BlueprintMain/BlueprintClass.h"
+#include "BlueprintMain/include/BlueprintClass.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,6 +14,9 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+
+    void Initialization() noexcept ;
+    void Shutdown() noexcept ;
 
 private:
     Ui::MainWindow *m_ui;

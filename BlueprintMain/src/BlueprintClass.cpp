@@ -1,5 +1,5 @@
-#include "BlueprintClass.h"
-#include "./ui_BlueprintClass.h"
+#include "../include/BlueprintClass.h"
+#include "../ui/ui_BlueprintClass.h"
 
 BlueprintClass::BlueprintClass(QWidget *parent)
     : QGraphicsView(parent),
@@ -10,10 +10,7 @@ BlueprintClass::BlueprintClass(QWidget *parent)
     setScene(m_scene);  // 将场景设置为QGraphicsView的场景
 }
 
-BlueprintClass::~BlueprintClass() {
-    delete m_ui;
-    m_ui = nullptr;
-}
+BlueprintClass::~BlueprintClass() = default;
 
 void BlueprintClass::Initialization() noexcept {
     setRenderHint(QPainter::Antialiasing);  // 抗锯齿
@@ -22,4 +19,9 @@ void BlueprintClass::Initialization() noexcept {
     // 初始视图缩放
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setBackgroundBrush(QColor(30, 30, 30));  // 设置深色背景
+}
+
+void BlueprintClass::Shutdown() noexcept {
+    delete m_ui;
+    m_ui = nullptr;
 }

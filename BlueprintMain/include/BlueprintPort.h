@@ -1,0 +1,9 @@
+#ifndef BLUEPRINT_BLUEPRINTPORT_H
+#define BLUEPRINT_BLUEPRINTPORT_H
+
+class BlueprintPort {
+
+};
+
+
+#endif //BLUEPRINT_BLUEPRINTPORT_H

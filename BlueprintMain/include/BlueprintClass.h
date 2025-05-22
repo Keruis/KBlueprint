@@ -16,6 +16,7 @@ public:
     ~BlueprintClass() override;
 
     void Initialization() noexcept ;
+    void Shutdown() noexcept ;
 
 private:
     Ui::BlueprintClass *m_ui;

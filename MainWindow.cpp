@@ -10,7 +10,18 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_blueprint);
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow() = default;
+
+void MainWindow::Initialization() noexcept {
+    m_blueprint->Initialization();
+}
+
+void MainWindow::Shutdown() noexcept {
     delete m_ui;
     m_ui = nullptr;
+
+    if (m_blueprint) {
+        m_blueprint->Shutdown();
+        m_blueprint = nullptr;
+    }
 }
