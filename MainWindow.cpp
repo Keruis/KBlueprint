@@ -3,11 +3,11 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      m_ui(new Ui::MainWindow),                    //NOLINT
-      m_blueprint(new BlueprintClass)
+      m_ui(std::make_unique<Ui::MainWindow>()),                    //NOLINT
+      m_blueprint(std::make_unique<BlueprintClass>())
 {
     m_ui->setupUi(this);
-    setCentralWidget(m_blueprint);
+    setCentralWidget(m_blueprint.get());
 }
 
 MainWindow::~MainWindow() = default;
@@ -16,12 +16,4 @@ void MainWindow::Initialization() noexcept {
     m_blueprint->Initialization();
 }
 
-void MainWindow::Shutdown() noexcept {
-    delete m_ui;
-    m_ui = nullptr;
-
-    if (m_blueprint) {
-        m_blueprint->Shutdown();
-        m_blueprint = nullptr;
-    }
-}
+void MainWindow::Shutdown() noexcept { }

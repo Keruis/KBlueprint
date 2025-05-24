@@ -6,6 +6,9 @@
 #include <QFile>
 #include <QMenu>
 #include <QWheelEvent>
+#include <memory>
+
+#include "BlueprintNode.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BlueprintClass; }
@@ -15,18 +18,23 @@ class BlueprintClass : public QGraphicsView {
     Q_OBJECT
 
 public:
-    explicit BlueprintClass(QWidget *parent = nullptr);
-    ~BlueprintClass() override;
+    explicit BlueprintClass(QWidget *parent = nullptr) ;
+    ~BlueprintClass() override ;
 
     void Initialization() noexcept ;
     void Shutdown() noexcept ;
+
+private:
+    void setupRendering() noexcept ;
+    void setupInteraction() noexcept ;
+    void setupAppearance() noexcept ;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
-    Ui::BlueprintClass *m_ui;
-    QGraphicsScene* m_scene;
+    std::unique_ptr<Ui::BlueprintClass> m_ui;
+    std::unique_ptr<QGraphicsScene> m_scene;
 };
 
 

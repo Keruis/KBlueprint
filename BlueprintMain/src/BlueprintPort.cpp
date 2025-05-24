@@ -2,13 +2,18 @@
 
 import BlueprintType;
 
+BlueprintPort::BlueprintPort()
+    : m_font(std::make_unique<BlueprintFont>())
+{
+
+}
+
+BlueprintPort::~BlueprintPort() = default;
+
 void BlueprintPort::Initialization() noexcept {
-    m_font = new BlueprintFont;
+
 }
 
 void BlueprintPort::Shutdown() noexcept {
-    if (m_font) {
-        delete m_font;
-        m_font = nullptr;
-    }
+
 }

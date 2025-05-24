@@ -1,6 +1,7 @@
 #ifndef BLUEPRINT_MAINWINDOW_H
 #define BLUEPRINT_MAINWINDOW_H
 
+#include <memory>
 #include <QMainWindow>
 #include "BlueprintMain/include/BlueprintClass.h"
 
@@ -19,8 +20,8 @@ public:
     void Shutdown() noexcept ;
 
 private:
-    Ui::MainWindow* m_ui;
-    BlueprintClass* m_blueprint;
+    std::unique_ptr<Ui::MainWindow> m_ui;
+    std::unique_ptr<BlueprintClass> m_blueprint;
 };
 
 

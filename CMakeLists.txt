@@ -23,7 +23,9 @@ add_executable(Blueprint
         MainWindow.ui
 )
 
+add_subdirectory(Container)
 add_subdirectory(BlueprintMain)
+
 
 qt_add_resources(
         RESOURCE_FILES ${QRC_RESOURCE}
@@ -31,6 +33,7 @@ qt_add_resources(
 
 target_link_libraries(Blueprint PRIVATE
         Qt6::Core Qt6::Widgets Qt6::Gui
+        Container BlueprintModules
 )
 
 #target_compile_options(Blueprint PRIVATE -fmodules)
