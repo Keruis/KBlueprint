@@ -24,7 +24,6 @@ target_sources(Blueprint PRIVATE
         src/BlueprintFont.cpp
         src/BlueprintNode.cpp
         src/BlueprintConnection.cpp
-        Types/MainType.cpp
 )
 
 # UI
