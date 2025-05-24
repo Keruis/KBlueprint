@@ -1,5 +1,5 @@
 export module EventHelpers;
 
-export namespace EventHelpers {
+export namespace Blueprint::EventHelpers {
     void showStandardContextMenu(void* view, void* event);
 }

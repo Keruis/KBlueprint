@@ -6,7 +6,7 @@ module;
 #include <QDebug>
 module EventHelpers;
 
-namespace EventHelpers {
+namespace Blueprint::EventHelpers {
     void showStandardContextMenu(void* viewPtr, void* eventPtr) {
         auto* view = reinterpret_cast<QGraphicsView*>(viewPtr);
         auto* event = reinterpret_cast<QContextMenuEvent*>(eventPtr);

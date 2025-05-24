@@ -5,11 +5,13 @@
       <w>autorcc</w>
       <w>autouic</w>
       <w>blueprintclass</w>
+      <w>blueprintconnection</w>
       <w>blueprintfont</w>
       <w>blueprintnode</w>
       <w>blueprintport</w>
       <w>keruis</w>
       <w>mainwindow</w>
+      <w>porttype</w>
     </words>
   </dictionary>
 </component>

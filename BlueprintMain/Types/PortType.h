@@ -1,0 +1,14 @@
+#ifndef BLUEPRINT_PORTTYPE_H
+#define BLUEPRINT_PORTTYPE_H
+
+enum PortType {
+    Input,
+    Output,
+    EVENT_OUTPUT,
+    EVENT_INPUT,
+    EVENT_TRUE_RETURN,
+    EVENT_FALSE_RETURN,
+    EVENT_CONDITION
+};
+
+#endif //BLUEPRINT_PORTTYPE_H

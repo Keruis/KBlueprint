@@ -1,5 +1,15 @@
 #include "../include/BlueprintFont.h"
 
+using namespace Blueprint;
+
+BlueprintFont::BlueprintFont() {
+
+}
+
+BlueprintFont::~BlueprintFont() {
+
+}
+
 QFont BlueprintFont::GetFont() const noexcept {
     return m_font;
 }

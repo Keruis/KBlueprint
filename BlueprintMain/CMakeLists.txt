@@ -4,7 +4,8 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
-        REQUIRED)
+        REQUIRED
+)
 
 # H
 target_sources(Blueprint PRIVATE
@@ -12,6 +13,8 @@ target_sources(Blueprint PRIVATE
         include/BlueprintPort.h
         include/BlueprintFont.h
         include/BlueprintNode.h
+        include/BlueprintConnection.h
+        Types/PortType.h
 )
 
 # CPP
@@ -20,6 +23,8 @@ target_sources(Blueprint PRIVATE
         src/BlueprintPort.cpp
         src/BlueprintFont.cpp
         src/BlueprintNode.cpp
+        src/BlueprintConnection.cpp
+        Types/MainType.cpp
 )
 
 # UI
@@ -36,13 +41,16 @@ target_sources(Blueprint PRIVATE
 target_sources(BlueprintModules
         PUBLIC
         FILE_SET CXX_MODULES FILES
-        Module/BlueprintPortType.ixx
         EventHelpers/EventHelpers.ixx
+        Types/DataType.ixx
+        Types/NodeType.ixx
 )
 
 target_sources(BlueprintModules
         PRIVATE
         EventHelpers/EventHelpers-impl.ixx
+        Types/DataType-impl.ixx
+        Types/NodeType-impl.ixx
 )
 
 set(RESOURCE_FILES
@@ -52,5 +60,5 @@ set(RESOURCE_FILES
 set(QRC_RESOURCE ${RESOURCE_FILES} PARENT_SCOPE)
 
 target_link_libraries(BlueprintModules PRIVATE
-        Qt6::Core Qt6::Widgets Qt6::Gui
+        Qt6::Core Qt6::Widgets Qt6::Gui Utils
 )

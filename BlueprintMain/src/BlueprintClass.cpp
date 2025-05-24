@@ -3,6 +3,8 @@
 
 import EventHelpers;
 
+using namespace Blueprint;
+
 BlueprintClass::BlueprintClass(QWidget *parent)
     : QGraphicsView(parent),
     m_ui(std::make_unique<Ui::BlueprintClass>()),
@@ -39,5 +41,5 @@ void BlueprintClass::Shutdown() noexcept {}
 
 // TEST
 void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
-    EventHelpers::showStandardContextMenu(this, event);
+    Blueprint::EventHelpers::showStandardContextMenu(this, event);
 }

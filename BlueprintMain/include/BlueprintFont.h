@@ -3,15 +3,19 @@
 
 #include <QFont>
 
-class BlueprintFont {
+namespace Blueprint {
+    class BlueprintFont {
 
-public:
-    void SetFont(const QFont& font) noexcept ;
-    [[nodiscard]] QFont GetFont() const noexcept ;
+    public:
+        BlueprintFont();
+        ~BlueprintFont();
 
-private:
-    QFont m_font;
-};
+        void SetFont(const QFont &font) noexcept;
+        [[nodiscard]] QFont GetFont() const noexcept;
 
+    private:
+        QFont m_font;
+    };
+}
 
 #endif //BLUEPRINT_BLUEPRINTFONT_H
