@@ -8,6 +8,9 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 #include <QMap>
+#include <QPropertyAnimation>
+#include <QGraphicsBlurEffect>
+#include <QTransform>
 
 #include <memory>
 #include <vector>
@@ -58,6 +61,7 @@ namespace Blueprint {
         void addConnection(BlueprintConnection* connection) noexcept ;
         void startConnectionDrag(const QPointF &startPos) noexcept ;
 
+        void smoothZoom() noexcept ;
     protected:
         void contextMenuEvent(QContextMenuEvent *event) override;
 
@@ -65,8 +69,16 @@ namespace Blueprint {
         bool m_panning = false;
         QPoint m_lastMousePos;
 
-        const double minScaleFactor = 0.1;
-        const double maxScaleFactor = 8.0;
+        double m_zoomLevel = 1.0;
+        double m_targetZoomLevel = 1.0;
+        double m_velocity = 0.0;
+        bool m_isDashing = false;
+
+        double m_blurLevel = 0.0;
+        double m_targetBlurLevel = 0.0;
+
+        QTimer *m_animationTimer = nullptr;
+        QGraphicsBlurEffect *m_blurEffect = nullptr;
 
         BlueprintPort *m_draggingPort = nullptr;
         BlueprintConnection *m_currentConnection = nullptr;

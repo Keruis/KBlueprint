@@ -75,6 +75,7 @@ BlueprintNode *BlueprintNode::clone() const {
     newNode->SetNodeName(this->m_name);
     newNode->SetClassName(this->m_className);
     newNode->SetNodeType(this->m_nodeType);
+    newNode->Initialize(m_nodeType);
 
     qDebug() << "node type :" << m_nodeType;
 
