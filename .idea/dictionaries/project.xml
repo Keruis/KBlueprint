@@ -11,7 +11,9 @@
       <w>blueprintport</w>
       <w>keruis</w>
       <w>mainwindow</w>
+      <w>nodetype</w>
       <w>porttype</w>
+      <w>vartype</w>
     </words>
   </dictionary>
 </component>

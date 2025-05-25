@@ -6,9 +6,14 @@
 #include <QFile>
 #include <QMenu>
 #include <QWheelEvent>
-#include <memory>
+#include <QScrollBar>
+#include <QMap>
 
+#include <memory>
+#include <vector>
 #include "BlueprintNode.h"
+#include "BlueprintConnection.h"
+#include "BlueprintPort.h"
 #include "../../Container/Vec/Vector.h"
 
 QT_BEGIN_NAMESPACE
@@ -27,21 +32,52 @@ namespace Blueprint {
         void Shutdown() noexcept;
 
         void PlaceNodeInScene(BlueprintNode* originalNode, const QPointF& mousePos) noexcept ;
+        void removeConnection(BlueprintConnection* connection) noexcept ;
+        // 更新与指定端口相关的所有连接
+        void updateConnectionsForPort(BlueprintPort *port);
+
+        Vector<BlueprintConnection*> GetConnections() noexcept ;
+
+        void propagateDataFromInitialNode(BlueprintPort* init) noexcept ;
+        bool areTypesCompatible(const QString& type1, const QString& type2) noexcept ;
+
+    protected:
+        void drawBackground(QPainter *painter, const QRectF &rect) override;
+        void wheelEvent(QWheelEvent *event) override;
+        void mousePressEvent(QMouseEvent *event) override;
+        void mouseMoveEvent(QMouseEvent *event) override;
+        void mouseReleaseEvent(QMouseEvent *event) override;
 
     private:
         void setupRendering() noexcept;
         void setupInteraction() noexcept;
         void setupAppearance() noexcept;
 
+        void updateAllConnections() noexcept ;
+
+        void addConnection(BlueprintConnection* connection) noexcept ;
+        void startConnectionDrag(const QPointF &startPos) noexcept ;
+
     protected:
         void contextMenuEvent(QContextMenuEvent *event) override;
 
     private:
+        bool m_panning = false;
+        QPoint m_lastMousePos;
+
+        const double minScaleFactor = 0.1;
+        const double maxScaleFactor = 8.0;
+
+        BlueprintPort *m_draggingPort = nullptr;
+        BlueprintConnection *m_currentConnection = nullptr;
+
         std::unique_ptr<Ui::BlueprintClass> m_ui;
         std::unique_ptr<QGraphicsScene> m_scene;
 
         Vector<BlueprintNode*> m_saveNodes; // 用于存储所有节点
         Vector<BlueprintNode*> m_sceneNodes; // 用于存储场景中的节点
+
+        Vector<BlueprintConnection*> m_connections;
     };
 }
 

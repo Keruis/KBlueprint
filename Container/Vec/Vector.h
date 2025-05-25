@@ -53,6 +53,9 @@ public:
     void resize(std::size_t new_size, ValueType val) noexcept ;
     void reserve(std::size_t new_capacity) noexcept ;
 
+    Iterator erase(Const_Iterator pos) noexcept;
+    Iterator erase(Const_Iterator first, Const_Iterator last) noexcept;
+
     void swap(Vector& other) noexcept ;
 
     void push_back(const ValueType& val) noexcept ;

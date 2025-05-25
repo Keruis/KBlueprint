@@ -15,6 +15,7 @@ target_sources(Blueprint PRIVATE
         include/BlueprintNode.h
         include/BlueprintConnection.h
         Types/PortType.h
+        Types/VarType.h
 )
 
 # CPP

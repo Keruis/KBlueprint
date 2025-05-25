@@ -78,6 +78,12 @@ template <typename Iterator>
         }
     }
 
+    template <typename Iter1, typename Iter2>
+    void moveAssign(Iter1 dest, Iter2 first, Iter2 last) {
+        while (first != last) {
+            *dest++ = std::move(*first++);
+        }
+    }
 } // namespace detail
 
 #endif // BLUEPRINT_DETAIL_H

@@ -1,4 +1,5 @@
 #include "../include/BlueprintPort.h"
+#include "../include/BlueprintConnection.h"
 
 using namespace Blueprint;
 
@@ -23,17 +24,17 @@ void BlueprintPort::Shutdown() noexcept {
 
 }
 
-BlueprintPort *BlueprintPort::clone() const noexcept {
+BlueprintPort *BlueprintPort::clone() const {
     BlueprintPort* new_port = new BlueprintPort(nullptr, this->m_type, this->m_name, this->m_dataType, this->m_portBrief);
     new_port->SetNodeType(this->m_parentNodeType);
     return new_port;
 }
 
-QRectF BlueprintPort::boundingRect() const noexcept {
+QRectF BlueprintPort::boundingRect() const {
     return QRectF(0, 0, 10, 10);
 }
 
-void BlueprintPort::paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget) noexcept {
+void BlueprintPort::paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     painter->setFont(m_font.GetFont());
 
     QFontMetrics fontMetrics(m_font.GetFont());
@@ -129,4 +130,64 @@ QString BlueprintPort::GetName() noexcept {
 
 PortType BlueprintPort::GetPortType() noexcept {
     return m_type;
+}
+#include "../include/BlueprintClass.h"
+
+void BlueprintPort::sendDataToConnectedPorts() noexcept {
+    // 获取当前场景
+    QGraphicsScene *currentScene = this->scene();
+    if (!currentScene) return;
+
+    // 获取 QBlueprint 视图
+    BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
+
+    if (blueprintView) {
+
+    }
+}
+
+void BlueprintPort::updateConnections() noexcept {
+    // 检查当前场景是否存在
+    QGraphicsScene *currentScene = this->scene();
+    if (!currentScene) return;  // 如果场景不存在，直接返回
+
+    BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
+
+    if (blueprintView)
+    {
+        // 更新该端口相关的所有连接
+        blueprintView->updateConnectionsForPort(this);
+    }
+}
+
+void BlueprintPort::removeConnections() noexcept {
+    QGraphicsScene *currentScene = this->scene();
+    BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
+
+    if (blueprintView)
+    {
+        std::vector<BlueprintConnection*> toRemove;
+        // 遍历所有连接，收集与此端口相关的连接
+        for (BlueprintConnection *connection : blueprintView->GetConnections())
+        {
+            if (connection->GetStartPort() == this || connection->GetEndPort() == this)
+            {
+                toRemove.push_back(connection);
+            }
+        }
+
+        // 删除所有相关连接
+        for (BlueprintConnection *connection : toRemove)
+        {
+            blueprintView->removeConnection(connection);
+        }
+    }
+}
+
+QString BlueprintPort::GetVarTypeName() const noexcept {
+    return QString::fromStdString(m_var.getDataTypeName());
+}
+
+QFont BlueprintPort::GetFont() noexcept {
+    return m_font.GetFont();
 }

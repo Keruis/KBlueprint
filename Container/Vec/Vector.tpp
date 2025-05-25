@@ -31,30 +31,51 @@ void Vector<Ty, Align>::DeallocateAligned() noexcept {
 
 template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::defaultInitialize(Vector::Iterator data, std::size_t count) noexcept {
-    Container::detail::defaultConstruct(data, data + count);
+    if constexpr (!std::is_trivially_default_constructible_v<ValueType>) {
+        for (std::size_t i = 0; i < count; i++)
+            new (data + i) ValueType();
+    }
 }
 
 template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::fillInitialize(Vector::Iterator data, std::size_t count,
                                        const Vector::ValueType &val) noexcept {
-    Container::detail::fillConstruct(data, data + count, val);
+    if constexpr (std::is_trivially_copy_constructible_v<ValueType>) {
+        std::fill(data, data + count, val);
+    } else {
+        for (std::size_t i = 0; i < count; i++)
+            new (data + i) ValueType(val);
+    }
 }
 
 template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::copyInitialize(Vector::Iterator dest, Vector::Const_Iterator src,
                                        std::size_t count) noexcept {
-    Container::detail::copyConstruct(dest, src, src + count);
+    if constexpr (std::is_trivially_copy_constructible_v<ValueType>) {
+        std::copy(src, src + count, dest);
+    } else {
+        for (std::size_t i = 0; i < count; i++)
+            new (dest + i) ValueType(src[i]);
+    }
 }
 
 template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::moveInitialize(Vector::Iterator dest, Vector::Iterator src,
                                        std::size_t count) noexcept {
-    Container::detail::moveConstruct(dest, src, src + count);
+    if constexpr (std::is_trivially_move_constructible_v<ValueType>) {
+        std::move(src, src + count, dest);
+    } else {
+        for (std::size_t i = 0; i < count; i++)
+            new (dest + i) ValueType(std::move(src[i]));
+    }
 }
 
 template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::destroyElements(Vector::Iterator data, std::size_t count) noexcept {
-    Container::detail::destroy(data, data + count);
+    if constexpr (std::is_trivially_destructible_v<ValueType>) {
+        for (std::size_t i = 0; i < count; i++)
+            data[i].~ValueType();
+    }
 }
 
 template <typename Ty, std::size_t Align>
@@ -107,7 +128,7 @@ Vector<Ty, Align>::Vector(const Vector<Ty, Align> &other)
 
 template <typename Ty, std::size_t Align>
 Vector<Ty, Align>::~Vector() {
-    destroyElements(m_data, m_size);
+    //destroyElements(m_data, m_size);
     DeallocateAligned();
 }
 
@@ -217,13 +238,50 @@ template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::reserve(std::size_t new_capacity) noexcept {
     if (new_capacity <= m_capacity) return;
 
+    std::cerr << "Reserving from " << m_capacity << " to " << new_capacity << "\n";
+
     Iterator new_data = AllocateAligned(new_capacity);
+    if (!new_data) {
+        std::cerr << "Allocation failed!\n";
+        std::terminate(); // 或抛出异常（但违反 noexcept）
+    }
+
     moveInitialize(new_data, m_data, m_size);
     destroyElements(m_data, m_size);
     DeallocateAligned();
 
     m_data = new_data;
     m_capacity = new_capacity;
+}
+
+template<typename Ty, std::size_t Align>
+Vector<Ty, Align>::Iterator Vector<Ty, Align>::erase(Vector::Const_Iterator pos) noexcept {
+    Iterator non_const_pos = const_cast<Iterator>(pos);
+    Iterator next = non_const_pos + 1;
+
+    if (next != end()) {
+        Container::detail::moveAssign(non_const_pos, next, end());
+    }
+
+    destroyElements(end() - 1, 1);
+    --m_size;
+    return non_const_pos;
+}
+
+template<typename Ty, std::size_t Align>
+Vector<Ty, Align>::Iterator Vector<Ty, Align>::erase(Vector::Const_Iterator first,
+                                                     Vector::Const_Iterator last) noexcept {
+    Iterator non_const_first = const_cast<Iterator>(first);
+    Iterator non_const_last = const_cast<Iterator>(last);
+    std::size_t count = non_const_last - non_const_first;
+
+    if (non_const_last != end()) {
+        Container::detail::moveAssign(non_const_first, non_const_last, end());
+    }
+
+    destroyElements(end() - count, count);
+    m_size -= count;
+    return non_const_first;
 }
 
 template <typename Ty, std::size_t Align>
@@ -235,11 +293,19 @@ void Vector<Ty, Align>::swap(Vector<Ty, Align> &other) noexcept {
 
 template <typename Ty, std::size_t Align>
 void Vector<Ty, Align>::push_back(const Vector::ValueType &val) noexcept {
-    if (m_size >= m_capacity) reserve(m_capacity == 0 ? 1 : m_capacity * 2);
+    // 检查容量
+    if (m_size >= m_capacity) {
+        reserve(m_capacity == 0 ? 1 : m_capacity * 2);
+    }
+
     if constexpr (std::is_trivially_copy_constructible_v<ValueType>) {
-        m_data[m_size++] = val;
+        // 平凡类型直接拷贝
+        std::memcpy(&m_data[m_size], &val, sizeof(ValueType));
+        ++m_size;
     } else {
-        new (m_data + m_size++) ValueType (val);
+        // 非平凡类型构造
+        new (&m_data[m_size]) ValueType(val);
+        ++m_size;
     }
 }
 

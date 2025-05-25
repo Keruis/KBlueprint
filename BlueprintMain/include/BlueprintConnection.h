@@ -2,7 +2,9 @@
 #define BLUEPRINT_BLUEPRINTCONNECTION_H
 
 #include <QObject>
+#include <QTimer>
 #include <QGraphicsItem>
+#include <QGraphicsScene>
 #include "BlueprintPort.h"
 
 namespace Blueprint {
@@ -12,6 +14,9 @@ namespace Blueprint {
     public:
         BlueprintConnection(BlueprintPort* startPort, BlueprintPort* endPort, QGraphicsItem* parent = nullptr);
         ~BlueprintConnection();
+
+        void Initialize() noexcept ;
+        void Shutdown() noexcept ;
 
         void UpdatePosition(const QPointF& startPos, const QPointF& endPos) noexcept ;
 
@@ -23,6 +28,11 @@ namespace Blueprint {
         BlueprintPort* GetEndPort() const;
         BlueprintPort* GetStartPort() const;
 
+    private:
+        void setupAnimation();
+        void clearSelection();
+        QColor getColorFromType(int type);
+
     protected:
         QPainterPath shape() const override;
         void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -30,7 +40,17 @@ namespace Blueprint {
     private:
         BlueprintPort* m_startPort;
         BlueprintPort* m_endPort;
+
+        QColor m_startColor;
+        QColor m_endColor;
+
+        QPointF m_startPoint;
+        QPointF m_endPoint;
+
         bool m_isSelected = false;
+
+        QTimer* m_animationTimer;
+        qreal m_animationProgress;
     };
 }
 
