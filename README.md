@@ -1,6 +1,5 @@
 # KBlueprint
-## LOL
-### ...
+## This is a simple blueprint implemented with Qt
 
 <h1 style="
   text-align: center;
