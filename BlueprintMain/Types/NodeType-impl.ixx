@@ -1,8 +1,7 @@
 module;
 #include <string>
+#include "../../utils/xml/xml.h"
 module NodeType;
-
-import XmlParse;
 
 namespace Types {
     NodeTypeManager::NodeTypeManager() {

@@ -9,8 +9,15 @@
       <w>blueprintfont</w>
       <w>blueprintnode</w>
       <w>blueprintport</w>
+      <w>getxml</w>
       <w>keruis</w>
+      <w>koption</w>
+      <w>kpainter</w>
+      <w>krect</w>
+      <w>kwidget</w>
+      <w>lerp</w>
       <w>mainwindow</w>
+      <w>nodestyle</w>
       <w>nodetype</w>
       <w>porttype</w>
       <w>vartype</w>

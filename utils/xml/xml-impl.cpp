@@ -1,12 +1,10 @@
-module;
-
+#include "xml.h"
 #include <string>
 #include <map>
 #include <fstream>
 #include <list>
 #include <sstream>
 
-module XmlParse;
 
 namespace Utils {
     Xml::Xml()
@@ -49,6 +47,7 @@ namespace Utils {
         return *this;
     }
 
+    bool Xml::empty() {return m_child == nullptr;}
     Xml::iterator Xml::begin(){return m_child->begin();}
     Xml::iterator Xml::end(){return m_child->end();}
     Xml::iterator Xml::erase(iterator it){it->clear();return m_child->erase(it);}

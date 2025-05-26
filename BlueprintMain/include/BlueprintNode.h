@@ -13,6 +13,7 @@
 #include "BlueprintFont.h"
 #include "BlueprintPort.h"
 #include "../../Container/Vec/Vector.h"
+#include "../Draw/PaintNode.h"
 
 namespace Blueprint {
     class BlueprintNode : public QObject, public QGraphicsItem {
@@ -55,16 +56,19 @@ namespace Blueprint {
         void addRadioButtonOptions(BlueprintPort* port) noexcept ;
         void addButtonToTopLeft() noexcept ;
         void addButtonToTopLeft(int type) noexcept ;
+        void addInputPortCondition(int type) noexcept ;
 
     protected:
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
         QRectF boundingRect() const override;
 
     private:
+        Paint::NodeStyle m_nodeStyle;
+
         BlueprintFont m_font;
         QString m_className;
         QString m_name;
-        int m_dataType;
+        int m_dataType{};
         int m_nodeType;
 
         Vector<BlueprintPort *> m_inputPorts; // 输入端口
@@ -77,7 +81,7 @@ namespace Blueprint {
 
         Vector<QString> m_relation; // 存放关系 ><=等
 
-        Vector<std::pair<QRadioButton*, QRadioButton*>> m_radioButtonOptions; // 存放关系 || &&
+        std::vector<std::pair<QRadioButton*, QRadioButton*>> m_radioButtonOptions; // 存放关系 || &&
         Vector<QString> m_radioButtonValues;
     };
 }

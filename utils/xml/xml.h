@@ -1,12 +1,9 @@
-module;
 #include <list>
 #include <map>
 #include <string>
 
-export module XmlParse;
-
 namespace Utils {
-    export class Xml {
+    class Xml {
     public:
         Xml();
         Xml(const char*);
@@ -19,6 +16,7 @@ namespace Utils {
         Xml& operator [] (const std::string&);
 
         typedef std::list<Xml>::iterator iterator;
+        bool empty();
         iterator begin();
         iterator end();
         iterator erase(iterator);

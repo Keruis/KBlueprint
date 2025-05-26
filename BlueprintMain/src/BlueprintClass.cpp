@@ -56,10 +56,10 @@ void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
     QPointF scenePos = mapToScene(event->pos());
 
     if (tt) {
-        BlueprintNode* tmp = new BlueprintNode(1, 1, nullptr);
+        BlueprintNode* tmp = new BlueprintNode(3, 1, nullptr);
         tmp->SetNodeName("A");
         tmp->SetClassName("Other");
-        //tmp->Initialize(1);
+        tmp->Initialize(1);
 
         BlueprintNode* tmp2 = new BlueprintNode(1, 1, nullptr);
         tmp2->SetNodeName("B");
@@ -166,19 +166,19 @@ void BlueprintClass::drawBackground(QPainter *painter, const QRectF &rect) {
 
 // 鼠标滚轮事件处理函数，用于触发平滑缩放和模糊过渡效果
 void BlueprintClass::wheelEvent(QWheelEvent *event) {
-    const double zoomStep = 0.25; // 每次滚动缩放步长
-    const double blurStep = 8.0;  // 每次滚动模糊步长
+    constexpr const double zoomStep = 0.25; // 每次滚动缩放步长
+    constexpr const double blurStep = 8.0;  // 每次滚动模糊步长
 
-    // 判断滚轮方向（向上滚动 -> 放大）
-    if (event->angleDelta().y() > 0) {
-        m_targetZoomLevel = std::min(m_zoomLevel + zoomStep, 3.0); // 设置目标缩放值，最大不超过 3.0
-        m_targetBlurLevel = std::min(m_blurLevel + blurStep, 15.0); // 设置目标模糊值，最大不超过 15.0
-        m_velocity = 0.45;  // 初始正向速度，用于平滑动画
-    } else { // 向下滚动 -> 缩小
-        m_targetZoomLevel = std::max(m_zoomLevel - 0.3, 0.5); // 设置目标缩放值，最小不小于 1.0
-        m_targetBlurLevel = std::max(m_blurLevel - blurStep, 0.0); // 设置目标模糊值，最小为 0.0
-        m_velocity = -0.45;  // 初始负向速度，用于平滑动画
-    }
+    EventHelpers::wheelEvent(
+            zoomStep,
+            blurStep,
+            event->angleDelta().y(),
+            m_targetZoomLevel,
+            m_targetBlurLevel,
+            m_zoomLevel,
+            m_blurLevel,
+            m_velocity
+    );
 
     m_isDashing = true;   // 启用平滑缩放动画
     event->accept();     // 标记事件已处理
@@ -186,26 +186,14 @@ void BlueprintClass::wheelEvent(QWheelEvent *event) {
 
 // 执行平滑缩放与模糊的动画过渡函数（需在定时器或帧更新中持续调用）
 void BlueprintClass::smoothZoom() noexcept {
-    if (m_isDashing) {  // 若正在缩放动画
-        m_velocity *= 0.62;   // 缓动：逐步衰减速度
-        if (std::abs(m_velocity) < 0.01) { // 若速度非常小，认为动画结束
-            m_isDashing = false;      // 停止动画
-            m_targetBlurLevel = 0.0; // 动画结束时模糊渐变为 0
-        }
-    }
-
-    // 平滑缩放：当前缩放值朝目标缩放值逼近，并叠加速度项
-    m_zoomLevel += (m_targetZoomLevel - m_zoomLevel) * 0.1 + m_velocity;
-    m_zoomLevel = std::clamp(m_zoomLevel, 0.1, 5.0);
-    if (m_zoomLevel <= 0.0 || !std::isfinite(m_zoomLevel)) {
-        m_zoomLevel = 1.0;
-        m_velocity = 0.0;
-        m_isDashing = false;
-        m_panning = false;
-    }
-
-    // 平滑模糊：当前模糊值朝目标模糊值逼近
-    m_blurLevel += (m_targetBlurLevel - m_blurLevel) * 0.1;
+    EventHelpers::smoothZoom(
+            m_isDashing,
+            m_velocity,
+            m_targetZoomLevel,
+            m_targetBlurLevel,
+            m_zoomLevel,
+            m_blurLevel
+            );
 
     // 应用缩放变换到视图
     QTransform t;
@@ -217,7 +205,7 @@ void BlueprintClass::smoothZoom() noexcept {
         m_blurEffect->setBlurRadius(m_blurLevel);   // 设置模糊半径
     }
 
-    updateAllConnections();   // 更新所有连接（自定义逻辑）
+    updateAllConnections();   // 更新所有连接
 }
 
 void BlueprintClass::mousePressEvent(QMouseEvent *event) {
@@ -275,43 +263,16 @@ void BlueprintClass::mousePressEvent(QMouseEvent *event) {
 }
 
 void BlueprintClass::mouseMoveEvent(QMouseEvent *event) {
-    if (m_panning && (event->buttons() & Qt::LeftButton)) {
-//        QPointF sceneDelta = event->pos() - m_lastMousePos;
-//        m_lastMousePos = event->pos();
-//
-//        // 反向移动滚动条
-//        qDebug() << "x : " << horizontalScrollBar()->value() << "        y : " << horizontalScrollBar()->value();
-//        qDebug() << "               sx : " << sceneDelta.x() << "                 sy : " << sceneDelta.y();
-//        qDebug() << "zoomLevel : " << m_zoomLevel;\
-//        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - sceneDelta.x());
-//        verticalScrollBar()->setValue(verticalScrollBar()->value() - sceneDelta.y());
-//
-//        event->accept();
-//        return;
-        QGraphicsView::mouseMoveEvent(event);
-    }
+    QPointF scenePos = mapToScene(event->pos());
 
-    // 如果在拖连线等
     if (m_draggingPort && m_currentConnection) {
-        QPointF scenePos = mapToScene(event->pos());
+        // 更新连接线位置
         m_currentConnection->UpdatePosition(m_draggingPort->centerPos(), scenePos);
     }
-
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void BlueprintClass::mouseReleaseEvent(QMouseEvent *event) {
-    if (m_panning && event->button()) {
-        m_panning = false;
-//        m_velocity = 0;
-//        m_isDashing = true;
-//        setCursor(Qt::ArrowCursor);
-//        qDebug() << "mouseReleaseEvent-Panning";
-//        event->accept();
-//        return;
-        QGraphicsView::mouseReleaseEvent(event);
-    }
-
     if (m_draggingPort && m_currentConnection) {
         // 将视图坐标转换为场景坐标
         QPointF scenePos = mapToScene(event->pos());

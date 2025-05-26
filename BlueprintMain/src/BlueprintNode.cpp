@@ -4,26 +4,30 @@ using namespace Blueprint;
 
 import NodeType;
 import DataType;
+
+
 #include <QPushButton>
 
 
 BlueprintNode::BlueprintNode(int type, int datatype, QGraphicsItem *parent)
     : QGraphicsItem(parent),
-      m_dataTypes(datatype)
+      m_dataTypes(datatype),
+      m_nodeType(type),
+      m_nodeStyle("NodeStyle.xml")
 {
 
 }
 
 BlueprintNode::~BlueprintNode() {
-
+    Shutdown();
 }
 
 void BlueprintNode::SetClassName(QString className) noexcept {
-    m_className = className;
+    m_className = std::move(className);
 }
 
 void BlueprintNode::SetNodeName(QString name) noexcept {
-    m_name = name;
+    m_name = std::move(name);
 }
 
 QString BlueprintNode::GetClassName() noexcept {
@@ -40,6 +44,8 @@ const Vector<BlueprintPort *> &BlueprintNode::GetOutputPorts() const noexcept {
 
 void BlueprintNode::Initialize(int type) noexcept {
     auto& nodeManager = Types::NodeTypeManager::instance();
+
+    m_nodeStyle.load();
 
     // 启用拖动（节点可以被鼠标拖动）
     setFlag(QGraphicsItem::ItemIsMovable);
@@ -101,8 +107,7 @@ BlueprintNode *BlueprintNode::clone() const {
     }
 
     // 克隆输出端口
-    for (size_t i = 0; i < this->m_outputPorts.size(); ++i) {
-        BlueprintPort* port = this->m_outputPorts[i];
+    for (auto port : this->m_outputPorts) {
         BlueprintPort* clonedPort = port->clone(); // 假设 QBlueprintPort 有一个 clone 方法
         clonedPort->setParentItem(newNode); // 设置父项为新的 QBlueprintNode
         newNode->m_outputPorts.push_back(clonedPort);
@@ -114,41 +119,13 @@ BlueprintNode *BlueprintNode::clone() const {
 }
 
 void BlueprintNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    auto& nodeManager = Types::NodeTypeManager::instance();
-
     // 设置节点的背景为圆角矩形
     QRectF rect = boundingRect();
-    painter->setBrush(Qt::gray);
-    painter->setPen(Qt::black);
-    painter->drawRoundedRect(rect, 10, 10);  // 绘制圆角矩形，10像素圆角
-
-    // 绘制内边框
-    QRectF innerRect = rect.adjusted(2, 2, -2, -2);  // 调整rect以绘制一个稍小的矩形，形成内边框效果
-    painter->setBrush(Qt::NoBrush);  // 内边框不填充
-    // 根据 nodeType 设置不同的内边框颜色
-    if (m_nodeType == nodeManager.getTypeId("FUNCTION"))
-        painter->setPen(QPen(QColor(0, 128, 255), 2));  // 设置内边框颜色为蓝色，宽度为2像素
-    else if (m_nodeType == nodeManager.getTypeId("INPUT"))
-        painter->setPen(QPen(QColor(0, 255, 0), 2));  // 设置内边框颜色为绿色，宽度为2像素
-    else if (m_nodeType == nodeManager.getTypeId("OUTPUT"))
-        painter->setPen(QPen(QColor(255, 0, 0), 2));  // 设置内边框颜色为红色，宽度为2像素
-    painter->drawRoundedRect(innerRect, 8, 8);  // 绘制内边框，圆角稍微小一点
-
-    // 设置字体大小并绘制标题
-    QFont font = painter->font();
-    font.setPointSize(10);  // 设置字体大小
-    painter->setFont(font);
-    painter->setPen(Qt::black);
-
-    // 设置标题区域
-    QRectF titleRect = QRectF(rect.left(), rect.top(), rect.width(), 30);  // 标题区域高度为30
-    painter->drawText(titleRect, Qt::AlignCenter, m_name);  // 居中绘制标题
-
-    // 在标题和端口区域之间绘制一条分割线
-    painter->setPen(QPen(Qt::black, 1));  // 设置线条颜色和宽度
-    painter->drawLine(rect.left(), titleRect.bottom(), rect.right(), titleRect.bottom());
+    m_nodeStyle.paintNode(painter, rect, m_nodeType, m_name);
 
     customNodePortSort();
+
+    update();
 }
 
 QRectF BlueprintNode::boundingRect() const {
@@ -490,7 +467,7 @@ void BlueprintNode::addRadioButtonOptions(BlueprintPort *port) noexcept {
     orOption->setChecked(true);
 
     // 初始化 radioButtonOptions 和 radioButtonValues
-    m_radioButtonOptions.push_back({orOption, andOption});
+    m_radioButtonOptions.emplace_back(orOption, andOption);
     m_radioButtonValues.push_back("||");  // 默认选中 "||"
 
     // 将单选按钮添加到布局
@@ -509,30 +486,30 @@ void BlueprintNode::addRadioButtonOptions(BlueprintPort *port) noexcept {
     containerWidget->setLayout(layout);
     containerWidget->setFixedSize(235, 20);  // 缩小容器的大小
 
-    int currentIndex = m_radioButtonOptions.size() - 1;  // 获取当前的索引
+    unsigned long currentIndex = m_radioButtonOptions.size() - 1;  // 获取当前的索引
     qDebug() << "radioButtonValues:" <<m_radioButtonValues.size();
     // 连接单选按钮的信号到槽函数，用于处理选择的变化
-    connect(orOption, &QRadioButton::toggled, this, [&](bool checked) {
-        if (checked) {
-            m_radioButtonValues[currentIndex] = "||";  // 更新当前选项为 "||"
-            qDebug() << "选择了 || 选项";
-
-        }
-    });
-
-    connect(andOption, &QRadioButton::toggled, this, [&](bool checked) {
-        if (checked) {
-            m_radioButtonValues[currentIndex] = "&&";  // 更新当前选项为 "&&"
-            qDebug() << "选择了 && 选项";
-            //processData(nullptr, QVariant());
-
-        }
-    });
+//    connect(orOption, &QRadioButton::toggled, this, [&](bool checked) {
+//        if (checked) {
+//            m_radioButtonValues[currentIndex] = "||";
+//            qDebug() << "选择了 || 选项";
+//
+//        }
+//    });
+//
+//    connect(andOption, &QRadioButton::toggled, this, [&](bool checked) {
+//        if (checked) {
+//            m_radioButtonValues[currentIndex] = "&&";
+//            qDebug() << "选择了 && 选项";
+//            //processData(nullptr, QVariant());
+//
+//        }
+//    });
 }
 
 void BlueprintNode::addButtonToTopLeft() noexcept {
     auto& nodeManager = Types::NodeTypeManager::instance();
-    auto& dataManager = Types::DataTypeManager::instance();
+
     // 创建 QPushButton
     QPushButton* button = new QPushButton("+");
     // 创建 QGraphicsProxyWidget 并将按钮嵌入其中
@@ -558,6 +535,7 @@ void BlueprintNode::addButtonToTopLeft() noexcept {
     // 设置按钮的点击事件
     connect(button, &QPushButton::clicked, [&]() {
         qDebug() << "Button clicked!";
+        addInputPortCondition(nodeManager.getTypeId("FUNCTION"));
     });
 }
 
@@ -589,5 +567,20 @@ void BlueprintNode::addButtonToTopLeft(int type) noexcept {
         //addInputPortCondition(Type::CONDITION);
         qDebug() << "Clicked";
     });
+}
+
+void BlueprintNode::addInputPortCondition(int type) noexcept {
+    auto& dataManager = Types::DataTypeManager::instance();
+    BlueprintPort *port =new BlueprintPort(this, PortType::Input, "Condition", m_dataType, QString::fromStdString(dataManager.getTypeName(m_dataType)));
+    port->SetNodeType(m_nodeType);
+    SetVariantType(port);
+    m_inputPorts.push_back(port);
+    AddOutputPort(Type);
+    customNodePortSort();
+    addOutputLabel(port, port);
+    if(m_inputPorts.size()>1) {
+        addRadioButtonOptions(port);
+    }
+    port->SetVarType(bool());
 }
 

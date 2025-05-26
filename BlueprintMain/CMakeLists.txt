@@ -16,6 +16,7 @@ target_sources(Blueprint PRIVATE
         include/BlueprintConnection.h
         Types/PortType.h
         Types/VarType.h
+        Draw/PaintNode.h
 )
 
 # CPP
@@ -25,6 +26,7 @@ target_sources(Blueprint PRIVATE
         src/BlueprintFont.cpp
         src/BlueprintNode.cpp
         src/BlueprintConnection.cpp
+        Draw/PaintNode-impl.cpp
 )
 
 # UI

@@ -67,7 +67,6 @@ namespace Blueprint {
 
     private:
         bool m_panning = false;
-        QPoint m_lastMousePos;
 
         double m_zoomLevel = 1.0;
         double m_targetZoomLevel = 1.0;

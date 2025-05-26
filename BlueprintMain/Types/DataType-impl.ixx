@@ -1,8 +1,7 @@
 module;
 #include <string>
+#include "../../utils/xml/xml.h"
 module DataType;
-
-import XmlParse;
 
 namespace Types {
     DataTypeManager::DataTypeManager() {

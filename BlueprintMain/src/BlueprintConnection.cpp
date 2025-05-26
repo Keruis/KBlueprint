@@ -212,5 +212,5 @@ QColor Blueprint::BlueprintConnection::getColorFromType(int type) {
     else if (type == manager.getTypeId("BRANCH"))
         return QColor(0,125,125);
     else
-        qDebug() <<"unkown type:" <<type;
+        return QColor(0,125,125);
 }
