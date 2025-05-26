@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <QColor>
+#include <QBrush>
 
 namespace Paint {
     #define ColorToStr(x) #x
@@ -30,6 +31,28 @@ namespace Paint {
             ColorToStyleM(Qt::darkMagenta),
             ColorToStyleM(Qt::darkYellow),
             ColorToStyleM(Qt::transparent)
+    };
+
+    inline std::map<std::string, Qt::BrushStyle> BrushQtStyle {
+            ColorToStyleM(Qt::NoBrush),
+            ColorToStyleM(Qt::SolidPattern),
+            ColorToStyleM(Qt::Dense1Pattern),
+            ColorToStyleM(Qt::Dense2Pattern),
+            ColorToStyleM(Qt::Dense3Pattern),
+            ColorToStyleM(Qt::Dense4Pattern),
+            ColorToStyleM(Qt::Dense5Pattern),
+            ColorToStyleM(Qt::Dense6Pattern),
+            ColorToStyleM(Qt::Dense7Pattern),
+            ColorToStyleM(Qt::HorPattern),
+            ColorToStyleM(Qt::VerPattern),
+            ColorToStyleM(Qt::CrossPattern),
+            ColorToStyleM(Qt::BDiagPattern),
+            ColorToStyleM(Qt::FDiagPattern),
+            ColorToStyleM(Qt::DiagCrossPattern),
+            ColorToStyleM(Qt::LinearGradientPattern),
+            ColorToStyleM(Qt::RadialGradientPattern),
+            ColorToStyleM(Qt::ConicalGradientPattern),
+            ColorToStyleM(Qt::TexturePattern)
     };
 }
 #endif //BLUEPRINT_STYLETYPE_H

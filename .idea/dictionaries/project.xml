@@ -19,7 +19,9 @@
       <w>mainwindow</w>
       <w>nodestyle</w>
       <w>nodetype</w>
+      <w>paintnode</w>
       <w>porttype</w>
+      <w>styletype</w>
       <w>vartype</w>
     </words>
   </dictionary>

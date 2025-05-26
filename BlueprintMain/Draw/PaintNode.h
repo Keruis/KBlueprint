@@ -21,7 +21,7 @@ namespace Paint {
 
         void load() noexcept ;
 
-        void paintNode(QPainter* painter, QRectF& rect, int type, QString name) noexcept ;
+        void paintNode(QPainter* painter, QRectF& rect, int type, const QString& name) noexcept ;
 
         std::map<std::string,
                 std::pair<
@@ -36,6 +36,7 @@ namespace Paint {
 
     private:
         Utils::Xml m_xml;
+        std::string StyleID = "Style-1";
         std::map<std::string,
             std::pair<
                 std::string,

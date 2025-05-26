@@ -1,0 +1,29 @@
+<NodeStyle>
+  <Style-1 NodeType="FUNCTION, INPUT">
+    <Background>Qt::gray</Background>
+    <BorderWidth>2</BorderWidth>
+    <BorderColor>Qt::red</BorderColor>
+    <Radius>20</Radius>
+    <xRadius>10</xRadius>
+    <yRadius>10</yRadius>
+    <BorderStyle>Qt::NoBrush</BorderStyle>
+      <FUNCTION>
+        <InnerBorderColor>Qt::green</InnerBorderColor>
+        <InnerBorderWidth>2</InnerBorderWidth>
+      </FUNCTION>
+    <FontSize>10</FontSize>
+    <FontColor>Qt::red</FontColor>
+    <DividerColor>Qt::black</DividerColor>
+    <DividerWidth>1</DividerWidth>
+  </Style-1>
+
+  <Style-2>
+
+  </Style-2>
+  <Style-3>
+
+    </Style-3>
+  <Style-4>
+
+    </Style-4>
+</NodeStyle>

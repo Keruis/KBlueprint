@@ -51,40 +51,67 @@ namespace Paint {
         printNodeStyle();
     }
 
-    void NodeStyle::paintNode(QPainter* painter, QRectF& rect, int type, QString name) noexcept {
+    void NodeStyle::paintNode(QPainter* painter, QRectF& rect, int type, const QString& name) noexcept {
         auto& nodeManager = Types::NodeTypeManager::instance();
 
-        std::string NodeType = nodeManager.getTypeName(type);
+        painter->setBrush(
+                m_xml[StyleID]["Background"].text().empty()
+                ? Qt::gray
+                : ColorQtStyle[m_xml[StyleID]["Background"].text()]
+        );
 
-        painter->setBrush(ColorQtStyle[m_xml["Style-1"]["Brush"].text()]);
+        int BorderWidth = m_xml[StyleID]["BorderWidth"].text().empty()
+                ? 1
+                : std::stoi(m_xml[StyleID]["BorderWidth"].text());
 
-        painter->setPen(Qt::black);
-        painter->drawRoundedRect(rect, 10, 10);
+        painter->setPen(QPen(m_xml[StyleID]["BorderColor"].text().empty()
+                ? Qt::black
+                : ColorQtStyle[m_xml[StyleID]["BorderColor"].text()]
+                , BorderWidth));
+
+        painter->drawRoundedRect(rect, m_xml[StyleID]["xRadius"].text().empty()
+                ? m_xml[StyleID]["Radius"].text().empty()
+                ? 10 : std::stoi(m_xml[StyleID]["Radius"].text())
+                : std::stoi(m_xml[StyleID]["xRadius"].text()), m_xml[StyleID]["yRadius"].text().empty()
+                        ? m_xml[StyleID]["Radius"].text().empty()
+                        ? 10 : std::stoi(m_xml[StyleID]["Radius"].text())
+                        : std::stoi(m_xml[StyleID]["yRadius"].text()));
 
         // 绘制内边框
-        QRectF innerRect = rect.adjusted(2, 2, -2, -2);  // 调整rect以绘制一个稍小的矩形，形成内边框效果
-        painter->setBrush(Qt::NoBrush);  // 内边框不填充
-        // 根据 nodeType 设置不同的内边框颜色
-        if (type == nodeManager.getTypeId("FUNCTION"))
-            painter->setPen(QPen(QColor(0, 128, 255), 2));  // 设置内边框颜色为蓝色，宽度为2像素
-        else if (type == nodeManager.getTypeId("INPUT"))
-            painter->setPen(QPen(QColor(0, 255, 0), 2));  // 设置内边框颜色为绿色，宽度为2像素
-        else if (type == nodeManager.getTypeId("OUTPUT"))
-            painter->setPen(QPen(QColor(255, 0, 0), 2));  // 设置内边框颜色为红色，宽度为2像素
-        painter->drawRoundedRect(innerRect, 8, 8);  // 绘制内边框，圆角稍微小一点
+        QRectF innerRect = rect.adjusted(2, 2, -2, -2);
+        painter->setBrush(m_xml[StyleID]["BorderStyle"].text().empty()
+                          ? Qt::NoBrush
+                          : BrushQtStyle[m_xml[StyleID]["BorderStyle"].text()]);
+
+        painter->setPen(QPen(
+                ColorQtStyle[m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderColor"].text().empty() ? "Qt::blue" : m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderColor"].text()]
+                , m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderWidth"].text().empty()
+                ? 2
+                : std::stoi(m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderWidth"].text())));
+
+        painter->drawRoundedRect(innerRect, 8, 8);
 
         // 设置字体大小并绘制标题
         QFont font = painter->font();
-        font.setPointSize(10);  // 设置字体大小
+        font.setPointSize(m_xml[StyleID]["FontSize"].text().empty()
+                          ? 10
+                          : std::stoi(m_xml[StyleID]["FontSize"].text()));  // 设置字体大小
         painter->setFont(font);
-        painter->setPen(Qt::black);
+        painter->setPen(m_xml[StyleID]["FontColor"].text().empty()
+                        ? Qt::black
+                        : ColorQtStyle[m_xml[StyleID]["FontColor"].text()]);
 
         // 设置标题区域
         QRectF titleRect = QRectF(rect.left(), rect.top(), rect.width(), 30);  // 标题区域高度为30
         painter->drawText(titleRect, Qt::AlignCenter, name);  // 居中绘制标题
 
         // 在标题和端口区域之间绘制一条分割线
-        painter->setPen(QPen(Qt::black, 1));  // 设置线条颜色和宽度
+        painter->setPen(QPen(m_xml[StyleID]["DividerColor"].text().empty()
+                             ? Qt::black
+                             : ColorQtStyle[m_xml[StyleID]["DividerColor"].text()],
+                             m_xml[StyleID]["DividerWidth"].text().empty()
+                             ? 1
+                             : std::stoi(m_xml[StyleID]["DividerWidth"].text())));  // 设置线条颜色和宽度
         painter->drawLine(rect.left(), titleRect.bottom(), rect.right(), titleRect.bottom());
     }
 }

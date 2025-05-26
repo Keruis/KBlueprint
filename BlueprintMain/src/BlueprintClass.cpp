@@ -56,10 +56,10 @@ void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
     QPointF scenePos = mapToScene(event->pos());
 
     if (tt) {
-        BlueprintNode* tmp = new BlueprintNode(3, 1, nullptr);
+        BlueprintNode* tmp = new BlueprintNode(0, 1, nullptr);
         tmp->SetNodeName("A");
         tmp->SetClassName("Other");
-        tmp->Initialize(1);
+        tmp->Initialize(0);
 
         BlueprintNode* tmp2 = new BlueprintNode(1, 1, nullptr);
         tmp2->SetNodeName("B");
@@ -273,6 +273,7 @@ void BlueprintClass::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void BlueprintClass::mouseReleaseEvent(QMouseEvent *event) {
+    m_panning = false;
     if (m_draggingPort && m_currentConnection) {
         // 将视图坐标转换为场景坐标
         QPointF scenePos = mapToScene(event->pos());
