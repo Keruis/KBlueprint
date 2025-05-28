@@ -10,6 +10,7 @@
 #include <QRegularExpressionValidator>
 #include <QHBoxLayout>
 #include <QRadioButton>
+#include <QGraphicsBlurEffect>
 #include "BlueprintFont.h"
 #include "BlueprintPort.h"
 #include "../../Container/Vec/Vector.h"
@@ -64,6 +65,8 @@ namespace Blueprint {
 
     private:
         Paint::NodeStyle m_nodeStyle;
+
+        QGraphicsBlurEffect* m_blurEffect;
 
         BlueprintFont m_font;
         QString m_className;

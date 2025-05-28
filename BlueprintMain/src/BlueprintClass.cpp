@@ -137,31 +137,7 @@ void BlueprintClass::updateConnectionsForPort(BlueprintPort *port) {
 void BlueprintClass::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
 
-    // 绘制网格背景
-    const int gridSize = 20;  // 网格大小
-    QPen lightPen(QColor(60, 60, 60), 1);  // 浅色网格线
-    QPen darkPen(QColor(25, 25, 25), 2);   // 深色网格线
-
-    // 获取当前视图的矩形区域
-    QRectF viewRect = rect;
-
-    // 绘制小网格线
-    painter->setPen(lightPen);
-    for (qreal x = std::floor(viewRect.left() / gridSize) * gridSize; x < viewRect.right(); x += gridSize) {
-        painter->drawLine(QLineF(x, viewRect.top(), x, viewRect.bottom()));
-    }
-    for (qreal y = std::floor(viewRect.top() / gridSize) * gridSize; y < viewRect.bottom(); y += gridSize) {
-        painter->drawLine(QLineF(viewRect.left(), y, viewRect.right(), y));
-    }
-
-    // 绘制大网格线（每隔5个小网格）
-    painter->setPen(darkPen);
-    for (qreal x = std::floor(viewRect.left() / (gridSize * 5)) * (gridSize * 5); x < viewRect.right(); x += gridSize * 5) {
-        painter->drawLine(QLineF(x, viewRect.top(), x, viewRect.bottom()));
-    }
-    for (qreal y = std::floor(viewRect.top() / (gridSize * 5)) * (gridSize * 5); y < viewRect.bottom(); y += gridSize * 5) {
-        painter->drawLine(QLineF(viewRect.left(), y, viewRect.right(), y));
-    }
+    m_background.DrawBackground(painter, rect);
 }
 
 // 鼠标滚轮事件处理函数，用于触发平滑缩放和模糊过渡效果

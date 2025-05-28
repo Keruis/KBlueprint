@@ -15,7 +15,12 @@ BlueprintNode::BlueprintNode(int type, int datatype, QGraphicsItem *parent)
       m_nodeType(type),
       m_nodeStyle("NodeStyle.xml")
 {
+    QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect(this);
+    shadowEffect->setBlurRadius(10);
+    shadowEffect->setColor(QColor(0, 0, 0, 100)); // 半透明黑色
+    shadowEffect->setOffset(15, 15); // 阴影偏移
 
+    this->setGraphicsEffect(shadowEffect);
 }
 
 BlueprintNode::~BlueprintNode() {
@@ -44,8 +49,6 @@ const Vector<BlueprintPort *> &BlueprintNode::GetOutputPorts() const noexcept {
 
 void BlueprintNode::Initialize(int type) noexcept {
     auto& nodeManager = Types::NodeTypeManager::instance();
-
-    m_nodeStyle.load();
 
     // 启用拖动（节点可以被鼠标拖动）
     setFlag(QGraphicsItem::ItemIsMovable);
@@ -360,7 +363,7 @@ void BlueprintNode::addOutputLabel(BlueprintPort *outport, BlueprintPort *inport
     if(m_nodeType == nodeManager.getTypeId("BRANCH"))
         pMyProxy->resize(QSize(50, 20));
     else
-        pMyProxy->resize(QSize(100, 20));
+        pMyProxy->resize(QSize(60, 20));
 
     // 添加克隆的 QLineEdit 到新的节点的 lineEdits 列表
     m_outputLabel.push_back(pLabel);
@@ -520,21 +523,21 @@ void BlueprintNode::addButtonToTopLeft() noexcept {
     // 使用样式表将按钮绘制成一个圆
     button->setStyleSheet(
             "QPushButton {"
-            "    background-color: #4CAF50;"  // 按钮背景颜色（绿色）
-            "    color: white;"  // 按钮文字颜色（白色）
+            "    background-color: #DFFFD6;"  // 按钮背景颜色（绿色）
+            "    color: black;"  // 按钮文字颜色（白色）
             "    border: none;"  // 无边框
-            "    border-radius: 0px;"  // 设置圆角半径，半径为按钮尺寸的一半
+            "    border-radius: 5px;"  // 设置圆角半径，半径为按钮尺寸的一半
             "}"
             "QPushButton:pressed {"
-            "    background-color: #45a049;"  // 点击时的背景颜色
+            "    background-color: #DFFFD6;"  // 点击时的背景颜色
             "}"
     );
     buttonProxy->setWidget(button);
-    buttonProxy->setPos(10, 10);
+    buttonProxy->setPos(10, 5);
 
     // 设置按钮的点击事件
     connect(button, &QPushButton::clicked, [&]() {
-        qDebug() << "Button clicked!";
+        qDebug() << "Button clicked! - addButtonToTopLeft";
         addInputPortCondition(nodeManager.getTypeId("FUNCTION"));
     });
 }
@@ -571,7 +574,7 @@ void BlueprintNode::addButtonToTopLeft(int type) noexcept {
 
 void BlueprintNode::addInputPortCondition(int type) noexcept {
     auto& dataManager = Types::DataTypeManager::instance();
-    BlueprintPort *port =new BlueprintPort(this, PortType::Input, "Condition", m_dataType, QString::fromStdString(dataManager.getTypeName(m_dataType)));
+    BlueprintPort *port =new BlueprintPort(this, PortType::Input, "Test", m_dataType, QString::fromStdString(dataManager.getTypeName(m_dataType)));
     port->SetNodeType(m_nodeType);
     SetVariantType(port);
     m_inputPorts.push_back(port);

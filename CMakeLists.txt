@@ -21,6 +21,7 @@ add_executable(Blueprint
         MainWindow.cpp
         MainWindow.h
         MainWindow.ui
+        BlueprintMain/Draw/Background.h
 )
 
 add_subdirectory(utils)

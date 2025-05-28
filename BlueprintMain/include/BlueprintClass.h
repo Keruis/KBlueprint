@@ -18,6 +18,7 @@
 #include "BlueprintConnection.h"
 #include "BlueprintPort.h"
 #include "../../Container/Vec/Vector.h"
+#include "../Draw/Background.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BlueprintClass; }
@@ -66,6 +67,8 @@ namespace Blueprint {
         void contextMenuEvent(QContextMenuEvent *event) override;
 
     private:
+        BlueprintBackground m_background;
+
         bool m_panning = false;
 
         double m_zoomLevel = 1.0;

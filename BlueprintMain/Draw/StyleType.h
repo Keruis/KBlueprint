@@ -54,5 +54,22 @@ namespace Paint {
             ColorToStyleM(Qt::ConicalGradientPattern),
             ColorToStyleM(Qt::TexturePattern)
     };
+
+    inline std::map<std::string, Qt::AlignmentFlag> AlignmentFlagQtStyle {
+            ColorToStyleM(Qt::AlignLeft),
+            ColorToStyleM(Qt::AlignLeading),
+            ColorToStyleM(Qt::AlignRight),
+            ColorToStyleM(Qt::AlignTrailing),
+            ColorToStyleM(Qt::AlignHCenter),
+            ColorToStyleM(Qt::AlignJustify),
+            ColorToStyleM(Qt::AlignAbsolute),
+            ColorToStyleM(Qt::AlignHorizontal_Mask),
+            ColorToStyleM(Qt::AlignTop),
+            ColorToStyleM(Qt::AlignBottom),
+            ColorToStyleM(Qt::AlignVCenter),
+            ColorToStyleM(Qt::AlignBaseline),
+            ColorToStyleM(Qt::AlignVertical_Mask),
+            ColorToStyleM(Qt::AlignCenter)
+    };
 }
 #endif //BLUEPRINT_STYLETYPE_H

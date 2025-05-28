@@ -19,7 +19,7 @@ namespace Blueprint {
     public:
         BlueprintPort(QGraphicsItem* parent,
                       PortType type,
-                      const QString& name,
+                      QString  name,
                       int dataType,
                       QString brief
                       );

@@ -1,14 +1,16 @@
+#include <utility>
+
 #include "../include/BlueprintPort.h"
 #include "../include/BlueprintConnection.h"
 
 using namespace Blueprint;
 
-BlueprintPort::BlueprintPort(QGraphicsItem *parent, PortType type, const QString &name, int dataType, QString brief)
+BlueprintPort::BlueprintPort(QGraphicsItem *parent, PortType type, QString name, int dataType, QString brief)
     : QGraphicsItem(parent),
       m_type(type),
-      m_name(name),
+      m_name(std::move(name)),
       m_dataType(dataType),
-      m_portBrief(brief)
+      m_portBrief(std::move(brief))
 {
 
 }

@@ -1,117 +1,237 @@
 #include "PaintNode.h"
 
 import NodeType;
+#include <QPainterPath>
 
 namespace Paint {
     NodeStyle::NodeStyle(const std::string &filePath) noexcept {
         m_xml.load(filePath);
+        updateNodeStyle();
     }
 
-    void NodeStyle::printNodeStyle() const noexcept {
-        std::cout << "=== NodeStyle Data ===\n";
-        for (const auto& [nodeName, nodeEntry] : m_NodeStyle) {
-            std::cout << "Node: " << nodeName << "\n";
-            std::cout << "  NodeType: " << nodeEntry.first << "\n";
-            std::cout << "  Children:\n";
+    std::vector<int> NodeStyle::parseStringToIntVector(const std::string &input) {
+        std::vector<int> result;
+        std::stringstream ss(input);
+        std::string item;
 
-            for (const auto& childMap : nodeEntry.second) {
-                std::cout << "    [";
-                bool first = true;
-                for (const auto& [childName, childText] : childMap) {
-                    if (!first) std::cout << ", ";
-                    std::cout << childName << "=" << childText;
-                    first = false;
-                }
-                std::cout << "]\n";
+        while (std::getline(ss, item, ',')) {
+            item.erase(item.begin(), std::find_if(item.begin(), item.end(), [](unsigned char ch) {
+                return !std::isspace(ch);
+            }));
+            item.erase(std::find_if(item.rbegin(), item.rend(), [](unsigned char ch) {
+                return !std::isspace(ch);
+            }).base(), item.end());
+
+            try {
+                int num = std::stoi(item);
+                result.push_back(num);
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "警告: 无法将 '" << item << "' 转换为整数，已跳过" << std::endl;
+            } catch (const std::out_of_range& e) {
+                std::cerr << "警告: 数字 '" << item << "' 超出范围，已跳过" << std::endl;
             }
-            std::cout << "\n"; // 分隔不同节点
         }
+
+        return result;
     }
 
-    void NodeStyle::load() noexcept {
-        for (auto& it : m_xml) {
-            // 获取当前节点的NodeType属性
-            const std::string nodeType = it.attr("NodeType");
-            // 获取或创建当前节点的条目
-            auto& nodeEntry = m_NodeStyle[it.name()];
-            nodeEntry.first = nodeType;  // 设置NodeType
+    QColor NodeStyle::GetXmlStyleColor(const std::string& style, QColor defaultColor) noexcept {
+        if (style.empty()) {
+            return defaultColor;
+        } else if (
+                [&]() -> bool{
+                    size_t start = style.find_first_not_of(" \t\n\r\f\v");
+                    if (start == std::string::npos) {
+                        return false; // 全是空格
+                    }
 
-            // 遍历当前节点的所有子节点
-            if (!it.empty()) {
-                for (auto &ss: it) {
-                    // 将子节点的name和text存入map
-                    std::map<std::string, std::string> attrMap;
-                    attrMap[ss.name()] = ss.text();
+                    // 检查剩余部分是否至少有4个字符
+                    if (style.size() - start < 4) {
+                        return false;
+                    }
 
-                    // 将map添加到vector中
-                    nodeEntry.second.emplace_back(std::move(attrMap));
-                }
-            }
+                    // 比较前4个字符是否为 "Qt::"
+                    return style.substr(start, 4) == "Qt::";
+                }()
+           ) {
+            return ColorQtStyle[style];
         }
-        printNodeStyle();
+        std::vector<int> colorTmp = parseStringToIntVector(style);
+        while (colorTmp.size() < 4) {
+            colorTmp.push_back(255);
+        }
+        return QColor(colorTmp[0], colorTmp[1], colorTmp[2], colorTmp[3]);
+    }
+
+    Qt::BrushStyle NodeStyle::GetXmlStyleBrush(const std::string& style, Qt::BrushStyle defaultBrush) noexcept {
+        if (style.empty()) {
+            return defaultBrush;
+        }
+        if ([&]() -> bool{
+                size_t start = style.find_first_not_of(" \t\n\r\f\v");
+                if (start == std::string::npos) {
+                    return false; // 全是空格
+                }
+
+                // 检查剩余部分是否至少有4个字符
+                if (style.size() - start < 4) {
+                    return false;
+                }
+
+                // 比较前4个字符是否为 "Qt::"
+                return style.substr(start, 4) == "Qt::";
+        }()) {
+            return BrushQtStyle[style];
+        }
+        return defaultBrush;
+    }
+
+    int NodeStyle::GetXmlStyleSum(const std::string &style, int defaultSum) {
+        if (style.empty()) {
+            return defaultSum;
+        }
+
+        std::vector<int> tmpSum = parseStringToIntVector(style);
+
+        return tmpSum[0];
+    }
+
+    Qt::AlignmentFlag
+    NodeStyle::GetXmlStyleAlignmentFlag(const std::string &style, Qt::AlignmentFlag defaultAlignmentFlag) noexcept {
+        if (style.empty()) {
+            return defaultAlignmentFlag;
+        }
+        if ([&]() -> bool{
+            size_t start = style.find_first_not_of(" \t\n\r\f\v");
+            if (start == std::string::npos) {
+                return false; // 全是空格
+            }
+
+            // 检查剩余部分是否至少有4个字符
+            if (style.size() - start < 4) {
+                return false;
+            }
+
+            // 比较前4个字符是否为 "Qt::"
+            return style.substr(start, 4) == "Qt::";
+        }()) {
+            return AlignmentFlagQtStyle[style];
+        }
+        return defaultAlignmentFlag;
+    }
+
+    void NodeStyle::updateNodeStyle() noexcept {
+        m_BackgroundColor = GetXmlStyleColor(m_xml[StyleID]["Background"]["Color"].text(), Qt::gray);
+        m_BackgroundBorderWidth = GetXmlStyleSum(m_xml[StyleID]["Background"]["BorderWidth"].text(), 1);
+        m_BackgroundBorderColor = GetXmlStyleColor(m_xml[StyleID]["Background"]["BorderColor"].text(), Qt::black);
+        int TmpRadius = GetXmlStyleSum(m_xml[StyleID]["Background"]["Radius"].text(), 10);
+        m_BackgroundRadiusX = GetXmlStyleSum(m_xml[StyleID]["Background"]["xRadius"].text(), TmpRadius);
+        m_BackgroundRadiusY = GetXmlStyleSum(m_xml[StyleID]["Background"]["yRadius"].text(), TmpRadius);
+        m_BackgroundBorderStyle = GetXmlStyleBrush(m_xml[StyleID]["Background"]["BorderStyle"].text(), Qt::NoBrush);
+        m_FontSize = GetXmlStyleSum(m_xml[StyleID]["FontSize"].text(), 10);
+        m_FontColor = GetXmlStyleColor(m_xml[StyleID]["FontColor"].text(), Qt::black);
+        m_TitleBackgroundColor = GetXmlStyleColor(m_xml[StyleID]["TitleBackgroundColor"].text(), QColor(128, 128, 128, 220));
+        m_FontFlagStyle = GetXmlStyleAlignmentFlag(m_xml[StyleID]["FontFlagStyle"].text(), Qt::AlignCenter);
+        m_DividerColor = GetXmlStyleColor(m_xml[StyleID]["DividerColor"].text(), Qt::black);
+        m_DividerWidth = GetXmlStyleSum(m_xml[StyleID]["DividerWidth"].text(), 1);
     }
 
     void NodeStyle::paintNode(QPainter* painter, QRectF& rect, int type, const QString& name) noexcept {
         auto& nodeManager = Types::NodeTypeManager::instance();
 
-        painter->setBrush(
-                m_xml[StyleID]["Background"].text().empty()
-                ? Qt::gray
-                : ColorQtStyle[m_xml[StyleID]["Background"].text()]
-        );
+        QLinearGradient bgGradient(rect.topLeft(), rect.bottomLeft());
+        bgGradient.setColorAt(0, m_BackgroundColor.lighter(110));
+        bgGradient.setColorAt(1, m_BackgroundColor.darker(90));
 
-        int BorderWidth = m_xml[StyleID]["BorderWidth"].text().empty()
-                ? 1
-                : std::stoi(m_xml[StyleID]["BorderWidth"].text());
+        painter->setBrush(bgGradient);
 
-        painter->setPen(QPen(m_xml[StyleID]["BorderColor"].text().empty()
-                ? Qt::black
-                : ColorQtStyle[m_xml[StyleID]["BorderColor"].text()]
-                , BorderWidth));
+        painter->setPen(QPen(m_BackgroundBorderColor, m_BackgroundBorderWidth));
 
-        painter->drawRoundedRect(rect, m_xml[StyleID]["xRadius"].text().empty()
-                ? m_xml[StyleID]["Radius"].text().empty()
-                ? 10 : std::stoi(m_xml[StyleID]["Radius"].text())
-                : std::stoi(m_xml[StyleID]["xRadius"].text()), m_xml[StyleID]["yRadius"].text().empty()
-                        ? m_xml[StyleID]["Radius"].text().empty()
-                        ? 10 : std::stoi(m_xml[StyleID]["Radius"].text())
-                        : std::stoi(m_xml[StyleID]["yRadius"].text()));
+        qreal titleRadiusX = m_BackgroundRadiusX;
+        qreal titleRadiusY = m_BackgroundRadiusY;
+
+        // 绘制阴影（黑色半透明）
+//        QRectF shadowRect = rect.adjusted(0, 0, 5, 5);
+//        QImage shadowImage(shadowRect.size().toSize(), QImage::Format_ARGB32_Premultiplied);
+//        shadowImage.fill(Qt::transparent);
+//        QPainter shadowPainter(&shadowImage);
+//        shadowPainter.setRenderHint(QPainter::Antialiasing);
+//
+//        // 绘制阴影形状
+//        QPainterPath shadowPath;
+//        shadowPath.addRoundedRect(shadowRect, titleRadiusX, titleRadiusY);
+//        shadowPainter.setBrush(QColor(0, 0, 0, 50));
+//        shadowPainter.drawPath(shadowPath);
+//
+//        shadowPainter.end();
+//
+//        painter->drawImage(shadowRect.toRect(), shadowImage);
+
+        painter->drawRoundedRect(rect, titleRadiusX, titleRadiusY);
 
         // 绘制内边框
         QRectF innerRect = rect.adjusted(2, 2, -2, -2);
-        painter->setBrush(m_xml[StyleID]["BorderStyle"].text().empty()
-                          ? Qt::NoBrush
-                          : BrushQtStyle[m_xml[StyleID]["BorderStyle"].text()]);
+        painter->setBrush(m_BackgroundBorderStyle);
 
         painter->setPen(QPen(
-                ColorQtStyle[m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderColor"].text().empty() ? "Qt::blue" : m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderColor"].text()]
+                ColorQtStyle[m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderColor"].text().empty()
+                ? "Qt::black" : m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderColor"].text()]
                 , m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderWidth"].text().empty()
                 ? 2
                 : std::stoi(m_xml[StyleID][nodeManager.getTypeName(type)]["InnerBorderWidth"].text())));
 
         painter->drawRoundedRect(innerRect, 8, 8);
 
-        // 设置字体大小并绘制标题
-        QFont font = painter->font();
-        font.setPointSize(m_xml[StyleID]["FontSize"].text().empty()
-                          ? 10
-                          : std::stoi(m_xml[StyleID]["FontSize"].text()));  // 设置字体大小
-        painter->setFont(font);
-        painter->setPen(m_xml[StyleID]["FontColor"].text().empty()
-                        ? Qt::black
-                        : ColorQtStyle[m_xml[StyleID]["FontColor"].text()]);
+        // 设置标题背景色
+        QColor titleBgColor = m_TitleBackgroundColor;
+        painter->setBrush(titleBgColor);
+        painter->setPen(Qt::NoPen);
 
-        // 设置标题区域
-        QRectF titleRect = QRectF(rect.left(), rect.top(), rect.width(), 30);  // 标题区域高度为30
-        painter->drawText(titleRect, Qt::AlignCenter, name);  // 居中绘制标题
+        QRectF titleRect = QRectF(rect.left(), rect.top(), rect.width(), 20);
+
+        QPointF center = titleRect.center();
+        QRadialGradient diffusionGradient(center, 60);  // 半径60px的扩散范围
+        diffusionGradient.setColorAt(0, QColor(255, 0, 200, 180));  // 中心颜色（半透明红）
+        diffusionGradient.setColorAt(0.7, QColor(255, 0, 200, 60)); // 中间过渡
+        diffusionGradient.setColorAt(1, Qt::transparent);             // 边缘透明
+
+        QPainterPath path;
+        path.moveTo(titleRect.left() + titleRadiusX, titleRect.top());
+        path.arcTo(titleRect.left(), titleRect.top(), titleRadiusX*2, titleRadiusX*2, 90, 90);
+        path.lineTo(titleRect.left(), titleRect.bottom());
+        path.lineTo(titleRect.right(), titleRect.bottom());
+        path.lineTo(titleRect.right(), titleRect.top() - titleRadiusY);
+        path.arcTo(titleRect.right() - titleRadiusY*2, titleRect.top(), titleRadiusY*2, titleRadiusY*2, 0, 90);
+        path.closeSubpath();
+
+        painter->setBrush(titleBgColor);
+        painter->drawPath(path);
+
+        QRectF diffusionRect = titleRect.adjusted(0, 1, 0, -1);  // 扩大绘制区域
+        painter->save();  // 保存当前状态
+        painter->setBrush(diffusionGradient);
+        painter->setPen(Qt::NoPen);
+        painter->drawRoundedRect(diffusionRect, 15, 15);  // 使用更大圆角
+        painter->restore();  // 恢复状态（避免影响后续绘制）
+
+
+        QPainterPath overlayPath = path;
+        painter->setBrush(QColor(0, 0, 0, 30)); // 半透明黑色
+        painter->setCompositionMode(QPainter::CompositionMode::CompositionMode_Multiply); // 混合模式
+        painter->drawPath(overlayPath);
+        painter->setCompositionMode(QPainter::CompositionMode::CompositionMode_SourceOver); // 恢复默认模式
+
+        QFont font = painter->font();
+        font.setPointSize(m_FontSize);  // 设置字体大小
+        painter->setFont(font);
+        painter->setPen(m_FontColor);   // 设置文字颜色
+
+        // 绘制标题文本
+        painter->drawText(titleRect, m_FontFlagStyle, name);
 
         // 在标题和端口区域之间绘制一条分割线
-        painter->setPen(QPen(m_xml[StyleID]["DividerColor"].text().empty()
-                             ? Qt::black
-                             : ColorQtStyle[m_xml[StyleID]["DividerColor"].text()],
-                             m_xml[StyleID]["DividerWidth"].text().empty()
-                             ? 1
-                             : std::stoi(m_xml[StyleID]["DividerWidth"].text())));  // 设置线条颜色和宽度
+        painter->setPen(QPen(m_DividerColor, m_DividerWidth));  // 设置线条颜色和宽度
+
         painter->drawLine(rect.left(), titleRect.bottom(), rect.right(), titleRect.bottom());
     }
 }
