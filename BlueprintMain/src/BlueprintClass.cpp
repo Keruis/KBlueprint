@@ -93,11 +93,23 @@ void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
     }
 
     QAction* createRegionAction = contextMenu.addAction("Create Region");
-    connect(createRegionAction, &QAction::triggered, [this, &event]() {
-        RegionItem* region = new RegionItem();
-        region->Initialize();
-        scene()->addItem(region);
-        region->setPos(mapToScene(event->pos()));
+    connect(createRegionAction, &QAction::triggered, [this, event]() {
+        bool ok = false;
+        QString name = QInputDialog::getText(
+                nullptr,
+                tr("Create Region"),
+                tr("Enter Region Name:"),
+                QLineEdit::Normal,
+                "Region",
+                &ok
+        );
+
+        if (ok && !name.isEmpty()) {
+            RegionItem* region = new RegionItem(nullptr, name);
+            region->Initialize();
+            scene()->addItem(region);
+            region->setPos(mapToScene(event->pos()));
+        }
     });
 
     contextMenu.exec(event->globalPos());

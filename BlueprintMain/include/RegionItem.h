@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QString>
 #include <QList>
+#include <QInputDialog>
 
 #include "BlueprintFont.h"
 
@@ -33,22 +34,19 @@ public:
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override ;
-
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override ;
-
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override ;
-
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override ;
-
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override ;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override ;
 
 private:
     ResizeDirection calculateResizeDirection(const QPointF& pos) noexcept ;
     void adjustSize(const QPointF& currentPos) noexcept ;
 
 private:
+    QRectF m_textRect;
     Blueprint::BlueprintFont m_font;
     QString m_name;
     ResizeDirection m_resizeDirection;

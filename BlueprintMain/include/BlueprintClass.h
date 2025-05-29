@@ -11,6 +11,7 @@
 #include <QPropertyAnimation>
 #include <QGraphicsBlurEffect>
 #include <QTransform>
+#include <QInputDialog>
 
 #include <memory>
 #include <vector>
@@ -40,7 +41,7 @@ namespace Blueprint {
 
         void PlaceNodeInScene(BlueprintNode* originalNode, const QPointF& mousePos) noexcept ;
         void removeConnection(BlueprintConnection* connection) noexcept ;
-        // 更新与指定端口相关的所有连接
+
         void updateConnectionsForPort(BlueprintPort *port);
 
         Vector<BlueprintConnection*> GetConnections() noexcept ;

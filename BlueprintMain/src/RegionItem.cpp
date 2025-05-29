@@ -71,6 +71,29 @@ void RegionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
 
+void RegionItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
+    // 判断是否点击在文字区域
+    if (m_textRect.contains(event->pos())) {
+        bool ok = false;
+        QString newName = QInputDialog::getText(
+                nullptr,
+                QObject::tr("Edit Region Name"),
+                QObject::tr("New name:"),
+                QLineEdit::Normal,
+                m_name,
+                &ok
+        );
+
+        if (ok && !newName.isEmpty()) {
+            m_name = newName;
+            update();  // 重新绘制
+        }
+    }
+
+    // 保持可拖动逻辑
+    QGraphicsRectItem::mouseDoubleClickEvent(event);
+}
+
 RegionItem::ResizeDirection RegionItem::calculateResizeDirection(const QPointF &pos) noexcept {
     QRectF rect = this->rect();
     qreal edgeSize = 15.0; // 边缘检测阈值
@@ -174,7 +197,7 @@ void RegionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     // 计算文本位置（右上角）
     qreal textHeight = painter->fontMetrics().height();
-    QRectF textRect(
+    m_textRect.setRect(
             rect().right() - painter->fontMetrics().horizontalAdvance(m_name) - 10,
             rect().top() + 2,
             painter->fontMetrics().horizontalAdvance(m_name),
@@ -182,6 +205,6 @@ void RegionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     );
 
     // 绘制文本
-    painter->drawText(textRect, Qt::AlignRight | Qt::AlignTop, m_name);
+    painter->drawText(m_textRect, Qt::AlignRight | Qt::AlignTop, m_name);
 }
 
