@@ -1,3 +1,5 @@
+#include <iostream>
+#include "../Draw/StyleType.h"
 #include "../include/RegionItem.h"
 
 RegionItem::RegionItem(QGraphicsItem *parent, const QString& name)
@@ -11,8 +13,14 @@ void RegionItem::Initialize() noexcept {
     setFlag(ItemIsMovable, true);
     setFlag(ItemIsSelectable, true);
     setAcceptHoverEvents(true);
-    setRect(0, 0, 200, 150);
-    setBrush(QColor(100, 100, 255, 150));
+    Utils::Xml root;
+    root.load("Region.xml");
+    std::vector<int> rectSize = parseStringToIntVector(root["RectSize"].text());
+    if (rectSize.size() < 4) {
+        rectSize = std::vector<int>{0, 0, 150, 200};
+    }
+    setRect(rectSize[0], rectSize[1], rectSize[2], rectSize[3]);
+    setBrush(GetXmlStyleColor(root["RectBackgroundColor"].text(), QColor(255, 255, 255, 120)));
     m_font.SetFont(QFont("Arial"));
 }
 
@@ -67,6 +75,29 @@ void RegionItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void RegionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    if (scene()) {
+        QPointF scenePos = this->scenePos();
+        QGraphicsItem* newParent = nullptr;
+
+        QList<QGraphicsItem*> itemsAtPos = scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder);
+        for (QGraphicsItem* item : itemsAtPos) {
+            // 排除自己
+            if (item == this) continue;
+
+            if (auto region = dynamic_cast<RegionItem*>(item)) {
+                newParent = region;
+                break;
+            }
+        }
+
+        // 如果父节点不同，更新 parent
+        if (newParent != parentItem()) {
+            QPointF oldScenePos = this->scenePos();
+            setParentItem(newParent); // 重新设置父区域
+            QPointF newPos = newParent ? newParent->mapFromScene(oldScenePos) : oldScenePos;
+            setPos(newPos); // 让区域在视觉上不跳动
+        }
+    }
     m_resizeDirection = NoResize;
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
@@ -162,6 +193,11 @@ void RegionItem::adjustSize(const QPointF &currentPos) noexcept {
     m_dragStartPos = currentPos;
 }
 
+void RegionItem::addChildRegion(RegionItem* child) noexcept {
+    child->setParentItem(this);
+    child->setZValue(this->zValue() + 1);
+}
+
 void RegionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     if (rect().width() > 1000 || rect().height() > 1000) {
         // 超大块就不渲染文字或特殊效果，提升速度
@@ -206,5 +242,59 @@ void RegionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     // 绘制文本
     painter->drawText(m_textRect, Qt::AlignRight | Qt::AlignTop, m_name);
+}
+
+std::vector<int> RegionItem::parseStringToIntVector(const std::string &input) {
+    std::vector<int> result;
+    std::stringstream ss(input);
+    std::string item;
+
+    while (std::getline(ss, item, ',')) {
+        item.erase(item.begin(), std::find_if(item.begin(), item.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }));
+        item.erase(std::find_if(item.rbegin(), item.rend(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }).base(), item.end());
+
+        try {
+            int num = std::stoi(item);
+            result.push_back(num);
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "警告: 无法将 '" << item << "' 转换为整数，已跳过" << std::endl;
+        } catch (const std::out_of_range& e) {
+            std::cerr << "警告: 数字 '" << item << "' 超出范围，已跳过" << std::endl;
+        }
+    }
+
+    return result;
+}
+
+QColor RegionItem::GetXmlStyleColor(const std::string& style, QColor defaultColor) noexcept {
+    if (style.empty()) {
+        return defaultColor;
+    } else if (
+            [&]() -> bool{
+                size_t start = style.find_first_not_of(" \t\n\r\f\v");
+                if (start == std::string::npos) {
+                    return false; // 全是空格
+                }
+
+                // 检查剩余部分是否至少有4个字符
+                if (style.size() - start < 4) {
+                    return false;
+                }
+
+                // 比较前4个字符是否为 "Qt::"
+                return style.substr(start, 4) == "Qt::";
+            }()
+            ) {
+        return Paint::ColorQtStyle[style];
+    }
+    std::vector<int> colorTmp = parseStringToIntVector(style);
+    while (colorTmp.size() < 4) {
+        colorTmp.push_back(255);
+    }
+    return QColor(colorTmp[0], colorTmp[1], colorTmp[2], colorTmp[3]);
 }
 

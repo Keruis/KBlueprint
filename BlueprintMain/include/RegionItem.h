@@ -9,8 +9,10 @@
 #include <QString>
 #include <QList>
 #include <QInputDialog>
+#include <QGraphicsScene>
 
 #include "BlueprintFont.h"
+#include "../../utils/xml/xml.h"
 
 class RegionItem : public QGraphicsRectItem {
 public:
@@ -44,8 +46,13 @@ protected:
 private:
     ResizeDirection calculateResizeDirection(const QPointF& pos) noexcept ;
     void adjustSize(const QPointF& currentPos) noexcept ;
+    void addChildRegion(RegionItem* child) noexcept ;
+    std::vector<int> parseStringToIntVector(const std::string &input) ;
+    QColor GetXmlStyleColor(const std::string& style, QColor defaultColor) noexcept ;
 
 private:
+    QColor m_backgroundColor;
+    QRectF m_rectSize;
     QRectF m_textRect;
     Blueprint::BlueprintFont m_font;
     QString m_name;

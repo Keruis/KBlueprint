@@ -1,3 +1,6 @@
+#ifndef BLUEPRINT_XML_H
+#define BLUEPRINT_XML_H
+
 #include <list>
 #include <map>
 #include <string>
@@ -71,3 +74,5 @@ namespace Utils {
         };
     };
 }
+
+#endif
