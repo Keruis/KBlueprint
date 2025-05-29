@@ -13,6 +13,8 @@ namespace Blueprint {
         void SetFont(const QFont &font) noexcept;
         [[nodiscard]] QFont GetFont() const noexcept;
 
+        void SetSize(const qreal fontSize) noexcept ;
+        [[nodiscard]] qreal GetSize() noexcept ;
     private:
         QFont m_font;
     };

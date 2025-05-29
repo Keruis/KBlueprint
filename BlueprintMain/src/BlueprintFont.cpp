@@ -17,3 +17,11 @@ QFont BlueprintFont::GetFont() const noexcept {
 void BlueprintFont::SetFont(const QFont &font) noexcept {
     m_font = font;
 }
+
+void BlueprintFont::SetSize(const qreal fontSize) noexcept {
+    m_font.setPointSize(fontSize);
+}
+
+qreal BlueprintFont::GetSize() noexcept {
+    return 0;
+}

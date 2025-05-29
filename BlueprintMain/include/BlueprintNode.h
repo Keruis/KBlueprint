@@ -51,23 +51,8 @@ namespace Blueprint {
 
         void SetVariantType(BlueprintPort* port) noexcept ;
 
-        const Vector<BlueprintPort*>& GetInputPorts() const noexcept ;
-        const Vector<BlueprintPort*>& GetOutputPorts() const  noexcept ;
-
-        QVariant itemChange(GraphicsItemChange change, const QVariant& value) override {
-            if (change == ItemPositionChange && scene()) {
-                QList<QGraphicsItem*> regions = scene()->items(value.toPointF(),
-                                                               Qt::IntersectsItemShape, Qt::DescendingOrder);
-                for (QGraphicsItem* item : regions) {
-                    if (auto region = dynamic_cast<RegionItem*>(item)) {
-                        // 将节点添加到区域的子项中（自动跟随移动）
-                        setParentItem(region);
-                        break;
-                    }
-                }
-            }
-            return QGraphicsItem::itemChange(change, value);
-        }
+        [[nodiscard]] const Vector<BlueprintPort*>& GetInputPorts() const noexcept ;
+        [[nodiscard]] const Vector<BlueprintPort*>& GetOutputPorts() const  noexcept ;
 
     private:
         void addOutputLabel(BlueprintPort* outport, BlueprintPort* inport) noexcept;
@@ -79,6 +64,7 @@ namespace Blueprint {
         void addInputPortCondition(int type) noexcept ;
 
     protected:
+        void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override ;
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
         QRectF boundingRect() const override;
 

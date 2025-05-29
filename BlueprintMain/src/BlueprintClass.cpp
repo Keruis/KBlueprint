@@ -95,6 +95,7 @@ void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
     QAction* createRegionAction = contextMenu.addAction("Create Region");
     connect(createRegionAction, &QAction::triggered, [this, &event]() {
         RegionItem* region = new RegionItem();
+        region->Initialize();
         scene()->addItem(region);
         region->setPos(mapToScene(event->pos()));
     });

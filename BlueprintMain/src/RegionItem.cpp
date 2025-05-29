@@ -1,12 +1,27 @@
 #include "../include/RegionItem.h"
 
-RegionItem::RegionItem(QGraphicsItem *parent)
-    : QGraphicsRectItem(parent), m_resizeDirection(NoResize) {
+RegionItem::RegionItem(QGraphicsItem *parent, const QString& name)
+    : QGraphicsRectItem(parent), m_resizeDirection(NoResize), m_name(name)
+    {
+
+
+}
+
+void RegionItem::Initialize() noexcept {
     setFlag(ItemIsMovable, true);
     setFlag(ItemIsSelectable, true);
     setAcceptHoverEvents(true);
     setRect(0, 0, 200, 150);
     setBrush(QColor(100, 100, 255, 150));
+    m_font.SetFont(QFont("Arial"));
+}
+
+QString RegionItem::GetName() noexcept {
+    return m_name;
+}
+
+void RegionItem::SetName(const QString& name) noexcept {
+    m_name = name;
 }
 
 void RegionItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
@@ -125,20 +140,36 @@ void RegionItem::adjustSize(const QPointF &currentPos) noexcept {
 }
 
 void RegionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    QGraphicsRectItem::paint(painter, option, widget);
+    if (rect().width() > 1000 || rect().height() > 1000) {
+        // 超大块就不渲染文字或特殊效果，提升速度
+        painter->setBrush(brush());
+        painter->setPen(Qt::NoPen);
+        painter->drawRect(rect());  // 无圆角
+        return;
+    }
 
-    m_name = "TEST";
+    QRectF r = rect();
+    constexpr const qreal radius = 10.0;  // 圆角半径
+
+    // 设置填充颜色
+    painter->setBrush(brush());
+    painter->setPen(Qt::NoPen);
+
+    // 启用抗锯齿
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    // 绘制圆角矩形
+    painter->drawRoundedRect(r, radius, radius);
 
     // 动态调整字体大小
-    QFont font("Arial");
     qreal availableWidth = rect().width() - 2;
     qreal textWidth = painter->fontMetrics().horizontalAdvance(m_name);
     qreal fontSize = 5 * (availableWidth / textWidth);
-    font.setPointSizeF(fontSize);
+    m_font.SetSize(fontSize);
 
     // 设置文字样式
     painter->setPen(QColor(255, 255, 255, 130));
-    painter->setFont(font);
+    painter->setFont(m_font.GetFont());
     painter->setRenderHint(QPainter::TextAntialiasing);
 
     // 计算文本位置（右上角）

@@ -27,6 +27,30 @@ BlueprintNode::~BlueprintNode() {
     Shutdown();
 }
 
+void BlueprintNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mouseReleaseEvent(event);
+
+    if (!scene()) return;
+
+    QPointF scenePos = this->scenePos();
+    QGraphicsItem* newParent = nullptr;
+
+    QList<QGraphicsItem*> itemsAtPos = scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder);
+    for (QGraphicsItem* item : itemsAtPos) {
+        if (auto region = dynamic_cast<RegionItem*>(item)) {
+            newParent = region;
+            break;
+        }
+    }
+
+    if (newParent != parentItem()) {
+        QPointF oldScenePos = this->scenePos();
+        setParentItem(newParent);
+        QPointF newPos = newParent ? newParent->mapFromScene(oldScenePos) : oldScenePos;
+        setPos(newPos);
+    }
+}
+
 void BlueprintNode::SetClassName(QString className) noexcept {
     m_className = std::move(className);
 }

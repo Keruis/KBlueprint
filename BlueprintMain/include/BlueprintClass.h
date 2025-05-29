@@ -94,8 +94,6 @@ namespace Blueprint {
         Vector<BlueprintNode*> m_saveNodes; // 用于存储所有节点
         Vector<BlueprintNode*> m_sceneNodes; // 用于存储场景中的节点
 
-        std::vector<RegionItem*> m_regionItem;
-
         Vector<BlueprintConnection*> m_connections;
     };
 }

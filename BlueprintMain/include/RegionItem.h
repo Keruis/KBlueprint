@@ -6,6 +6,10 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QCursor>
 #include <QPainter>
+#include <QString>
+#include <QList>
+
+#include "BlueprintFont.h"
 
 class RegionItem : public QGraphicsRectItem {
 public:
@@ -21,7 +25,11 @@ public:
         ResizeRightBottom
     };
 
-    RegionItem(QGraphicsItem* parent = nullptr) ;
+    RegionItem(QGraphicsItem* parent = nullptr, const QString& name = "TEST") ;
+
+    void Initialize() noexcept ;
+    QString GetName() noexcept ;
+    void SetName(const QString& name) noexcept ;
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override ;
@@ -41,6 +49,7 @@ private:
     void adjustSize(const QPointF& currentPos) noexcept ;
 
 private:
+    Blueprint::BlueprintFont m_font;
     QString m_name;
     ResizeDirection m_resizeDirection;
     QPointF m_dragStartPos;
