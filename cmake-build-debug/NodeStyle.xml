@@ -2,10 +2,6 @@
   <Style-1 NodeType="FUNCTION, INPUT">
     <Background>
       <Color>128, 128, 128, 200</Color>
-      <linearGradient type="vertical">
-        <stop offset="0%" color="#FFA0A0A0"/>
-        <stop offset="100%" color="#FF808080"/>
-      </linearGradient>
       <BorderWidth>1</BorderWidth>
       <BorderColor>Qt::black</BorderColor>
       <Radius>20</Radius>

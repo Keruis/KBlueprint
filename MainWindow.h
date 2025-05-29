@@ -19,6 +19,9 @@ public:
     void Initialization() noexcept ;
     void Shutdown() noexcept ;
 
+    std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
+
+
 private:
     std::unique_ptr<Ui::MainWindow> m_ui;
     std::unique_ptr<Blueprint::BlueprintClass> m_blueprint;

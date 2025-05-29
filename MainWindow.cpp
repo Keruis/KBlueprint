@@ -17,3 +17,7 @@ void MainWindow::Initialization() noexcept {
 }
 
 void MainWindow::Shutdown() noexcept { }
+
+std::unique_ptr<Blueprint::BlueprintClass> &MainWindow::GetBlueprint() noexcept {
+    return m_blueprint;
+}

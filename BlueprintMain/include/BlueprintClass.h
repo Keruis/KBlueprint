@@ -19,6 +19,7 @@
 #include "BlueprintPort.h"
 #include "../../Container/Vec/Vector.h"
 #include "../Draw/Background.h"
+#include "RegionItem.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BlueprintClass; }
@@ -34,6 +35,8 @@ namespace Blueprint {
 
         void Initialization() noexcept;
         void Shutdown() noexcept;
+
+        void SaveNodePush(BlueprintNode* node) noexcept ;
 
         void PlaceNodeInScene(BlueprintNode* originalNode, const QPointF& mousePos) noexcept ;
         void removeConnection(BlueprintConnection* connection) noexcept ;
@@ -90,6 +93,8 @@ namespace Blueprint {
 
         Vector<BlueprintNode*> m_saveNodes; // 用于存储所有节点
         Vector<BlueprintNode*> m_sceneNodes; // 用于存储场景中的节点
+
+        std::vector<RegionItem*> m_regionItem;
 
         Vector<BlueprintConnection*> m_connections;
     };

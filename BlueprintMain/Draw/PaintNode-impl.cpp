@@ -150,23 +150,6 @@ namespace Paint {
         qreal titleRadiusX = m_BackgroundRadiusX;
         qreal titleRadiusY = m_BackgroundRadiusY;
 
-        // 绘制阴影（黑色半透明）
-//        QRectF shadowRect = rect.adjusted(0, 0, 5, 5);
-//        QImage shadowImage(shadowRect.size().toSize(), QImage::Format_ARGB32_Premultiplied);
-//        shadowImage.fill(Qt::transparent);
-//        QPainter shadowPainter(&shadowImage);
-//        shadowPainter.setRenderHint(QPainter::Antialiasing);
-//
-//        // 绘制阴影形状
-//        QPainterPath shadowPath;
-//        shadowPath.addRoundedRect(shadowRect, titleRadiusX, titleRadiusY);
-//        shadowPainter.setBrush(QColor(0, 0, 0, 50));
-//        shadowPainter.drawPath(shadowPath);
-//
-//        shadowPainter.end();
-//
-//        painter->drawImage(shadowRect.toRect(), shadowImage);
-
         painter->drawRoundedRect(rect, titleRadiusX, titleRadiusY);
 
         // 绘制内边框

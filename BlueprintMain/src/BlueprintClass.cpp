@@ -48,27 +48,14 @@ void BlueprintClass::Initialization() noexcept {
 
 void BlueprintClass::Shutdown() noexcept {}
 
-bool tt = true;
+void BlueprintClass::SaveNodePush(BlueprintNode* node) noexcept {
+    m_saveNodes.push_back(node);
+}
 
-//  TEST
 void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
     QMenu contextMenu;
     QPointF scenePos = mapToScene(event->pos());
 
-    if (tt) {
-        BlueprintNode* tmp = new BlueprintNode(0, 1, nullptr);
-        tmp->SetNodeName("A");
-        tmp->SetClassName("Other");
-        tmp->Initialize(0);
-
-        BlueprintNode* tmp2 = new BlueprintNode(1, 1, nullptr);
-        tmp2->SetNodeName("B");
-        tmp2->SetClassName("Other");
-        tmp2->Initialize(1);
-        m_saveNodes.push_back(tmp);
-        m_saveNodes.push_back(tmp2);
-    }
-    tt = false;
     // 加载 QSS 文件
     QFile styleFile(":/qss/ContextMenu.qss");
     if (styleFile.open(QFile::ReadOnly)) {
@@ -104,6 +91,13 @@ void BlueprintClass::contextMenuEvent(QContextMenuEvent* event) {
             });
         }
     }
+
+    QAction* createRegionAction = contextMenu.addAction("Create Region");
+    connect(createRegionAction, &QAction::triggered, [this, &event]() {
+        RegionItem* region = new RegionItem();
+        scene()->addItem(region);
+        region->setPos(mapToScene(event->pos()));
+    });
 
     contextMenu.exec(event->globalPos());
 }
@@ -240,6 +234,9 @@ void BlueprintClass::mousePressEvent(QMouseEvent *event) {
 
 void BlueprintClass::mouseMoveEvent(QMouseEvent *event) {
     QPointF scenePos = mapToScene(event->pos());
+    if (!m_panning && (event->button() == Qt::LeftButton)) {
+        return;
+    }
 
     if (m_draggingPort && m_currentConnection) {
         // 更新连接线位置
