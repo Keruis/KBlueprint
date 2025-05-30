@@ -21,12 +21,13 @@ add_executable(Blueprint
         MainWindow.cpp
         MainWindow.h
         MainWindow.ui
-        BlueprintMain/Draw/Background.h
+        CPUFeatures.h
 )
 
 add_subdirectory(utils)
 add_subdirectory(Container)
 add_subdirectory(BlueprintMain)
+add_subdirectory(IP/CPU)
 
 qt_add_resources(
         RESOURCE_FILES ${QRC_RESOURCE}

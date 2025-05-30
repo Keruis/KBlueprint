@@ -2,6 +2,7 @@
 #include "MainWindow.h"
 #include "BlueprintMain/include/BlueprintNode.h"
 
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     MainWindow window;

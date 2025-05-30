@@ -1,4 +1,5 @@
-
+#include <iostream>
+#include <cstring>
 
 template <typename Ty, std::size_t Align>
 Vector<Ty, Align>::Iterator Vector<Ty, Align>::AllocateAligned(std::size_t n) noexcept {
@@ -271,8 +272,8 @@ Vector<Ty, Align>::Iterator Vector<Ty, Align>::erase(Vector::Const_Iterator pos)
 template<typename Ty, std::size_t Align>
 Vector<Ty, Align>::Iterator Vector<Ty, Align>::erase(Vector::Const_Iterator first,
                                                      Vector::Const_Iterator last) noexcept {
-    Iterator non_const_first = const_cast<Iterator>(first);
-    Iterator non_const_last = const_cast<Iterator>(last);
+    auto non_const_first = const_cast<Iterator>(first);
+    auto non_const_last = const_cast<Iterator>(last);
     std::size_t count = non_const_last - non_const_first;
 
     if (non_const_last != end()) {

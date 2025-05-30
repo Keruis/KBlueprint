@@ -10,6 +10,7 @@
       <w>blueprintnode</w>
       <w>blueprintport</w>
       <w>getxml</w>
+      <w>imagedatatype</w>
       <w>keruis</w>
       <w>koption</w>
       <w>kpainter</w>
@@ -17,13 +18,30 @@
       <w>kwidget</w>
       <w>lerp</w>
       <w>mainwindow</w>
+      <w>movzb</w>
       <w>nodestyle</w>
       <w>nodetype</w>
+      <w>normd</w>
       <w>paintnode</w>
       <w>porttype</w>
+      <w>prefetchnta</w>
       <w>regionitem</w>
       <w>styletype</w>
+      <w>vaddps</w>
       <w>vartype</w>
+      <w>vcvtdq</w>
+      <w>vcvtps</w>
+      <w>vinserti</w>
+      <w>vmovdqu</w>
+      <w>vmovq</w>
+      <w>vmulps</w>
+      <w>vpackssdw</w>
+      <w>vpackuswb</w>
+      <w>vpermq</w>
+      <w>vpmovzxbd</w>
+      <w>vpsrldq</w>
+      <w>vzeroupper</w>
+      <w>xgetbv</w>
     </words>
   </dictionary>
 </component>

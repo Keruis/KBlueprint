@@ -21,8 +21,23 @@ public:
 
     std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
 
+protected:
+    void mousePressEvent(QMouseEvent *event) override {
+        if (event->button() == Qt::LeftButton) {
+            m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+            event->accept();
+        }
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) override {
+        if (event->buttons() & Qt::LeftButton) {
+            move(event->globalPos() - m_dragPosition);
+            event->accept();
+        }
+    }
 
 private:
+    QPoint m_dragPosition;
     std::unique_ptr<Ui::MainWindow> m_ui;
     std::unique_ptr<Blueprint::BlueprintClass> m_blueprint;
 };
