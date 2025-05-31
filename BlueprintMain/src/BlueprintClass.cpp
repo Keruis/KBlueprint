@@ -46,6 +46,7 @@ void BlueprintClass::Initialization() noexcept {
     setupRendering();
     setupInteraction();
     setupAppearance();
+    update();
 }
 
 void BlueprintClass::Shutdown() noexcept {}

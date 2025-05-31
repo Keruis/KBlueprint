@@ -14,6 +14,7 @@ MainWindow::~MainWindow() = default;
 
 void MainWindow::Initialization() noexcept {
     m_blueprint->Initialization();
+
     this->setContentsMargins(8, 0, 8, 8);
     setMouseTracking(true);
 

@@ -11,25 +11,71 @@ TitleBar::TitleBar(QWidget* parent)
 void TitleBar::Initialize() noexcept {
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(5, 0, 5, 0);
+    layout->setSpacing(12); // 控制整体间距
+
     auto iconLabel = createIconLabel();
+
+    // 创建菜单按钮
+    auto fileBtn = new QPushButton("文件", this);
+    auto editBtn = new QPushButton("编辑", this);
+    auto viewBtn = new QPushButton("视图", this);
+    auto navBtn  = new QPushButton("导航", this);
+    auto helpBtn = new QPushButton("帮助", this);
+
+    // 设置统一样式
+    auto style = QString(
+            "QPushButton {"
+            "   border: none;"
+            "   background-color: transparent;"
+            "   color: white;"
+            "   font-weight: bold;"
+            "   padding: 0 6px;"
+            "}"
+            "QPushButton:hover {"
+            "   background-color: #5A5A5A;"
+            "}"
+            "QPushButton:pressed {"
+            "   background-color: #3A3A3A;"
+            "}"
+    );
+
+    fileBtn->setStyleSheet(style);
+    editBtn->setStyleSheet(style);
+    viewBtn->setStyleSheet(style);
+    navBtn->setStyleSheet(style);
+    helpBtn->setStyleSheet(style);
+
+    // 创建右侧按钮
     auto settingBtn = createSettingBtn();
     auto minimizeBtn = createMinimizeBtn();
     auto maximizeBtn = createMaximizeBtn();
     auto closeBtn = createCloseBtn();
 
+    // 添加控件到布局
     layout->addWidget(iconLabel);
-    layout->addStretch();
+
+    // 添加菜单按钮
+    layout->addSpacing(10); // 图标与菜单间距
+    layout->addWidget(fileBtn);
+    layout->addWidget(editBtn);
+    layout->addWidget(viewBtn);
+    layout->addWidget(navBtn);
+    layout->addWidget(helpBtn);
+
+    layout->addStretch(); // 推动右边按钮到最右侧
+
+    // 添加右侧控制按钮
     layout->addWidget(settingBtn);
     layout->addWidget(minimizeBtn);
     layout->addWidget(maximizeBtn);
     layout->addWidget(closeBtn);
 
+    // 信号连接
     connect(settingBtn, &QPushButton::clicked, this, &TitleBar::requestSetting);
     connect(minimizeBtn, &QPushButton::clicked, this, &TitleBar::requestMinimize);
     connect(maximizeBtn, &QPushButton::clicked, this, &TitleBar::toggleMaximizeRestore);
     connect(closeBtn, &QPushButton::clicked, this, &TitleBar::requestClose);
 }
-
 QLabel *TitleBar::createIconLabel() noexcept {
     auto iconLabel = new QLabel(this);
     iconLabel->setPixmap(QPixmap(":/icons/aspect-ratio(1).svg").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -63,15 +109,15 @@ QPushButton *TitleBar::createSettingBtn() noexcept {
 
 QPushButton *TitleBar::createMinimizeBtn() noexcept {
     auto minimizeBtn = new QPushButton(this);
-    minimizeBtn->setIcon(QIcon(":/icons/arrows-minimize.svg"));
-    minimizeBtn->setIconSize(QSize(16, 16));
+    minimizeBtn->setIcon(QIcon(":/icons/minimize.svg"));
+    minimizeBtn->setIconSize(QSize(20, 20));
     minimizeBtn->setFlat(true);
     minimizeBtn->setFixedSize(24, 24);
     minimizeBtn->setStyleSheet(
             "QPushButton {"
             "   border: none;"
             "   background-color: transparent;"
-            "   border-radius: 5px;"
+            "   border-radius: 12px;"
             "}"
 
             "QPushButton:hover {"
@@ -87,15 +133,15 @@ QPushButton *TitleBar::createMinimizeBtn() noexcept {
 
 QPushButton *TitleBar::createMaximizeBtn() noexcept {
     m_maximizeBtn = new QPushButton(this);
-    m_maximizeBtn->setIcon(QIcon(":/icons/arrows-maximize.svg"));
-    m_maximizeBtn->setIconSize(QSize(16, 16));
+    m_maximizeBtn->setIcon(QIcon(":/icons/maximize.svg"));
+    m_maximizeBtn->setIconSize(QSize(20, 20));
     m_maximizeBtn->setFlat(true);
     m_maximizeBtn->setFixedSize(24, 24);
     m_maximizeBtn->setStyleSheet(
             "QPushButton {"
             "   border: none;"
             "   background-color: transparent;"
-            "   border-radius: 5px;"
+            "   border-radius: 12px;"
             "}"
 
             "QPushButton:hover {"
@@ -111,15 +157,15 @@ QPushButton *TitleBar::createMaximizeBtn() noexcept {
 
 QPushButton *TitleBar::createCloseBtn() noexcept {
     auto closeBtn = new QPushButton(this);
-    closeBtn->setIcon(QIcon(":/icons/aspect-ratio.svg"));
-    closeBtn->setIconSize(QSize(16, 16));
+    closeBtn->setIcon(QIcon(":/icons/close.svg"));
+    closeBtn->setIconSize(QSize(20, 20));
     closeBtn->setFlat(true);
     closeBtn->setFixedSize(24, 24);
     closeBtn->setStyleSheet(
             "QPushButton {"
             "   border: none;"
             "   background-color: transparent;"
-            "   border-radius: 5px;"
+            "   border-radius: 12px;"
             "}"
 
             "QPushButton:hover {"
@@ -138,9 +184,9 @@ void TitleBar::toggleMaximizeRestore() noexcept {
 
     if (win->isMaximized()) {
         win->showNormal();
-        m_maximizeBtn->setIcon(QIcon(":/icons/arrows-maximize.svg")); // 还原图标
+        m_maximizeBtn->setIcon(QIcon(":/icons/maximize.svg")); // 还原图标
     } else {
         win->showMaximized();
-        m_maximizeBtn->setIcon(QIcon(":/icons/aspect-ratio.svg")); // 最大化图标替换为还原图标
+        m_maximizeBtn->setIcon(QIcon(":/icons/restore.svg")); // 最大化图标替换为还原图标
     }
 }
