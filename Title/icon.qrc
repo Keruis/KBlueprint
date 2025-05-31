@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../icons/settings.svg</file>
+        <file>../icons/arrows-maximize.svg</file>
+        <file>../icons/arrows-minimize.svg</file>
+        <file>../icons/aspect-ratio.svg</file>
+        <file>../icons/aspect-ratio(1).svg</file>
+    </qresource>
+</RCC>

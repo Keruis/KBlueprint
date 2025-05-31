@@ -13,6 +13,8 @@ BlueprintClass::BlueprintClass(QWidget *parent)
     m_blurEffect(new QGraphicsBlurEffect(this))
 {
     m_ui->setupUi(this);
+    //setViewport(new QOpenGLWidget(this));
+    //setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     m_scene->setSceneRect(-1000, -1000, 2000, 2000);
     setScene(m_scene.get());
 }
@@ -143,7 +145,6 @@ void BlueprintClass::updateConnectionsForPort(BlueprintPort *port) {
 
 void BlueprintClass::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
-
     m_background.DrawBackground(painter, rect);
 }
 
@@ -164,6 +165,7 @@ void BlueprintClass::wheelEvent(QWheelEvent *event) {
     );
 
     m_isDashing = true;   // 启用平滑缩放动画
+
     event->accept();     // 标记事件已处理
 }
 
@@ -256,6 +258,7 @@ void BlueprintClass::mouseMoveEvent(QMouseEvent *event) {
         m_currentConnection->UpdatePosition(m_draggingPort->centerPos(), scenePos);
     }
     QGraphicsView::mouseMoveEvent(event);
+    QTimer::singleShot(0, this, [this]{ensureSceneRectCoversViewport();});
 }
 
 void BlueprintClass::mouseReleaseEvent(QMouseEvent *event) {

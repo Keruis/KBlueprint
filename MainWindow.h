@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <QMainWindow>
+#include "Title/TitleBar.h"
 #include "BlueprintMain/include/BlueprintClass.h"
 
 QT_BEGIN_NAMESPACE
@@ -11,7 +12,17 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
-
+    enum ResizeDirection {
+        NoResize,
+        ResizeLeft,
+        ResizeRight,
+        ResizeTop,
+        ResizeBottom,
+        ResizeLeftTop,
+        ResizeRightTop,
+        ResizeLeftBottom,
+        ResizeRightBottom
+    };
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
@@ -22,21 +33,18 @@ public:
     std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override {
-        if (event->button() == Qt::LeftButton) {
-            m_dragPosition = event->globalPos() - frameGeometry().topLeft();
-            event->accept();
-        }
-    }
-
-    void mouseMoveEvent(QMouseEvent *event) override {
-        if (event->buttons() & Qt::LeftButton) {
-            move(event->globalPos() - m_dragPosition);
-            event->accept();
-        }
-    }
+    void mousePressEvent(QMouseEvent *event) override ;
+    void mouseMoveEvent(QMouseEvent *event) override ;
+    void mouseReleaseEvent(QMouseEvent *event) override ;
 
 private:
+    ResizeDirection calculateResizeDirection(const QPoint &pos) noexcept ;
+
+private:
+    TitleBar* m_title;
+    ResizeDirection m_resizeDir = NoResize;
+    QPoint m_dragStartPos;
+    QRect m_startGeometry;
     QPoint m_dragPosition;
     std::unique_ptr<Ui::MainWindow> m_ui;
     std::unique_ptr<Blueprint::BlueprintClass> m_blueprint;

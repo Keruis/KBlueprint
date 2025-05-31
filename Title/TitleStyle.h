@@ -1,9 +1,0 @@
-#ifndef BLUEPRINT_TITLESTYLE_H
-#define BLUEPRINT_TITLESTYLE_H
-
-class TitleStyle {
-
-};
-
-
-#endif //BLUEPRINT_TITLESTYLE_H

@@ -2,6 +2,7 @@
 #define BLUEPRINT_BLUEPRINTCLASS_H
 
 #include <QGraphicsView>
+#include <QOpenGLWidget>
 #include <QGraphicsScene>
 #include <QFile>
 #include <QMenu>
@@ -48,6 +49,41 @@ namespace Blueprint {
 
         void propagateDataFromInitialNode(BlueprintPort* init) noexcept ;
         bool areTypesCompatible(const QString& type1, const QString& type2) noexcept ;
+
+        void ensureSceneRectCoversViewport() {
+            QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
+            QRectF sceneRect = scene()->sceneRect();
+
+            QRectF expanded = sceneRect;
+            constexpr qreal margin = 100.0;
+            constexpr qreal extendSize = 1000.0;
+
+            // 向右扩展
+            if (viewRect.right() > sceneRect.right() - margin) {
+                expanded.setRight(sceneRect.right() + extendSize);
+            }
+
+            // 向左扩展
+            if (viewRect.left() < sceneRect.left() + margin) {
+                expanded.setLeft(sceneRect.left() - extendSize);
+            }
+
+            // 向下扩展
+            if (viewRect.bottom() > sceneRect.bottom() - margin) {
+                expanded.setBottom(sceneRect.bottom() + extendSize);
+            }
+
+            // 向上扩展
+            if (viewRect.top() < sceneRect.top() + margin) {
+                expanded.setTop(sceneRect.top() - extendSize);
+            }
+
+            // 如果扩展了，就更新 sceneRect
+            if (expanded != sceneRect) {
+                scene()->setSceneRect(expanded);
+                qDebug() << "Scene rect expanded to:" << expanded;
+            }
+        }
 
     protected:
         void drawBackground(QPainter *painter, const QRectF &rect) override;

@@ -59,11 +59,11 @@ target_sources(BlueprintModules
         Types/NodeType-impl.ixx
 )
 
-set(RESOURCE_FILES
+set(RESOURCE_FILES_BlUEPRINT
     resources.qrc
 )
 
-set(QRC_RESOURCE ${RESOURCE_FILES} PARENT_SCOPE)
+set(QRC_RESOURCE ${RESOURCE_FILES_BlUEPRINT} PARENT_SCOPE)
 
 target_link_libraries(BlueprintModules PRIVATE
         Qt6::Core Qt6::Widgets Qt6::Gui Utils

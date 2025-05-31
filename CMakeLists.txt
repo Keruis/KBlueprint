@@ -14,6 +14,7 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
+        OpenGLWidgets
         REQUIRED)
 
 add_executable(Blueprint
@@ -22,6 +23,8 @@ add_executable(Blueprint
         MainWindow.h
         MainWindow.ui
         CPUFeatures.h
+        Title/TitleBar.cpp
+        Title/icon.qrc
 )
 
 add_subdirectory(utils)
@@ -29,12 +32,14 @@ add_subdirectory(Container)
 add_subdirectory(BlueprintMain)
 add_subdirectory(IP/CPU)
 
-qt_add_resources(
-        RESOURCE_FILES ${QRC_RESOURCE}
+set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} Title/icon.qrc)
+
+qt_add_resources(Blueprint
+        RESOURCE_FILES ${RESOURCE_FILES_BLUEPRINT}
 )
 
 target_link_libraries(Blueprint PRIVATE
-        Qt6::Core Qt6::Widgets Qt6::Gui
+        Qt6::Core Qt6::Widgets Qt6::Gui Qt6::OpenGLWidgets
 
         Utils Container BlueprintModules
 )
