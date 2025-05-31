@@ -2,9 +2,10 @@
 #include "./ui_MainWindow.h"
 #include <QDockWidget>
 #include <QPushButton>
+#include <QStringList>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      m_ui(std::make_unique<Ui::MainWindow>()),                    //NOLINT
+      m_ui(new Ui::MainWindow()),                    //NOLINT
       m_blueprint(std::make_unique<Blueprint::BlueprintClass>())
 {
     m_ui->setupUi(this);
@@ -15,29 +16,82 @@ MainWindow::~MainWindow() = default;
 void MainWindow::Initialization() noexcept {
     m_blueprint->Initialization();
 
-    this->setContentsMargins(8, 0, 8, 8);
+    this->setContentsMargins(4, 0, 4, 4);
     setMouseTracking(true);
-
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground, false);
 
-    // 自定义标题栏
+    QWidget* central = new QWidget;
+    QVBoxLayout* VLayout = new QVBoxLayout(central);
+    VLayout->setContentsMargins(0, 0, 0, 0);
+    VLayout->setSpacing(0);
+
     m_title = new TitleBar(this);
     m_title->Initialize();
-
-    // 蓝图容器
-    auto central = new QWidget;
-    auto layout = new QVBoxLayout(central);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(m_title);
-    layout->addWidget(m_blueprint.get());
-    setCentralWidget(central);
+    m_title->setFixedHeight(30);
+    VLayout->addWidget(m_title);
 
     connect(m_title, &TitleBar::requestMinimize, this, &MainWindow::showMinimized);
     connect(m_title, &TitleBar::requestClose, this, &MainWindow::close);
 
-    update();
+    QSplitter* splitter = new QSplitter(Qt::Horizontal);
+
+    QWidget *sidebarContainer = new QWidget();
+    QHBoxLayout *sidebarLayout = new QHBoxLayout(sidebarContainer);
+    sidebarLayout->setContentsMargins(0, 0, 0, 0);
+    sidebarLayout->setSpacing(0);
+
+    m_leftSidebarList = new QListWidget();
+    m_leftSidebarList->addItem("📁");
+    m_leftSidebarList->addItem("🔍");
+    m_leftSidebarList->addItem("Git");
+    m_leftSidebarList->addItem("💡");
+    m_leftSidebarList->addItem("⚙️");
+    m_leftSidebarList->setFixedWidth(48);
+
+    m_explorer = new QTreeWidget();
+    m_explorer->setHeaderLabel("EXPLORER");
+    auto src = new QTreeWidgetItem(m_explorer);
+    src->setText(0, "📁 src");
+    src->addChild(new QTreeWidgetItem(QStringList("📄 main.js")));
+    src->addChild(new QTreeWidgetItem(QStringList("📄 utils.js")));
+
+    auto pub = new QTreeWidgetItem(m_explorer);
+    pub->setText(0, "📁 public");
+    pub->addChild(new QTreeWidgetItem(QStringList("📄 index.html")));
+    pub->addChild(new QTreeWidgetItem(QStringList("📄 style.css")));
+
+    m_explorer->addTopLevelItem(src);
+    m_explorer->addTopLevelItem(pub);
+    m_explorer->addTopLevelItem(new QTreeWidgetItem(QStringList("📄 README.md")));
+
+    m_leftStackedWidget = new QStackedWidget();
+    m_leftStackedWidget->addWidget(m_explorer);
+    m_leftStackedWidget->addWidget(new QLabel("Search View"));
+    m_leftStackedWidget->addWidget(new QLabel("Git View"));
+    m_leftStackedWidget->addWidget(new QLabel("Other View"));
+    m_leftStackedWidget->addWidget(new QLabel("Settings View"));
+
+    sidebarLayout->addWidget(m_leftSidebarList);
+    sidebarLayout->addWidget(m_leftStackedWidget);
+    sidebarContainer->setMinimumWidth(200);
+    sidebarContainer->setMaximumWidth(400);
+    sidebarContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+    splitter->addWidget(sidebarContainer);
+    splitter->addWidget(m_blueprint.get());
+    splitter->setStretchFactor(1, 1);
+
+    m_leftSidebarList->setMinimumWidth(48);
+    m_leftStackedWidget->setMinimumWidth(48);
+    sidebarContainer->setMinimumWidth(48);
+    splitter->setCollapsible(0, false);
+
+    VLayout->addWidget(splitter);
+    setCentralWidget(central);
+
+    connect(m_leftSidebarList, &QListWidget::currentRowChanged,
+            m_leftStackedWidget, &QStackedWidget::setCurrentIndex);
 }
 
 void MainWindow::Shutdown() noexcept { }

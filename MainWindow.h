@@ -3,6 +3,11 @@
 
 #include <memory>
 #include <QMainWindow>
+#include <QListWidget>
+#include <QTreeWidget>
+#include <QStackedWidget>
+#include <QSplitter>
+#include <QTextEdit>
 #include "Title/TitleBar.h"
 #include "BlueprintMain/include/BlueprintClass.h"
 
@@ -46,8 +51,32 @@ private:
     QPoint m_dragStartPos;
     QRect m_startGeometry;
     QPoint m_dragPosition;
-    std::unique_ptr<Ui::MainWindow> m_ui;
+    Ui::MainWindow* m_ui;
     std::unique_ptr<Blueprint::BlueprintClass> m_blueprint;
+
+private:
+    QDockWidget* m_leftSidebar;
+    QListWidget* m_leftSidebarList;
+    QTreeWidget* m_explorer;
+    QStackedWidget* m_leftStackedWidget;
+
+    QSplitter* m_splitter;
+    QTextEdit* m_editor;
+
+    QDockWidget* m_rightSidebar;
+    QListWidget* m_rightSidebarList;
+    QStackedWidget* m_rightStackedWidget;
+
+    QDockWidget* m_terminalPanel;
+    QTextEdit* m_terminal;
+    QAction* m_toggleTerminalAction;
+
+    QPushButton* m_terminalLabel;
+    QPushButton* m_helpButton;
+    QPushButton* m_settingsButton;
+    QLabel* m_cpuInfoLabel;
+    QLabel* m_memInfoLabel;
+    QTimer* m_statusUpdateTimer;
 };
 
 

@@ -1,0 +1,10 @@
+#ifndef BLUEPRINT_TERMINALUI_H
+#define BLUEPRINT_TERMINALUI_H
+
+
+class terminalUI {
+
+};
+
+
+#endif //BLUEPRINT_TERMINALUI_H
