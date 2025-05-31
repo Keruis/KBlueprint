@@ -1,0 +1,179 @@
+QMainWindow {
+  background-color: #21252b;
+  color: #abb2bf;
+}
+
+QDockWidget#sidebar {
+  background-color: #1e222a;
+  border: none;
+}
+
+QListWidget {
+  background-color: #1e222a;
+  color: #abb2bf;
+  font-size: 14px;
+  border: none;
+  outline: 0;
+}
+
+QListWidget::item {
+  padding: 10px;
+}
+
+QListWidget::item:selected {
+  background-color: #333842;
+  color: #ffffff;
+}
+
+QTreeWidget {
+  background-color: #1e222a;
+  color: #abb2bf;
+  font-size: 14px;
+  border: none;
+  outline: 0;
+}
+
+QTreeWidget::item {
+  padding: 5px;
+}
+
+QTreeWidget::item:selected {
+  background-color: #4d4d4d;
+  color: white;
+}
+
+
+QTextEdit#editor {
+  background-color: #282c34;
+  color: #abb2bf;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px;
+  border: none;
+  padding: 10px;
+}
+
+QLabel#header {
+  background-color: #21252b;
+  color: #abb2bf;
+  font-size: 14px;
+  padding: 5px;
+  border-bottom: 2px solid #333842;
+}
+
+/* 右侧边栏样式 */
+QDockWidget#rightSidebar {
+  background-color: #1e222a;
+  border: none;
+}
+
+QListWidget#rightSidebarList {
+  background-color: #1e222a;
+  color: #abb2bf;
+  font-size: 14px;
+  border: none;
+  outline: 0;
+}
+
+QListWidget#rightSidebarList::item {
+  padding: 10px;
+}
+
+QListWidget#rightSidebarList::item:selected {
+  background-color: #333842;
+  color: white;
+}
+
+QStatusBar {
+  background-color: #282c34;
+  border-top: 1px solid #333842;
+}
+
+QStatusBar::item {
+  border: none;
+  padding: 5px;
+}
+
+QStatusBar>QPushButton {
+  background-color: transparent;
+  color: #abb2bf;
+  border: none;
+  padding: 5px 10px;
+}
+
+QStatusBar QWidget QPushButton[selected="true"] {
+  color: rgb(55, 117, 232);
+}
+
+
+QStatusBar>QLabel {
+  background-color: transparent;
+  color: #abb2bf;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* 终部面板样式优化 */
+QDockWidget#terminalPanel {
+  background-color: #282c34;
+  border: 1px solid #333842;
+}
+
+QTextEdit#terminal {
+  background-color: #282c34;
+  color: #abb2bf;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* 按钮样式 */
+QPushButton {
+  background-color: #333842;
+  color: #abb2bf;
+  font-size: 14px;
+  border: 1px solid #333842;
+  padding: 5px 10px;
+}
+
+QPushButton:hover {
+  background-color: #444a56;
+}
+
+QPushButton:pressed {
+  background-color: #22262e;
+}
+
+/* 分割条样式 */
+QSplitter::handle {
+  background-color: #333842;
+  border: 1px solid #21252b;
+}
+
+/* 滚动条样式 */
+QScrollBar {
+  background-color: #1e222a;
+  border: none;
+}
+
+QScrollBar::handle {
+  background-color: #333842;
+  border: 1px solid #21252b;
+  border-radius: 4px;
+}
+
+QScrollBar::handle:hover {
+  background-color: #444a56;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+  border: none;
+  background: none;
+}
+
+QScrollBar::add-page,
+QScrollBar::sub-page {
+  background: none;
+}
