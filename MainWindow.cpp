@@ -3,8 +3,12 @@
 #include <QDockWidget>
 #include <QPushButton>
 #include <QStringList>
+#include <QPlainTextEdit>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
+      m_explorer(new Explorer(parent)),
+      m_terminal(new Terminal(parent)),
       m_ui(new Ui::MainWindow()),                    //NOLINT
       m_blueprint(std::make_unique<Blueprint::BlueprintClass>())
 {
@@ -26,72 +30,23 @@ void MainWindow::Initialization() noexcept {
     VLayout->setContentsMargins(0, 0, 0, 0);
     VLayout->setSpacing(0);
 
-    m_title = new TitleBar(this);
-    m_title->Initialize();
-    m_title->setFixedHeight(30);
+    m_title = createTitleBar();
     VLayout->addWidget(m_title);
 
-    connect(m_title, &TitleBar::requestMinimize, this, &MainWindow::showMinimized);
-    connect(m_title, &TitleBar::requestClose, this, &MainWindow::close);
+    QSplitter* verticalSplitter = new QSplitter(Qt::Vertical); // 垂直方向的分割器
 
-    QSplitter* splitter = new QSplitter(Qt::Horizontal);
+    QSplitter* mainAreaSplitter = createMainSplitter(); // 左右区域（Explorer + Blueprint）
+    m_terminal->Initialize();
 
-    QWidget *sidebarContainer = new QWidget();
-    QHBoxLayout *sidebarLayout = new QHBoxLayout(sidebarContainer);
-    sidebarLayout->setContentsMargins(0, 0, 0, 0);
-    sidebarLayout->setSpacing(0);
+    verticalSplitter->addWidget(mainAreaSplitter);
+    verticalSplitter->addWidget(m_terminal);
 
-    m_leftSidebarList = new QListWidget();
-    m_leftSidebarList->addItem("📁");
-    m_leftSidebarList->addItem("🔍");
-    m_leftSidebarList->addItem("Git");
-    m_leftSidebarList->addItem("💡");
-    m_leftSidebarList->addItem("⚙️");
-    m_leftSidebarList->setFixedWidth(48);
+    verticalSplitter->setStretchFactor(0, 1); // 主区域占主要空间
+    verticalSplitter->setStretchFactor(1, 0); // 终端初始较小
+    verticalSplitter->setCollapsible(1, true);
 
-    m_explorer = new QTreeWidget();
-    m_explorer->setHeaderLabel("EXPLORER");
-    auto src = new QTreeWidgetItem(m_explorer);
-    src->setText(0, "📁 src");
-    src->addChild(new QTreeWidgetItem(QStringList("📄 main.js")));
-    src->addChild(new QTreeWidgetItem(QStringList("📄 utils.js")));
-
-    auto pub = new QTreeWidgetItem(m_explorer);
-    pub->setText(0, "📁 public");
-    pub->addChild(new QTreeWidgetItem(QStringList("📄 index.html")));
-    pub->addChild(new QTreeWidgetItem(QStringList("📄 style.css")));
-
-    m_explorer->addTopLevelItem(src);
-    m_explorer->addTopLevelItem(pub);
-    m_explorer->addTopLevelItem(new QTreeWidgetItem(QStringList("📄 README.md")));
-
-    m_leftStackedWidget = new QStackedWidget();
-    m_leftStackedWidget->addWidget(m_explorer);
-    m_leftStackedWidget->addWidget(new QLabel("Search View"));
-    m_leftStackedWidget->addWidget(new QLabel("Git View"));
-    m_leftStackedWidget->addWidget(new QLabel("Other View"));
-    m_leftStackedWidget->addWidget(new QLabel("Settings View"));
-
-    sidebarLayout->addWidget(m_leftSidebarList);
-    sidebarLayout->addWidget(m_leftStackedWidget);
-    sidebarContainer->setMinimumWidth(200);
-    sidebarContainer->setMaximumWidth(400);
-    sidebarContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-
-    splitter->addWidget(sidebarContainer);
-    splitter->addWidget(m_blueprint.get());
-    splitter->setStretchFactor(1, 1);
-
-    m_leftSidebarList->setMinimumWidth(48);
-    m_leftStackedWidget->setMinimumWidth(48);
-    sidebarContainer->setMinimumWidth(48);
-    splitter->setCollapsible(0, false);
-
-    VLayout->addWidget(splitter);
+    VLayout->addWidget(verticalSplitter);
     setCentralWidget(central);
-
-    connect(m_leftSidebarList, &QListWidget::currentRowChanged,
-            m_leftStackedWidget, &QStackedWidget::setCurrentIndex);
 }
 
 void MainWindow::Shutdown() noexcept { }
@@ -109,7 +64,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
             event->accept();
             return;
         } else {
-            m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+            // 只有点标题栏区域，才允许拖动窗口
+            if (m_title && m_title->geometry().contains(event->pos())) {
+                m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+                event->accept();
+                return;
+            }
         }
     }
     QMainWindow::mousePressEvent(event);
@@ -151,7 +111,9 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
             setGeometry(geom);
             unsetCursor();
         } else {
-            move(event->globalPos() - m_dragPosition);
+            if (!m_dragPosition.isNull()) {
+                move(event->globalPos() - m_dragPosition);
+            }
             unsetCursor();
         }
         event->accept();
@@ -174,6 +136,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
+    m_dragPosition = QPoint();
     if (event->button() == Qt::LeftButton) {
         m_resizeDir = NoResize;
         unsetCursor();
@@ -201,4 +164,39 @@ MainWindow::ResizeDirection MainWindow::calculateResizeDirection(const QPoint &p
     if (top) return ResizeTop;
     if (bottom) return ResizeBottom;
     return NoResize;
+}
+
+TitleBar* MainWindow::createTitleBar() noexcept {
+    auto* title = new TitleBar(this);
+    title->Initialize();
+    title->setFixedHeight(30);
+
+    connect(title, &TitleBar::requestMinimize, this, &MainWindow::showMinimized);
+    connect(title, &TitleBar::requestClose, this, &MainWindow::close);
+
+    return title;
+}
+
+QSplitter* MainWindow::createMainSplitter() noexcept {
+    QSplitter* splitter = new QSplitter(Qt::Horizontal);
+
+    // 侧边栏
+    QWidget* sidebarContainer = new QWidget();
+    QHBoxLayout* sidebarLayout = new QHBoxLayout(sidebarContainer);
+    sidebarLayout->setContentsMargins(0, 0, 0, 0);
+    sidebarLayout->setSpacing(0);
+
+    m_explorer->Initialize(sidebarLayout);
+
+    sidebarContainer->setMinimumWidth(48);        // 允许收起到 icon 宽度
+    sidebarContainer->setMaximumWidth(400);
+    sidebarContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+    splitter->addWidget(sidebarContainer);
+    splitter->addWidget(m_blueprint.get());
+
+    splitter->setStretchFactor(1, 1);
+    splitter->setCollapsible(0, false);
+
+    return splitter;
 }

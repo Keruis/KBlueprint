@@ -10,6 +10,8 @@
 #include <QTextEdit>
 #include "Title/TitleBar.h"
 #include "BlueprintMain/include/BlueprintClass.h"
+#include "Panels/Explorer/explorer.h"
+#include "Panels/Terminalpanel/terminal.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,7 +38,7 @@ public:
     void Shutdown() noexcept ;
 
     std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
-
+    QWidget* createBottomPane();
 protected:
     void mousePressEvent(QMouseEvent *event) override ;
     void mouseMoveEvent(QMouseEvent *event) override ;
@@ -44,9 +46,13 @@ protected:
 
 private:
     ResizeDirection calculateResizeDirection(const QPoint &pos) noexcept ;
+    TitleBar* createTitleBar() noexcept ;
+    QSplitter* createMainSplitter() noexcept ;
 
 private:
     TitleBar* m_title;
+    Explorer *m_explorer;
+    Terminal* m_terminal;
     ResizeDirection m_resizeDir = NoResize;
     QPoint m_dragStartPos;
     QRect m_startGeometry;
@@ -56,10 +62,6 @@ private:
 
 private:
     QDockWidget* m_leftSidebar;
-    QListWidget* m_leftSidebarList;
-    QTreeWidget* m_explorer;
-    QStackedWidget* m_leftStackedWidget;
-
     QSplitter* m_splitter;
     QTextEdit* m_editor;
 
@@ -68,7 +70,6 @@ private:
     QStackedWidget* m_rightStackedWidget;
 
     QDockWidget* m_terminalPanel;
-    QTextEdit* m_terminal;
     QAction* m_toggleTerminalAction;
 
     QPushButton* m_terminalLabel;
