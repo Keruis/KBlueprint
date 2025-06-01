@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>../icons/settings.svg</file>
-        <file>../icons/close.svg</file>
-        <file>../icons/maximize.svg</file>
-        <file>../icons/minimize.svg</file>
-        <file>../icons/restore.svg</file>
-        <file>../icons/aspect-ratio(1).svg</file>
+        <file>icons/settings.svg</file>
+        <file>icons/close.svg</file>
+        <file>icons/maximize.svg</file>
+        <file>icons/minimize.svg</file>
+        <file>icons/restore.svg</file>
+        <file>icons/titleIcon.jpg</file>
     </qresource>
 </RCC>

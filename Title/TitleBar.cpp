@@ -76,9 +76,10 @@ void TitleBar::Initialize() noexcept {
     connect(maximizeBtn, &QPushButton::clicked, this, &TitleBar::toggleMaximizeRestore);
     connect(closeBtn, &QPushButton::clicked, this, &TitleBar::requestClose);
 }
+
 QLabel *TitleBar::createIconLabel() noexcept {
     auto iconLabel = new QLabel(this);
-    iconLabel->setPixmap(QPixmap(":/icons/aspect-ratio(1).svg").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setPixmap(QPixmap(":/icons/titleIcon.jpg").scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     iconLabel->setFixedSize(24, 24);
     return iconLabel;
 }
