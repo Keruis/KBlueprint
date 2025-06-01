@@ -15,7 +15,7 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         OpenGLWidgets
-
+        Svg
         REQUIRED)
 
 add_executable(Blueprint
@@ -34,14 +34,14 @@ add_subdirectory(BlueprintMain)
 add_subdirectory(IP/CPU)
 add_subdirectory(Panels)
 
-set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} Title/icon.qrc)
+set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc)
 
 qt_add_resources(Blueprint
         RESOURCE_FILES ${RESOURCE_FILES_BLUEPRINT}
 )
 
 target_link_libraries(Blueprint PRIVATE
-        Qt6::Core Qt6::Widgets Qt6::Gui Qt6::OpenGLWidgets
+        Qt6::Core Qt6::Widgets Qt6::Gui Qt6::OpenGLWidgets Qt6::Svg
 
         Utils Container BlueprintModules
 )

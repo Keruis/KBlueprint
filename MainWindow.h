@@ -12,6 +12,7 @@
 #include "BlueprintMain/include/BlueprintClass.h"
 #include "Panels/Explorer/explorer.h"
 #include "Panels/Terminal/terminal.h"
+#include "Panels/RenderPreviewWidget/RenderPreviewWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -53,6 +54,7 @@ private:
     TitleBar* m_title;
     Explorer *m_explorer;
     Terminal* m_terminal;
+    RenderPreviewWidget* m_renderPreview;
     ResizeDirection m_resizeDir = NoResize;
     QPoint m_dragStartPos;
     QRect m_startGeometry;

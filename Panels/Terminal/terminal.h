@@ -11,6 +11,10 @@
 #include <QLineEdit>
 #include <QString>
 #include <QRegularExpression>
+#include <QPainter>
+#include <QPushButton>
+#include <QFileInfo>
+#include <QSvgRenderer>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -37,11 +41,20 @@ private:
     void setupShell();
     void setupInputHandling();
     void setupResourceMonitor();
+    void setupButton();
+    void setupLabel();
+
+    QString stripAnsi(const QString& text) ;
+    void onPtyReadyRead();
+
+    QWidget* createIconLabelWithText(const QString& icon, const QString& text) noexcept ;
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override ;
 
 private:
+    QLabel* m_title = nullptr;
+
     CPUUsage m_cpuUsage;
 
     QPlainTextEdit* m_terminalOutput = nullptr;
@@ -51,33 +64,25 @@ private:
     QLabel* m_cpuLabel = nullptr;
     QLabel* m_memLabel = nullptr;
 
-
-    int m_ptyMasterFd = -1;  // 伪终端 master 文件描述符
+    int m_ptyMasterFd = -1;
     int m_ptySlaveFd  = -1;
-    pid_t m_childPid  = -1;   // 子进程 PID
+    pid_t m_childPid  = -1;
     QSocketNotifier* m_ptyNotifier = nullptr;
 
     QStringList m_commandHistory;
     int m_historyIndex = -1;
 
-    QString stripAnsi(const QString& text) {
-        static QRegularExpression ansiEscapePattern(R"(\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))");
-        QString copy = text;
-        return copy.replace(ansiEscapePattern, "");
-    }
+    QPushButton* m_firstRightButton = nullptr;
+    QPushButton* m_secondRightButton = nullptr;
+    QPushButton* m_thirdRightButton = nullptr;
 
-    void onPtyReadyRead() {
-        char buf[4096];
-        ssize_t bytesRead = ::read(m_ptyMasterFd, buf, sizeof(buf));
-        if (bytesRead > 0) {
-            QString rawText = QString::fromLocal8Bit(buf, bytesRead);
-            QString cleanText = stripAnsi(rawText);
+    QWidget* m_topInfo;
+    QWidget* m_middleInfo;
+    QWidget* m_bottomInfo;
 
-            m_terminalOutput->moveCursor(QTextCursor::End);
-            m_terminalOutput->insertPlainText(cleanText);
-            m_terminalOutput->moveCursor(QTextCursor::End);
-        }
-    }
+    std::size_t m_errorNum = 0;
+    std::size_t m_warning = 0;
+    std::size_t m_Info = 0;
 };
 
 

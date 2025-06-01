@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_explorer(new Explorer(parent)),
       m_terminal(new Terminal(parent)),
+      m_renderPreview(new RenderPreviewWidget(parent)),
       m_ui(new Ui::MainWindow()),                    //NOLINT
       m_blueprint(std::make_unique<Blueprint::BlueprintClass>())
 {
@@ -33,16 +34,17 @@ void MainWindow::Initialization() noexcept {
     m_title = createTitleBar();
     VLayout->addWidget(m_title);
 
-    QSplitter* verticalSplitter = new QSplitter(Qt::Vertical); // 垂直方向的分割器
+    QSplitter* verticalSplitter = new QSplitter(Qt::Vertical);
 
-    QSplitter* mainAreaSplitter = createMainSplitter(); // 左右区域（Explorer + Blueprint）
+    QSplitter* mainAreaSplitter = createMainSplitter();
+
     m_terminal->Initialize();
 
     verticalSplitter->addWidget(mainAreaSplitter);
     verticalSplitter->addWidget(m_terminal);
 
-    verticalSplitter->setStretchFactor(0, 1); // 主区域占主要空间
-    verticalSplitter->setStretchFactor(1, 0); // 终端初始较小
+    verticalSplitter->setStretchFactor(0, 1);
+    verticalSplitter->setStretchFactor(1, 0);
     verticalSplitter->setCollapsible(1, true);
 
     VLayout->addWidget(verticalSplitter);
@@ -188,14 +190,18 @@ QSplitter* MainWindow::createMainSplitter() noexcept {
 
     m_explorer->Initialize(sidebarLayout);
 
-    sidebarContainer->setMinimumWidth(48);        // 允许收起到 icon 宽度
+    sidebarContainer->setMinimumWidth(48);
     sidebarContainer->setMaximumWidth(400);
     sidebarContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
+    m_renderPreview->setMinimumWidth(20);
+
     splitter->addWidget(sidebarContainer);
     splitter->addWidget(m_blueprint.get());
+    splitter->addWidget(m_renderPreview);
 
     splitter->setStretchFactor(1, 1);
+    splitter->setStretchFactor(2, 1);
     splitter->setCollapsible(0, false);
 
     return splitter;

@@ -21,23 +21,107 @@ void Terminal::Initialize() noexcept {
 
 void Terminal::setupLayout() {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0, 0, 12, 0);
     layout->setSpacing(0);
 
-    QLabel* title = new QLabel("Terminal");
-    title->setFixedHeight(24);
-    layout->addWidget(title);
+    m_title = new QLabel("Terminal");
+    m_title->setFixedHeight(24);
+    layout->addWidget(m_title);
 
+    // 中间部分：输出和右边面板
+    QHBoxLayout* centerLayout = new QHBoxLayout;
+
+    // 左侧输出区域
     m_terminalOutput = new QPlainTextEdit;
     m_terminalOutput->setReadOnly(true);
     m_terminalOutput->setStyleSheet("color: white; font-family: Consolas;");
-    m_terminalOutput->setMinimumHeight(80);
-    layout->addWidget(m_terminalOutput);
+    m_terminalOutput->setMinimumHeight(40);
 
+    // 右侧信息面板
+    QWidget* rightInfoPanel = new QWidget;
+    QVBoxLayout* infoLayout = new QVBoxLayout(rightInfoPanel);
+
+    setupLabel();
+
+    infoLayout->addWidget(m_topInfo);
+    infoLayout->addWidget(m_middleInfo);
+    infoLayout->addWidget(m_bottomInfo);
+    rightInfoPanel->setFixedWidth(50);
+    centerLayout->addWidget(rightInfoPanel, /*stretch=*/1);
+    centerLayout->addWidget(m_terminalOutput, /*stretch=*/3);
+
+    layout->addLayout(centerLayout);
+
+    QHBoxLayout* inputLayout = new QHBoxLayout;
+
+    inputLayout->setContentsMargins(50, 0, 0, 0);
     m_commandInput = new QLineEdit;
     m_commandInput->setPlaceholderText("Enter command...");
     m_commandInput->setStyleSheet("color: white; font-family: Consolas;");
-    layout->addWidget(m_commandInput);
+    inputLayout->addWidget(m_commandInput);
+
+    setupButton();
+    inputLayout->addWidget(m_firstRightButton);
+    inputLayout->addWidget(m_secondRightButton);
+    inputLayout->addWidget(m_thirdRightButton);
+
+    layout->addLayout(inputLayout);
+}
+
+void Terminal::setupButton() {
+    m_firstRightButton  = new QPushButton("1");
+    m_secondRightButton = new QPushButton("2");
+    m_thirdRightButton  = new QPushButton("3");
+}
+
+QWidget *Terminal::createIconLabelWithText(const QString &icon, const QString &text) noexcept {
+    QWidget* container = new QWidget;
+    QVBoxLayout* layout = new QVBoxLayout(container);
+    layout->setSpacing(2);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QLabel* iconLabel = new QLabel;
+    iconLabel->setAlignment(Qt::AlignCenter);
+
+    if (QFileInfo(icon).exists() && icon.endsWith(".svg", Qt::CaseInsensitive)) {
+        // 加载 SVG 图标
+        QSvgRenderer svg(icon);
+        QPixmap pixmap(24, 24);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        svg.render(&painter);
+        iconLabel->setPixmap(pixmap);
+    } else {
+        // 显示 Emoji 或字符
+        iconLabel->setText(icon);
+        iconLabel->setStyleSheet(R"(
+            font-size: 20px;
+            font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif;
+        )");
+    }
+
+    QLabel* textLabel = new QLabel(text);
+    textLabel->setStyleSheet(R"(
+        color: lightgray;
+        font-family: Consolas;
+        font-size: 12px;
+        border: 1px solid gray;
+        border-radius: 6px;
+        padding: 2px 4px;
+    )");
+    textLabel->setAlignment(Qt::AlignCenter);
+
+    layout->addWidget(iconLabel);
+    layout->addWidget(textLabel);
+
+    return container;
+}
+
+void Terminal::setupLabel() {
+    m_topInfo = createIconLabelWithText(":icons/error.svg", QString::number(m_errorNum));
+    m_middleInfo = createIconLabelWithText(":icons/warning.svg", QString::number(m_warning));
+    m_bottomInfo = createIconLabelWithText(":icons/Info.svg", QString::number(m_Info));
 }
 
 void Terminal::setupStatusBar() {
@@ -84,7 +168,6 @@ void Terminal::setupShell() {
     }
 
     if (m_childPid == 0) {
-        // child process
         ::close(m_ptyMasterFd);
         setsid();
         ioctl(m_ptySlaveFd, TIOCSCTTY, 0);
@@ -172,4 +255,23 @@ bool Terminal::eventFilter(QObject* obj, QEvent* event) {
         }
     }
     return QWidget::eventFilter(obj, event);
+}
+
+QString Terminal::stripAnsi(const QString& text) {
+    static QRegularExpression ansiEscapePattern(R"(\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))");
+    QString copy = text;
+    return copy.replace(ansiEscapePattern, "");
+}
+
+void Terminal::onPtyReadyRead() {
+    char buf[4096];
+    ssize_t bytesRead = ::read(m_ptyMasterFd, buf, sizeof(buf));
+    if (bytesRead > 0) {
+        QString rawText = QString::fromLocal8Bit(buf, bytesRead);
+        QString cleanText = stripAnsi(rawText);
+
+        m_terminalOutput->moveCursor(QTextCursor::End);
+        m_terminalOutput->insertPlainText(cleanText);
+        m_terminalOutput->moveCursor(QTextCursor::End);
+    }
 }
