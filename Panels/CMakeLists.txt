@@ -1,13 +1,13 @@
 # H
 target_sources(Blueprint PRIVATE
         Explorer/explorer.h
-        Terminalpanel/terminal.h
-        Terminalpanel/CPUUsage.h
+        Terminal/terminal.h
+        Terminal/CPUUsage.h
 )
 
 # CPP
 target_sources(Blueprint PRIVATE
         Explorer/explorer.cpp
-        Terminalpanel/terminal.cpp
-        Terminalpanel/CPUUsage.cpp
+        Terminal/terminal.cpp
+        Terminal/CPUUsage.cpp
 )

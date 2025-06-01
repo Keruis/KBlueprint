@@ -15,6 +15,7 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         OpenGLWidgets
+
         REQUIRED)
 
 add_executable(Blueprint

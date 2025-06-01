@@ -11,7 +11,7 @@
 #include "Title/TitleBar.h"
 #include "BlueprintMain/include/BlueprintClass.h"
 #include "Panels/Explorer/explorer.h"
-#include "Panels/Terminalpanel/terminal.h"
+#include "Panels/Terminal/terminal.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,7 +38,7 @@ public:
     void Shutdown() noexcept ;
 
     std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
-    QWidget* createBottomPane();
+
 protected:
     void mousePressEvent(QMouseEvent *event) override ;
     void mouseMoveEvent(QMouseEvent *event) override ;
@@ -59,25 +59,6 @@ private:
     QPoint m_dragPosition;
     Ui::MainWindow* m_ui;
     std::unique_ptr<Blueprint::BlueprintClass> m_blueprint;
-
-private:
-    QDockWidget* m_leftSidebar;
-    QSplitter* m_splitter;
-    QTextEdit* m_editor;
-
-    QDockWidget* m_rightSidebar;
-    QListWidget* m_rightSidebarList;
-    QStackedWidget* m_rightStackedWidget;
-
-    QDockWidget* m_terminalPanel;
-    QAction* m_toggleTerminalAction;
-
-    QPushButton* m_terminalLabel;
-    QPushButton* m_helpButton;
-    QPushButton* m_settingsButton;
-    QLabel* m_cpuInfoLabel;
-    QLabel* m_memInfoLabel;
-    QTimer* m_statusUpdateTimer;
 };
 
 
