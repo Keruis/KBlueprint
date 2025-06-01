@@ -18,9 +18,11 @@ Blueprint::BlueprintConnection::BlueprintConnection(Blueprint::BlueprintPort *st
         m_endColor = getColorFromType(endPort->GetNodeType());
     }
     else {
-        m_endPoint = m_startPoint;  // 如果没有终点端口，临时设置终点为起点
+        m_endPoint = m_startPoint;
         m_endColor = QColor(Qt::yellow);
     }
+
+    Initialize();
 }
 
 Blueprint::BlueprintConnection::~BlueprintConnection() {
@@ -100,28 +102,19 @@ void Blueprint::BlueprintConnection::paint(QPainter *painter, const QStyleOption
     qreal offset = qAbs(dx) * 0.6;  // 控制点偏移量
 
     if (m_startPort->GetPortType() == PortType::Output || m_startPort->GetPortType() == PortType::EVENT_OUTPUT
-        || m_startPort->GetPortType() == PortType::EVENT_TRUE_RETURN || m_startPort->GetPortType() == PortType::EVENT_FALSE_RETURN)
-    {
-        if (dx > 0)
-        {
+        || m_startPort->GetPortType() == PortType::EVENT_TRUE_RETURN || m_startPort->GetPortType() == PortType::EVENT_FALSE_RETURN) {
+        if (dx > 0) {
             controlPoint1 = m_startPoint + QPointF(offset, 0);
             controlPoint2 = m_endPoint - QPointF(offset, 0);
-        }
-        else
-        {
+        } else {
             controlPoint1 = m_startPoint + QPointF(offset, dy * 0.5);
             controlPoint2 = m_endPoint - QPointF(offset, -dy * 0.5);
         }
-    }
-    else if (m_startPort->GetPortType() == PortType::Input || m_startPort->GetPortType() == PortType::EVENT_INPUT)
-    {
-        if (dx > 0)
-        {
+    } else if (m_startPort->GetPortType() == PortType::Input || m_startPort->GetPortType() == PortType::EVENT_INPUT) {
+        if (dx > 0) {
             controlPoint1 = m_startPoint - QPointF(offset, 0);
             controlPoint2 = m_endPoint + QPointF(offset, 0);
-        }
-        else
-        {
+        } else {
             controlPoint1 = m_startPoint - QPointF(offset, -dy * 0.5);
             controlPoint2 = m_endPoint + QPointF(offset, dy * 0.5);
         }
@@ -132,12 +125,12 @@ void Blueprint::BlueprintConnection::paint(QPainter *painter, const QStyleOption
 
     // 绘制曲线
     painter->drawPath(path);
+    update();
 }
 
 void Blueprint::BlueprintConnection::SetEndPort(Blueprint::BlueprintPort *endPort) {
     m_endPort = endPort;
-    if (m_endPort)
-    {
+    if (m_endPort) {
         // 如果存在终点端口，更新终点坐标为端口的中心
         UpdatePosition(m_startPort->centerPos(), m_endPort->centerPos());
         m_startPort->sendDataToConnectedPorts();
@@ -186,15 +179,14 @@ void Blueprint::BlueprintConnection::clearSelection() {
     if (!currentScene) return;
 
     BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
-    if (blueprintView)
-    {
-        for (BlueprintConnection *connection : blueprintView->GetConnections())
-        {
+    if (blueprintView) {
+        for (BlueprintConnection *connection : blueprintView->GetConnections()) {
             connection->m_isSelected = false;
             connection->m_animationTimer->stop();  // 停止动画
             connection->update();
         }
     }
+    update();
 }
 
 import NodeType;

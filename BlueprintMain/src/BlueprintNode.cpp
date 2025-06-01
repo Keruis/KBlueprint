@@ -18,7 +18,7 @@ BlueprintNode::BlueprintNode(int type, int datatype, QGraphicsItem *parent)
     QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect(this);
     shadowEffect->setBlurRadius(10);
     shadowEffect->setColor(QColor(0, 0, 0, 100)); // 半透明黑色
-    shadowEffect->setOffset(15, 15); // 阴影偏移
+    shadowEffect->setOffset(10, 10); // 阴影偏移
 
     this->setGraphicsEffect(shadowEffect);
 }
@@ -87,7 +87,7 @@ void BlueprintNode::Initialize(int type) noexcept {
     setZValue(1);
 
     SetNodeType(type);
-    if(m_nodeType == nodeManager.getTypeId("FUNCTION") || m_nodeType == nodeManager.getTypeId("BRANCH") /*|| nodeType == Type::CONDITION*/ || m_nodeType == nodeManager.getTypeId("FORLOOP"))
+    if(m_nodeType == nodeManager.getTypeId("FUNCTION") || m_nodeType == nodeManager.getTypeId("BRANCH") || m_nodeType == nodeManager.getTypeId("FORLOOP"))
         customNodePortSort();
     else
         addButtonToTopLeft();
@@ -107,7 +107,6 @@ BlueprintNode *BlueprintNode::clone() const {
     BlueprintNode* newNode = new BlueprintNode(this->m_nodeType,this->m_dataType);
     newNode->SetNodeName(this->m_name);
     newNode->SetClassName(this->m_className);
-    newNode->SetNodeType(this->m_nodeType);
     newNode->Initialize(m_nodeType);
 
     qDebug() << "node type :" << m_nodeType;

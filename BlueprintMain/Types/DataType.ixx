@@ -5,17 +5,7 @@ export module DataType;
 
 namespace Types {
     export enum class BaseDataType {
-        FOR_FUNCTION = 0,
-        INT,
-        FLOAT,
-        DOUBLE,
-        CHAR,
-        STRING,
-        BOOL,
-        LONG,
-        SHORT,
-        UNSIGNED_INT,
-        VARIANT,
+        IMAGE = 0,
         MAX_BASE_TYPE
     };
 

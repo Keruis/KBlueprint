@@ -5,17 +5,7 @@ module DataType;
 
 namespace Types {
     DataTypeManager::DataTypeManager() {
-        idToName[(int)BaseDataType::FOR_FUNCTION] = "FOR_FUNCTION";
-        idToName[(int)BaseDataType::INT] = "INT";
-        idToName[(int)BaseDataType::FLOAT] = "FLOAT";
-        idToName[(int)BaseDataType::DOUBLE] = "DOUBLE";
-        idToName[(int)BaseDataType::CHAR] = "CHAR";
-        idToName[(int)BaseDataType::STRING] = "STRING";
-        idToName[(int)BaseDataType::BOOL] = "BOOL";
-        idToName[(int)BaseDataType::LONG] = "LONG";
-        idToName[(int)BaseDataType::SHORT] = "SHORT";
-        idToName[(int)BaseDataType::UNSIGNED_INT] = "UNSIGNED_INT";
-        idToName[(int)BaseDataType::VARIANT] = "VARIANT";
+        idToName[(int)BaseDataType::IMAGE] = "IMAGE";
 
         for (const auto& [id, name] : idToName) {
             nameToId[name] = id;

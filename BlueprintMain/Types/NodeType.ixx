@@ -5,7 +5,8 @@ export module NodeType;
 
 namespace Types {
     export enum class BaseNodeType {
-        FUNCTION = 0,   // 函数节点：表示一个可执行的函数操作，一般包含逻辑处理
+        MAIN = 0,
+        FUNCTION,   // 函数节点：表示一个可执行的函数操作，一般包含逻辑处理
         INPUT,          // 输入节点：表示外部输入的数据、信号或变量进入系统的入口
         OUTPUT,         // 输出节点：表示系统输出数据或结果的出口
         BRANCH,         // 分支节点：用于流程控制，根据条件决定下一步执行路径

@@ -5,6 +5,7 @@ module NodeType;
 
 namespace Types {
     NodeTypeManager::NodeTypeManager() {
+        idToName[(int)BaseNodeType::MAIN] = "MAIN";
         idToName[(int)BaseNodeType::FUNCTION] = "FUNCTION";
         idToName[(int)BaseNodeType::INPUT] = "INPUT";
         idToName[(int)BaseNodeType::OUTPUT] = "OUTPUT";
