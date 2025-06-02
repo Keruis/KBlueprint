@@ -13,8 +13,8 @@ BlueprintClass::BlueprintClass(QWidget *parent)
     m_blurEffect(new QGraphicsBlurEffect(this))
 {
     m_ui->setupUi(this);
-    //setViewport(new QOpenGLWidget(this));
-    //setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+//    setViewport(new QOpenGLWidget(this));
+//    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     m_scene->setSceneRect(-1000, -1000, 2000, 2000);
     setScene(m_scene.get());
 }
@@ -125,7 +125,7 @@ void BlueprintClass::PlaceNodeInScene(BlueprintNode *originalNode, const QPointF
     m_sceneNodes.push_back(newNode);
 }
 
-Vector<BlueprintConnection *> BlueprintClass::GetConnections() noexcept {
+std::vector<BlueprintConnection *> BlueprintClass::GetConnections() noexcept {
     return m_connections;
 }
 
@@ -264,50 +264,82 @@ void BlueprintClass::mouseMoveEvent(QMouseEvent *event) {
 
 void BlueprintClass::mouseReleaseEvent(QMouseEvent *event) {
     m_panning = false;
+
     if (m_draggingPort && m_currentConnection) {
-        // 将视图坐标转换为场景坐标
         QPointF scenePos = mapToScene(event->pos());
-        qDebug() << "(m_draggingPort && m_currentConnection)" ;
-        // 遍历场景中的所有项目，寻找匹配的端口
+        qDebug() << "(m_draggingPort && m_currentConnection)";
+
         BlueprintPort *targetPort = nullptr;
         for (QGraphicsItem *item : m_scene->items(scenePos)) {
             targetPort = dynamic_cast<BlueprintPort*>(item);
-            if (targetPort && targetPort != m_draggingPort && targetPort->GetPortType() != m_draggingPort->GetPortType() && targetPort->parentItem() != m_draggingPort->parentItem()) {
-                break;  // 找到目标端口，退出循环
+            if (targetPort && targetPort != m_draggingPort && targetPort->parentItem() != m_draggingPort->parentItem()) {
+                break;
             }
         }
-        if(targetPort) {
-            if((targetPort->GetPortType() == PortType::EVENT_INPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_OUTPUT)
-               ||(targetPort->GetPortType() == PortType::EVENT_OUTPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_INPUT)
-               ||(targetPort->GetPortType() == PortType::EVENT_INPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_FALSE_RETURN)
-               ||(targetPort->GetPortType() == PortType::EVENT_INPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_TRUE_RETURN))
-            {
-                qDebug() << "事件端口连接";
-                m_currentConnection->SetEndPort(targetPort);
-                m_draggingPort->sendDataToConnectedPorts();
-                propagateDataFromInitialNode(m_currentConnection->GetStartPort());
-            }
-            else if (areTypesCompatible(m_currentConnection->GetStartPort()->GetVarTypeName(),targetPort->GetVarTypeName())
-                     && targetPort->GetPortType()!=PortType::EVENT_INPUT && targetPort->GetPortType()!=PortType::EVENT_OUTPUT)
-            {
-                qDebug() << "Found target port:" << targetPort->GetName();
-                // 连接两个端口
-                m_currentConnection->SetEndPort(targetPort);
-                m_draggingPort->sendDataToConnectedPorts();
-            } else {
-                qDebug() << m_currentConnection->GetStartPort()->GetVarTypeName() << " vs " << targetPort->GetVarTypeName();
-                removeConnection(m_currentConnection); // 删除连接
-            }
+
+        if (targetPort) {
+            qDebug() << "连接到目标端口:" << targetPort->GetName();
+            m_currentConnection->SetEndPort(targetPort);
+            m_draggingPort->sendDataToConnectedPorts();
+            propagateDataFromInitialNode(m_currentConnection->GetStartPort());
+        } else {
+            removeConnection(m_currentConnection); // 没找到端口就删掉连接
         }
-        else
-            removeConnection(m_currentConnection);
 
         m_currentConnection = nullptr;
         m_draggingPort = nullptr;
     }
+
     qDebug() << "mouseReleaseEvent(event);";
     QGraphicsView::mouseReleaseEvent(event);
 }
+
+//void BlueprintClass::mouseReleaseEvent(QMouseEvent *event) {
+//    m_panning = false;
+//    if (m_draggingPort && m_currentConnection) {
+//        // 将视图坐标转换为场景坐标
+//        QPointF scenePos = mapToScene(event->pos());
+//        qDebug() << "(m_draggingPort && m_currentConnection)" ;
+//        // 遍历场景中的所有项目，寻找匹配的端口
+//        BlueprintPort *targetPort = nullptr;
+//        for (QGraphicsItem *item : m_scene->items(scenePos)) {
+//            targetPort = dynamic_cast<BlueprintPort*>(item);
+//            if (targetPort && targetPort != m_draggingPort && targetPort->GetPortType() != m_draggingPort->GetPortType() && targetPort->parentItem() != m_draggingPort->parentItem()) {
+//                break;  // 找到目标端口，退出循环
+//            }
+//        }
+//        if(targetPort) {
+//            if((targetPort->GetPortType() == PortType::EVENT_INPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_OUTPUT)
+//               ||(targetPort->GetPortType() == PortType::EVENT_OUTPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_INPUT)
+//               ||(targetPort->GetPortType() == PortType::EVENT_INPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_FALSE_RETURN)
+//               ||(targetPort->GetPortType() == PortType::EVENT_INPUT && m_currentConnection->GetStartPort()->GetPortType() == PortType::EVENT_TRUE_RETURN))
+//            {
+//                qDebug() << "事件端口连接";
+//                m_currentConnection->SetEndPort(targetPort);
+//                m_draggingPort->sendDataToConnectedPorts();
+//                propagateDataFromInitialNode(m_currentConnection->GetStartPort());
+//            }
+//            else if (areTypesCompatible(m_currentConnection->GetStartPort()->GetVarTypeName(),targetPort->GetVarTypeName())
+//                     && targetPort->GetPortType()!=PortType::EVENT_INPUT && targetPort->GetPortType()!=PortType::EVENT_OUTPUT)
+//            {
+//                qDebug() << "Found target port:" << targetPort->GetName();
+//                // 连接两个端口
+//                m_currentConnection->SetEndPort(targetPort);
+//                m_draggingPort->sendDataToConnectedPorts();
+//            } else {
+//                qDebug() << m_currentConnection->GetStartPort()->GetVarTypeName() << " vs " << targetPort->GetVarTypeName();
+//                removeConnection(m_currentConnection); // 删除连接
+//            }
+//        }
+//        else
+//            removeConnection(m_currentConnection);
+//
+//        m_currentConnection = nullptr;
+//        m_draggingPort = nullptr;
+//    }
+//    qDebug() << "mouseReleaseEvent(event);";
+//    QGraphicsView::mouseReleaseEvent(event);
+//}
 
 void BlueprintClass::updateAllConnections() noexcept {
     for (BlueprintConnection* connection : m_connections) {
@@ -326,6 +358,7 @@ void BlueprintClass::removeConnection(BlueprintConnection *connection) noexcept 
     m_connections.erase(std::remove(m_connections.begin(), m_connections.end(), connection), m_connections.end());
     m_scene->removeItem(connection); // 从场景中移除连接
     delete connection;
+    connection = nullptr;
 }
 
 void BlueprintClass::startConnectionDrag(const QPointF &startPos) noexcept {

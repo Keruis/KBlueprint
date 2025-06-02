@@ -13,6 +13,7 @@
 #include "Panels/Explorer/explorer.h"
 #include "Panels/Terminal/terminal.h"
 #include "Panels/RenderPreviewWidget/RenderPreviewWidget.h"
+#include "RadialMenu/RadialMenu.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,16 +42,21 @@ public:
     std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
 
 protected:
+    void paintEvent(QPaintEvent* event) override ;
     void mousePressEvent(QMouseEvent *event) override ;
     void mouseMoveEvent(QMouseEvent *event) override ;
     void mouseReleaseEvent(QMouseEvent *event) override ;
+    void keyPressEvent(QKeyEvent* event) override ;
 
 private:
     ResizeDirection calculateResizeDirection(const QPoint &pos) noexcept ;
     TitleBar* createTitleBar() noexcept ;
     QSplitter* createMainSplitter() noexcept ;
+    void showOptionMenu(const QPoint &pos);
 
 private:
+    QPixmap m_background;
+
     TitleBar* m_title;
     Explorer *m_explorer;
     Terminal* m_terminal;

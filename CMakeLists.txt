@@ -25,7 +25,9 @@ add_executable(Blueprint
         MainWindow.ui
         CPUFeatures.h
         Title/TitleBar.cpp
+        RadialMenu/RadialMenu.cpp
         Title/icon.qrc
+        resources.qrc
 )
 
 add_subdirectory(utils)
@@ -34,7 +36,7 @@ add_subdirectory(BlueprintMain)
 add_subdirectory(IP/CPU)
 add_subdirectory(Panels)
 
-set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc)
+set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc)
 
 qt_add_resources(Blueprint
         RESOURCE_FILES ${RESOURCE_FILES_BLUEPRINT}

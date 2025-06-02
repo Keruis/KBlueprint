@@ -45,7 +45,7 @@ namespace Blueprint {
 
         void updateConnectionsForPort(BlueprintPort *port);
 
-        Vector<BlueprintConnection*> GetConnections() noexcept ;
+        std::vector<BlueprintConnection*> GetConnections() noexcept ;
 
         void propagateDataFromInitialNode(BlueprintPort* init) noexcept ;
         bool areTypesCompatible(const QString& type1, const QString& type2) noexcept ;
@@ -103,6 +103,7 @@ namespace Blueprint {
         void startConnectionDrag(const QPointF &startPos) noexcept ;
 
         void smoothZoom() noexcept ;
+
     protected:
         void contextMenuEvent(QContextMenuEvent *event) override;
 
@@ -131,7 +132,7 @@ namespace Blueprint {
         Vector<BlueprintNode*> m_saveNodes; // 用于存储所有节点
         Vector<BlueprintNode*> m_sceneNodes; // 用于存储场景中的节点
 
-        Vector<BlueprintConnection*> m_connections;
+        std::vector<BlueprintConnection*> m_connections;
     };
 }
 

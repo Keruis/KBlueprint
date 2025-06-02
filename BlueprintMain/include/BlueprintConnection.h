@@ -38,8 +38,8 @@ namespace Blueprint {
         void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
     private:
-        BlueprintPort* m_startPort;
-        BlueprintPort* m_endPort;
+        BlueprintPort* m_startPort = nullptr;
+        BlueprintPort* m_endPort = nullptr;
 
         QColor m_startColor;
         QColor m_endColor;

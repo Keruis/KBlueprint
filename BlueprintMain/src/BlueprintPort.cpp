@@ -44,23 +44,24 @@ void BlueprintPort::paint(QPainter* painter, const QStyleOptionGraphicsItem *opt
     int textHeight = fontMetrics.height();
 
     // 绘制端口
-    if (m_type == EVENT_INPUT || m_type == EVENT_OUTPUT || m_type == EVENT_TRUE_RETURN || m_type == EVENT_FALSE_RETURN)
-    {
-        // 绘制朝右的三角形
-        QPolygonF triangle;
-        qreal size = 5; // 三角形的大小
-        QPointF center = boundingRect().center(); // 获取中心位置
+    if (m_type == EVENT_INPUT || m_type == EVENT_OUTPUT || m_type == EVENT_TRUE_RETURN || m_type == EVENT_FALSE_RETURN) {
+        QPolygonF pentagon;
+        qreal size = 5; // 控制整体大小
+        QPointF center = boundingRect().center(); // 中心点
 
-        // 定义三角形的三个顶点
-        triangle << QPointF(center.x() - size, center.y() - size); // 左上顶点
-        triangle << QPointF(center.x() - size, center.y() + size); // 左下顶点
-        triangle << QPointF(center.x() + size, center.y());        // 右侧顶点
+        // 计算五角形的五个顶点（以中心点为圆心，顺时针方向）
+        for (int i = 0; i < 5; ++i) {
+            qreal angle_deg = 72 * i - 90;  // 起始角为 -90° 使其朝右
+            qreal angle_rad = qDegreesToRadians(angle_deg);
+            QPointF point(center.x() + size * std::cos(angle_rad),
+                          center.y() + size * std::sin(angle_rad));
+            pentagon << point;
+        }
 
-        painter->setBrush(Qt::white); // 设置三角形为白色
-        painter->drawPolygon(triangle); // 绘制三角形
-    }
-    else
-    {
+        painter->setBrush(Qt::white);
+        painter->setPen(Qt::NoPen);
+        painter->drawPolygon(pentagon);
+    } else {
         // 绘制圆形端口
         painter->setBrush((m_type == Input) ? Qt::blue : Qt::green);  // 输入端口为蓝色，输出端口为绿色
         painter->drawEllipse(boundingRect());  // 绘制圆形端口
@@ -68,16 +69,13 @@ void BlueprintPort::paint(QPainter* painter, const QStyleOptionGraphicsItem *opt
 
     // 绘制端口名称，放在端口旁边
     painter->setPen(Qt::white);
-    if (m_type == Input || m_type == EVENT_INPUT)
-    {
+    if (m_type == Input || m_type == EVENT_INPUT) {
         // 输入端口：名称在端口的右边，左对齐
         QRectF textRect = boundingRect().translated(boundingRect().width() + 10, 0);  // 向右移动文本区域，留出10像素的间距
         textRect.setWidth(textWidth);  // 设置文本区域的宽度，确保名称的最后字符靠近端口
         textRect.setHeight(textHeight);
         painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, m_name);  // 名称放在右侧，左对齐
-    }
-    else
-    {
+    } else {
         // 输出端口：名称在端口的左边，右对齐
         QRectF textRect = boundingRect().translated(-textWidth - 10, 0);  // 根据文本长度动态调整区域，留出10像素的间距
         textRect.setWidth(textWidth);  // 设置文本区域的宽度，确保名称的最后字符靠近端口
@@ -155,8 +153,7 @@ void BlueprintPort::updateConnections() noexcept {
 
     BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
 
-    if (blueprintView)
-    {
+    if (blueprintView) {
         // 更新该端口相关的所有连接
         blueprintView->updateConnectionsForPort(this);
     }
@@ -164,25 +161,32 @@ void BlueprintPort::updateConnections() noexcept {
 
 void BlueprintPort::removeConnections() noexcept {
     QGraphicsScene *currentScene = this->scene();
-    BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
+    if (!currentScene || currentScene->views().isEmpty()) return;
+    qDebug() << "w1";
+    auto *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
+    if (!blueprintView) return;
+    qDebug() << "w2";
+    std::vector<BlueprintConnection*> toRemove;
 
-    if (blueprintView)
-    {
-        std::vector<BlueprintConnection*> toRemove;
-        // 遍历所有连接，收集与此端口相关的连接
-        for (BlueprintConnection *connection : blueprintView->GetConnections())
-        {
-            if (connection->GetStartPort() == this || connection->GetEndPort() == this)
-            {
-                toRemove.push_back(connection);
-            }
-        }
+    for (BlueprintConnection *connection : blueprintView->GetConnections()) {
+        if (!connection) continue;
 
-        // 删除所有相关连接
-        for (BlueprintConnection *connection : toRemove)
-        {
-            blueprintView->removeConnection(connection);
+        qDebug() << "w3";
+        BlueprintPort *startPort = connection->GetStartPort();
+        qDebug() << "ww";
+        BlueprintPort *endPort = connection->GetEndPort();
+        qDebug() << "w4";
+        if (!startPort || !endPort)
+            continue;
+        qDebug() << "w5";
+        if (startPort == this || endPort == this) {
+            qDebug() << "w6";
+            toRemove.push_back(connection);
         }
+    }
+
+    for (BlueprintConnection *connection : toRemove) {
+        blueprintView->removeConnection(connection);
     }
 }
 

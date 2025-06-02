@@ -51,8 +51,8 @@ namespace Blueprint {
 
         void SetVariantType(BlueprintPort* port) noexcept ;
 
-        [[nodiscard]] const Vector<BlueprintPort*>& GetInputPorts() const noexcept ;
-        [[nodiscard]] const Vector<BlueprintPort*>& GetOutputPorts() const  noexcept ;
+        [[nodiscard]] const std::vector<BlueprintPort*>& GetInputPorts() const noexcept ;
+        [[nodiscard]] const std::vector<BlueprintPort*>& GetOutputPorts() const  noexcept ;
 
     private:
         void addOutputLabel(BlueprintPort* outport, BlueprintPort* inport) noexcept;
@@ -79,8 +79,8 @@ namespace Blueprint {
         int m_dataType{};
         int m_nodeType;
 
-        Vector<BlueprintPort *> m_inputPorts; // 输入端口
-        Vector<BlueprintPort *> m_outputPorts; // 输出端口
+        std::vector<BlueprintPort *> m_inputPorts; // 输入端口
+        std::vector<BlueprintPort *> m_outputPorts; // 输出端口
         Vector<int> m_dataTypes;       // 存储节点支持的数据类型
 
         Vector<QLineEdit*> m_lineEdits;

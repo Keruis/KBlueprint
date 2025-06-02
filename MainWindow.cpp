@@ -7,6 +7,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
+      m_background(":resource/Honkai-Impact-3rd.png"),
       m_explorer(new Explorer(parent)),
       m_terminal(new Terminal(parent)),
       m_renderPreview(new RenderPreviewWidget(parent)),
@@ -57,6 +58,25 @@ std::unique_ptr<Blueprint::BlueprintClass> &MainWindow::GetBlueprint() noexcept 
     return m_blueprint;
 }
 
+void MainWindow::paintEvent(QPaintEvent *event) {
+    //QPainter painter(this);
+    //painter.drawPixmap(rect(), m_background);
+    QMainWindow::paintEvent(event);
+}
+
+void MainWindow::showOptionMenu(const QPoint &pos) {
+    RadialMenu* radialMenu = new RadialMenu(this);
+
+    connect(radialMenu, &RadialMenu::segmentClicked, this, [=](int index){
+        qDebug() << "你点击了第" << index << "个菜单选项";
+    });
+
+    // 放置在窗口中心（你也可以用 mapToGlobal() + 偏移）
+    QPoint center = rect().center();
+    radialMenu->move(mapToGlobal(center) - QPoint(radialMenu->width()/2, radialMenu->height()/2));
+    radialMenu->show();
+}
+
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         m_resizeDir = calculateResizeDirection(event->pos());
@@ -74,6 +94,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
             }
         }
     }
+    L1:
     QMainWindow::mousePressEvent(event);
 }
 
@@ -145,6 +166,15 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
         event->accept();
     } else {
         QMainWindow::mouseReleaseEvent(event);
+    }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Tab && event->modifiers() & Qt::ControlModifier) {
+        showOptionMenu(rect().center());  // 在窗口中心弹出菜单
+        event->accept(); // 阻止事件继续传递
+    } else {
+        QMainWindow::keyPressEvent(event);
     }
 }
 

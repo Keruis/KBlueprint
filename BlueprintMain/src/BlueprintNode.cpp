@@ -63,11 +63,11 @@ QString BlueprintNode::GetClassName() noexcept {
     return m_className;
 }
 
-const Vector<BlueprintPort *> &BlueprintNode::GetInputPorts() const noexcept {
+const std::vector<BlueprintPort *> &BlueprintNode::GetInputPorts() const noexcept {
     return m_inputPorts;
 }
 
-const Vector<BlueprintPort *> &BlueprintNode::GetOutputPorts() const noexcept {
+const std::vector<BlueprintPort *> &BlueprintNode::GetOutputPorts() const noexcept {
     return m_outputPorts;
 }
 
@@ -94,12 +94,14 @@ void BlueprintNode::Initialize(int type) noexcept {
 }
 
 void BlueprintNode::Shutdown() noexcept {
-    for (BlueprintPort *port : m_inputPorts) {
-        port->removeConnections();
-    }
-    for (BlueprintPort *port : m_outputPorts) {
-        port->removeConnections();
-    }
+//    for (BlueprintPort *port : m_inputPorts) {
+//        qDebug() << "inputSize : " << m_inputPorts.size();
+//        port->removeConnections();
+//    }
+//    for (BlueprintPort *port : m_outputPorts) {
+//        qDebug() << "outputSize : " << m_outputPorts.size();
+//        port->removeConnections();
+//    }
 }
 
 BlueprintNode *BlueprintNode::clone() const {

@@ -28,7 +28,8 @@ Blueprint::BlueprintConnection::BlueprintConnection(Blueprint::BlueprintPort *st
 }
 
 Blueprint::BlueprintConnection::~BlueprintConnection() {
-
+//    m_startPort = nullptr;
+//    m_endPort = nullptr;
 }
 
 void Blueprint::BlueprintConnection::Initialize() noexcept {
@@ -171,7 +172,7 @@ Blueprint::BlueprintPort *Blueprint::BlueprintConnection::GetEndPort() const {
     return m_endPort;
 }
 
-Blueprint::BlueprintPort *Blueprint::BlueprintConnection::GetStartPort() const {
+Blueprint::BlueprintPort* Blueprint::BlueprintConnection::GetStartPort() const {
     return m_startPort;
 }
 
