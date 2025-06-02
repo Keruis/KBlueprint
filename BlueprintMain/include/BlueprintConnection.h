@@ -31,7 +31,7 @@ namespace Blueprint {
     private:
         void setupAnimation();
         void clearSelection();
-        QColor getColorFromType(int type);
+        QColor getColorFromType(const std::string& nodeName);
 
     protected:
         QPainterPath shape() const override;
@@ -46,8 +46,6 @@ namespace Blueprint {
 
         QPointF m_startPoint;
         QPointF m_endPoint;
-
-        bool m_isSelected = false;
 
         QTimer* m_animationTimer;
         qreal m_animationProgress;

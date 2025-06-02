@@ -2,22 +2,24 @@
 #include "../Types/PortType.h"
 #include "../include/BlueprintClass.h"
 
+import NodeType;
+
 Blueprint::BlueprintConnection::BlueprintConnection(Blueprint::BlueprintPort *startPort, Blueprint::BlueprintPort *endPort, QGraphicsItem *parent)
-    : QGraphicsItem(parent),
-      m_startPort(startPort),
-      m_endPort(endPort)
+        : QGraphicsItem(parent),
+          m_startPort(startPort),
+          m_endPort(endPort)
 {
+    auto& manager = Types::NodeTypeManager::instance();
     m_startPoint = startPort->centerPos();
-    if(startPort->GetPortType() == PortType::EVENT_INPUT || startPort->GetPortType() == PortType::EVENT_OUTPUT)
-        m_startColor = Qt::white;
-    else
-        m_startColor = getColorFromType(startPort->GetNodeType());
+
+    m_startColor = getColorFromType(manager.getTypeName(startPort->GetNodeType()));
+
     qDebug() << startPort->GetNodeType();
+
     if (endPort) {
         m_endPoint = endPort->centerPos();
-        m_endColor = getColorFromType(endPort->GetNodeType());
-    }
-    else {
+        m_endColor = getColorFromType(manager.getTypeName(endPort->GetNodeType()));
+    } else {
         m_endPoint = m_startPoint;
         m_endColor = QColor(Qt::yellow);
     }
@@ -56,13 +58,43 @@ void Blueprint::BlueprintConnection::UpdatePosition(const QPointF &startPos, con
 }
 
 QRectF Blueprint::BlueprintConnection::boundingRect() const {
-    return QRectF(m_startPoint, m_endPoint).normalized().adjusted(-5, -5, -5, -5);
+    QPointF controlPoint1, controlPoint2;
+
+    qreal dx = m_endPoint.x() - m_startPoint.x();
+    qreal dy = m_endPoint.y() - m_startPoint.y();
+    qreal offset = qAbs(dx) * 0.6;
+
+    if (m_startPort->GetPortType() == PortType::Output || m_startPort->GetPortType() == PortType::EVENT_OUTPUT
+        || m_startPort->GetPortType() == PortType::EVENT_TRUE_RETURN || m_startPort->GetPortType() == PortType::EVENT_FALSE_RETURN) {
+        if (dx > 0) {
+            controlPoint1 = m_startPoint + QPointF(offset, 0);
+            controlPoint2 = m_endPoint - QPointF(offset, 0);
+        } else {
+            controlPoint1 = m_startPoint + QPointF(offset, dy * 0.5);
+            controlPoint2 = m_endPoint - QPointF(offset, -dy * 0.5);
+        }
+    } else {
+        if (dx > 0) {
+            controlPoint1 = m_startPoint - QPointF(offset, 0);
+            controlPoint2 = m_endPoint + QPointF(offset, 0);
+        } else {
+            controlPoint1 = m_startPoint - QPointF(offset, -dy * 0.5);
+            controlPoint2 = m_endPoint + QPointF(offset, dy * 0.5);
+        }
+    }
+
+    QRectF bounding = QRectF(m_startPoint, m_endPoint)
+            .united(QRectF(controlPoint1, controlPoint2))
+            .normalized()
+            .adjusted(-10, -10, 10, 10);
+
+    return bounding;
 }
 
 void Blueprint::BlueprintConnection::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     QPen pen;
 
-    if (m_isSelected) {
+    if (isSelected()) {
         // 使用动态渐变效果
         QLinearGradient gradient(m_startPoint, m_endPoint);
 
@@ -125,13 +157,11 @@ void Blueprint::BlueprintConnection::paint(QPainter *painter, const QStyleOption
 
     // 绘制曲线
     painter->drawPath(path);
-    update();
 }
 
 void Blueprint::BlueprintConnection::SetEndPort(Blueprint::BlueprintPort *endPort) {
     m_endPort = endPort;
     if (m_endPort) {
-        // 如果存在终点端口，更新终点坐标为端口的中心
         UpdatePosition(m_startPort->centerPos(), m_endPort->centerPos());
         m_startPort->sendDataToConnectedPorts();
     }
@@ -164,7 +194,6 @@ void Blueprint::BlueprintConnection::mousePressEvent(QGraphicsSceneMouseEvent *e
     clearSelection();
 
     // 切换选中状态
-    m_isSelected = true;
     m_animationTimer->start(50);  // 启动动画，每50毫秒更新一次
 
     // 重绘线条
@@ -181,7 +210,6 @@ void Blueprint::BlueprintConnection::clearSelection() {
     BlueprintClass *blueprintView = dynamic_cast<BlueprintClass*>(currentScene->views().first());
     if (blueprintView) {
         for (BlueprintConnection *connection : blueprintView->GetConnections()) {
-            connection->m_isSelected = false;
             connection->m_animationTimer->stop();  // 停止动画
             connection->update();
         }
@@ -189,20 +217,17 @@ void Blueprint::BlueprintConnection::clearSelection() {
     update();
 }
 
-import NodeType;
+#include "../../utils/xml/xml.h"
 
-QColor Blueprint::BlueprintConnection::getColorFromType(int type) {
-    auto& manager = Types::NodeTypeManager::instance();
-    if (type == manager.getTypeId("FUNCTION"))
-        return QColor(0, 128, 255);  // 颜色为蓝色
-    else if (type == manager.getTypeId("INPUT"))
-        return QColor(0, 255, 0);  // 颜色为绿色
-    else if (type == manager.getTypeId("OUTPUT"))
-        return QColor(Qt::red);  // 颜色为红色
-    else if (type == manager.getTypeId("CONDITION"))
-        return QColor(124, 255, 0);
-    else if (type == manager.getTypeId("BRANCH"))
-        return QColor(0,125,125);
-    else
-        return QColor(0,125,125);
+QColor Blueprint::BlueprintConnection::getColorFromType(const std::string& nodeName) {
+    Utils::Xml root;
+    QColor color;
+    root.load("ConnectionColor.xml");
+    std::string StrColor = root["Color"][nodeName].text();
+    qDebug() << root["Color"][nodeName].text();
+    color.setNamedColor(QString::fromStdString(StrColor));
+    if (!color.isValid()) {
+        color = Qt::yellow;
+    }
+    return color;
 }
