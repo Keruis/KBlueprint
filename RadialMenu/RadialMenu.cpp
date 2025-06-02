@@ -2,7 +2,7 @@
 
 RadialMenu::RadialMenu(QWidget* parent)
     : QWidget(parent),
-      m_radius(100),
+      m_radius(130),
       m_innerRadius(40),
       m_segmentCount(5)
 {
@@ -10,6 +10,8 @@ RadialMenu::RadialMenu(QWidget* parent)
     setAttribute(Qt::WA_TranslucentBackground);
     setFixedSize(m_radius * 2, m_radius * 2);
     setMouseTracking(true);
+
+    m_svgRenderer0 = new QSvgRenderer(QString(":resource/terminal.svg"), this);
 }
 
 void RadialMenu::paintEvent(QPaintEvent *) {
@@ -39,10 +41,23 @@ void RadialMenu::paintEvent(QPaintEvent *) {
         path.closeSubpath();
 
         QColor color = (i == m_hoveredIndex)
-                       ? QColor(180, 180, 180)  // 高亮灰
-                       : QColor(100, 100, 100); // 默认灰
+                       ? QColor(180, 180, 180, 140)  // 高亮灰
+                       : QColor(100, 100, 100, 140); // 默认灰
         painter.setBrush(color);
         painter.drawPath(path);
+
+        if (i == 0 && m_svgRenderer0 && m_svgRenderer0->isValid()) {
+            double midAngle = angle + spanAngle / 2.0;
+            double radians = midAngle * M_PI / 180.0;
+
+            double r = (m_innerRadius + m_radius) / 2.0;
+            QPointF center = rect().center();
+            QPointF svgPos = center + QPointF(std::cos(radians), -std::sin(radians)) * r;
+
+            QRectF svgRect(svgPos.x() - 26, svgPos.y() - 26, 54, 54);
+
+            m_svgRenderer0->render(&painter, svgRect);
+        }
 
         angle += spanAngle + gapAngle;
     }
@@ -71,7 +86,7 @@ void RadialMenu::closeEvent(QCloseEvent *event) {
 
 void RadialMenu::updateHoveredByDirection() {
     QPoint globalMousePos = QCursor::pos();
-    QPoint globalCenter = mapToGlobal(rect().center()); // 把本地中心点转成全局坐标
+    QPoint globalCenter = mapToGlobal(rect().center());
 
     QPointF delta = globalMousePos - globalCenter;
 
@@ -83,8 +98,6 @@ void RadialMenu::updateHoveredByDirection() {
 
     double angle = std::atan2(-delta.y(), delta.x()) * 180 / M_PI;
     if (angle < 0) angle += 360;
-
-    qDebug() << "鼠标角度:" << angle;
 
     int index = getHoveredSegmentFromAngle(angle);
     if (index != m_hoveredIndex) {
@@ -103,7 +116,6 @@ int RadialMenu::getHoveredSegmentFromAngle(double angle) const {
         int startAngle = i * fullSpan;
         int endAngle = startAngle + spanAngle;
 
-        // 处理跨 360° 情况
         if (startAngle <= angle && angle < endAngle)
             return i;
         else if (endAngle > 360 && angle < (endAngle - 360))

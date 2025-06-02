@@ -7,6 +7,7 @@
 #include <QPointF>
 #include <QTimer>
 #include <QPaintEvent>
+#include <QSvgRenderer>
 
 class RadialMenu : public QWidget {
     Q_OBJECT
@@ -17,7 +18,7 @@ public:
 private:
     //void showAt(const QPoint& globalPos) ;
     void updateHoveredByDirection() ;
-    int getHoveredSegmentFromAngle(double angle) const ;
+    [[nodiscard]] int getHoveredSegmentFromAngle(double angle) const ;
 
 protected:
     void paintEvent(QPaintEvent *) override ;
@@ -36,6 +37,8 @@ private:
 
     int m_hoveredIndex = -1;
     QPoint m_screenCenter;
+
+    QSvgRenderer* m_svgRenderer0;
 };
 
 

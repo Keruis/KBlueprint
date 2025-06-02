@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>resource/Honkai-Impact-3rd.png</file>
+        <file>resource/terminal.svg</file>
     </qresource>
 </RCC>

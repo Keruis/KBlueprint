@@ -50,6 +50,12 @@ void MainWindow::Initialization() noexcept {
 
     VLayout->addWidget(verticalSplitter);
     setCentralWidget(central);
+
+    connect(verticalSplitter, &QSplitter::splitterMoved, this, [=](int pos, int index) {
+        Q_UNUSED(pos);
+        Q_UNUSED(index);
+        m_lastTerminalSplitterSizes = verticalSplitter->sizes();
+    });
 }
 
 void MainWindow::Shutdown() noexcept { }
@@ -64,14 +70,45 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     QMainWindow::paintEvent(event);
 }
 
+void MainWindow::toggleTerminal() {
+    QSplitter* splitter = qobject_cast<QSplitter*>(m_terminal->parentWidget());
+    if (!splitter) return;
+
+    if (m_terminalVisible) {
+        // 折叠：记录当前尺寸
+        m_lastTerminalSplitterSizes = splitter->sizes();
+
+        QList<int> sizes = m_lastTerminalSplitterSizes;
+        sizes[0] += sizes[1];
+        sizes[1] = 0;
+        splitter->setSizes(sizes);
+    } else {
+        // 还原：使用上次记录的尺寸
+        if (!m_lastTerminalSplitterSizes.isEmpty()) {
+            splitter->setSizes(m_lastTerminalSplitterSizes);
+        } else {
+            // 如果没有记录，用默认比例
+            QList<int> sizes;
+            sizes << height() * 0.75 << height() * 0.25;
+            splitter->setSizes(sizes);
+        }
+    }
+
+    m_terminalVisible = !m_terminalVisible;
+}
+
 void MainWindow::showOptionMenu(const QPoint &pos) {
     RadialMenu* radialMenu = new RadialMenu(this);
 
     connect(radialMenu, &RadialMenu::segmentClicked, this, [=](int index){
         qDebug() << "你点击了第" << index << "个菜单选项";
+        switch (index) {
+            case 0:
+                toggleTerminal();
+                break;
+        }
     });
 
-    // 放置在窗口中心（你也可以用 mapToGlobal() + 偏移）
     QPoint center = rect().center();
     radialMenu->move(mapToGlobal(center) - QPoint(radialMenu->width()/2, radialMenu->height()/2));
     radialMenu->show();

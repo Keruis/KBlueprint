@@ -53,13 +53,18 @@ private:
     TitleBar* createTitleBar() noexcept ;
     QSplitter* createMainSplitter() noexcept ;
     void showOptionMenu(const QPoint &pos);
+    void toggleTerminal();
 
 private:
     QPixmap m_background;
 
     TitleBar* m_title;
     Explorer *m_explorer;
+
     Terminal* m_terminal;
+    bool m_terminalVisible = true;
+    QList<int> m_lastTerminalSplitterSizes;
+
     RenderPreviewWidget* m_renderPreview;
     ResizeDirection m_resizeDir = NoResize;
     QPoint m_dragStartPos;
