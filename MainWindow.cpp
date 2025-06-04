@@ -97,14 +97,33 @@ void MainWindow::toggleTerminal() {
     m_terminalVisible = !m_terminalVisible;
 }
 
+void MainWindow::changeFilePath() {
+    QString folderPath = QFileDialog::getExistingDirectory(
+            this,
+            tr("选择文件夹"),
+            m_explorer->GetRootPath(),
+            QFileDialog::ShowDirsOnly
+    );
+
+    if (!folderPath.isEmpty()) {
+        m_explorer->loadNewPath(folderPath);
+        qDebug() << "Selected Folder:" << folderPath;
+        update();
+    }
+}
+
 void MainWindow::showOptionMenu(const QPoint &pos) {
     RadialMenu* radialMenu = new RadialMenu(this);
 
-    connect(radialMenu, &RadialMenu::segmentClicked, this, [=](int index){
+    connect(radialMenu, &RadialMenu::segmentClicked, this, [=, this](int index){
         qDebug() << "你点击了第" << index << "个菜单选项";
         switch (index) {
             case 0:
                 toggleTerminal();
+                break;
+
+            case 1:
+                changeFilePath();
                 break;
         }
     });
@@ -255,6 +274,7 @@ QSplitter* MainWindow::createMainSplitter() noexcept {
     sidebarLayout->setContentsMargins(0, 0, 0, 0);
     sidebarLayout->setSpacing(0);
 
+   // m_explorer->SetRootPath("/home/keruis/extra/ASMDSL/");
     m_explorer->Initialize(sidebarLayout);
 
     sidebarContainer->setMinimumWidth(48);

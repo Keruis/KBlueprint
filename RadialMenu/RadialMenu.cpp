@@ -12,6 +12,7 @@ RadialMenu::RadialMenu(QWidget* parent)
     setMouseTracking(true);
 
     m_svgRenderer0 = new QSvgRenderer(QString(":resource/terminal.svg"), this);
+    m_svgRenderer1 = new QSvgRenderer(QString(":resource/folder.svg"), this);
 }
 
 void RadialMenu::paintEvent(QPaintEvent *) {
@@ -57,6 +58,19 @@ void RadialMenu::paintEvent(QPaintEvent *) {
             QRectF svgRect(svgPos.x() - 26, svgPos.y() - 26, 54, 54);
 
             m_svgRenderer0->render(&painter, svgRect);
+        }
+
+        if (i == 1 && m_svgRenderer1 && m_svgRenderer1->isValid()) {
+            double midAngle = angle + spanAngle / 2.0;
+            double radians = midAngle * M_PI / 180.0;
+
+            double r = (m_innerRadius + m_radius) / 2.0;
+            QPointF center = rect().center();
+            QPointF svgPos = center + QPointF(std::cos(radians), -std::sin(radians)) * r;
+
+            QRectF svgRect(svgPos.x() - 26, svgPos.y() - 26, 54, 54);
+
+            m_svgRenderer1->render(&painter, svgRect);
         }
 
         angle += spanAngle + gapAngle;

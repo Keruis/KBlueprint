@@ -30,6 +30,13 @@ void Explorer::Initialize(QHBoxLayout* sidebarLayout) noexcept {
 
     connect(m_leftSidebarList, &QListWidget::currentRowChanged,
             m_leftStackedWidget, &QStackedWidget::setCurrentIndex);
+
+    connect(
+        static_cast<QTreeWidget*>(m_leftStackedWidget->currentWidget()),
+        &QTreeWidget::itemDoubleClicked,
+        this,
+        &Explorer::onItemClicked
+    );
 }
 
 void Explorer::addSidebarPage(const QString& iconText, QWidget* widget) noexcept {
@@ -42,31 +49,94 @@ void Explorer::addSidebarPage(const QString& iconText, QWidget* widget) noexcept
 void Explorer::addSidebarPage(const QIcon& icon, const QString& tooltip, QWidget* widget) noexcept {
     auto* item = new QListWidgetItem();
     item->setIcon(icon);
-    item->setToolTip(tooltip); // 鼠标悬停可见
+    item->setToolTip(tooltip);
     item->setTextAlignment(Qt::AlignHCenter);
-    item->setText(""); // 不显示文字，只显示图标
+    item->setText("");
     m_leftSidebarList->addItem(item);
     m_leftStackedWidget->addWidget(widget);
+}
+
+void Explorer::populateTreeFromDirectory(const QString& path, QTreeWidgetItem* parent) {
+    QDir dir(path);
+    if (!dir.exists()) {
+        qWarning() << "Directory not found:" << path; // 路径检查
+        return;
+    }
+
+    QFileInfoList entries = dir.entryInfoList(
+            QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs | QDir::NoSymLinks
+    );
+
+    for (const QFileInfo& info : entries) {
+        QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+        item->setText(0, info.fileName());
+
+        // 设置图标
+        QFileIconProvider iconProvider;
+        item->setIcon(0, iconProvider.icon(info));
+        item->setData(0, Qt::UserRole, QVariant::fromValue(info));
+
+        qDebug() << "Added:" << info.filePath()
+                 << "Type:" << (info.isFile() ? "File" : "Directory");
+
+        if (info.isDir()) {
+            populateTreeFromDirectory(info.filePath(), item);
+        }
+    }
 }
 
 QTreeWidget* Explorer::createExplorerTree() noexcept {
     auto* explorer = new QTreeWidget();
     explorer->setHeaderLabel("EXPLORER");
+    explorer->setColumnCount(1);
 
-    auto src = new QTreeWidgetItem(explorer);
-    src->setText(0, "📁 src");
-    src->addChild(new QTreeWidgetItem(QStringList("📄 main.js")));
-    src->addChild(new QTreeWidgetItem(QStringList("📄 utils.js")));
+    QTreeWidgetItem* rootNode = new QTreeWidgetItem(explorer);
+    rootNode->setText(0, m_rootPath);
+    rootNode->setIcon(0, QFileIconProvider().icon(QFileIconProvider::Folder));
 
-    auto pub = new QTreeWidgetItem(explorer);
-    pub->setText(0, "📁 public");
-    pub->addChild(new QTreeWidgetItem(QStringList("📄 index.html")));
-    pub->addChild(new QTreeWidgetItem(QStringList("📄 style.css")));
+    populateTreeFromDirectory(m_rootPath, rootNode);
 
-    explorer->addTopLevelItem(src);
-    explorer->addTopLevelItem(pub);
-    explorer->addTopLevelItem(new QTreeWidgetItem(QStringList("📄 README.md")));
+    //explorer->expandAll();
 
     return explorer;
 }
 
+QString Explorer::GetRootPath() const noexcept {
+    return m_rootPath;
+}
+
+void Explorer::SetRootPath(const QString &rootPath) noexcept {
+    m_rootPath = rootPath;
+}
+
+void Explorer::loadNewPath(const QString& newPath) noexcept {
+    SetRootPath(newPath);
+
+    QTreeWidget* currentTree = qobject_cast<QTreeWidget*>(m_leftStackedWidget->currentWidget());
+    if (!currentTree) {
+        qWarning() << "No valid tree widget found!";
+        return;
+    }
+
+    // 清空当前树内容
+    currentTree->clear();
+
+    // 创建新的根节点
+    QTreeWidgetItem* newRoot = new QTreeWidgetItem(currentTree);
+    newRoot->setText(0, m_rootPath);
+    newRoot->setIcon(0, QFileIconProvider().icon(QFileIconProvider::Folder));
+
+    // 填充子节点
+    populateTreeFromDirectory(m_rootPath, newRoot);
+}
+
+void Explorer::onItemClicked(QTreeWidgetItem *item, int colum) {
+    QFileInfo fileInfo = item->data(0, Qt::UserRole).value<QFileInfo>();
+
+    if (fileInfo.isFile()) {
+        QString filePath = fileInfo.absoluteFilePath();
+
+        FileViewer* viewer = new FileViewer(filePath, this);
+        viewer->show();
+    }
+}

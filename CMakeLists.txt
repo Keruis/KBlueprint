@@ -43,7 +43,11 @@ qt_add_resources(Blueprint
 )
 
 target_link_libraries(Blueprint PRIVATE
-        Qt6::Core Qt6::Widgets Qt6::Gui Qt6::OpenGLWidgets Qt6::Svg
+        Qt6::Core
+        Qt6::Widgets
+        Qt6::Gui
+        Qt6::OpenGLWidgets
+        Qt6::Svg
 
         Utils Container BlueprintModules
 )

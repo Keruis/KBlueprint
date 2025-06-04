@@ -6,6 +6,7 @@
 #include <QListWidget>
 #include <QTreeWidget>
 #include <QStackedWidget>
+#include <QFileDialog>
 #include <QSplitter>
 #include <QTextEdit>
 #include "Title/TitleBar.h"
@@ -53,7 +54,9 @@ private:
     TitleBar* createTitleBar() noexcept ;
     QSplitter* createMainSplitter() noexcept ;
     void showOptionMenu(const QPoint &pos);
+
     void toggleTerminal();
+    void changeFilePath();
 
 private:
     QPixmap m_background;

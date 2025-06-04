@@ -39,6 +39,7 @@ private:
     QPoint m_screenCenter;
 
     QSvgRenderer* m_svgRenderer0;
+    QSvgRenderer* m_svgRenderer1;
 };
 
 

@@ -8,6 +8,12 @@
 #include <QSplitter>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QDir>
+#include <QFileInfo>
+#include <QFileIconProvider>
+#include <QVariant>
+
+#include "FileViewer.h"
 
 class Explorer : public QWidget {
     Q_OBJECT
@@ -18,12 +24,21 @@ public:
     void addSidebarPage(const QIcon& icon, const QString& tooltip, QWidget* widget) noexcept ;
     void addSidebarPage(const QString& iconText, QWidget* widget) noexcept ;
 
+    QString GetRootPath() const noexcept;
+    void SetRootPath(const QString& rootPath) noexcept ;
+    void loadNewPath(const QString& newRootPath) noexcept ;
+
 private:
+    void populateTreeFromDirectory(const QString& path, QTreeWidgetItem* parent) ;
     QTreeWidget* createExplorerTree() noexcept ;
 
 private:
+    QString m_rootPath;
     QListWidget* m_leftSidebarList;
     QStackedWidget* m_leftStackedWidget;
+
+private slots:
+    void onItemClicked(QTreeWidgetItem* item, int colum);
 };
 
 
