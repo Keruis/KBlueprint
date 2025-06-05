@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_background(":resource/Honkai-Impact-3rd.png"),
       m_explorer(new Explorer(parent)),
+      m_bottomBar(new BottomBar(parent)),
+      m_leftToolBar(new LeftToolBar(parent)),
       m_terminal(new Terminal(parent)),
       m_renderPreview(new RenderPreviewWidget(parent)),
       m_ui(new Ui::MainWindow()),                    //NOLINT
@@ -19,43 +21,70 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() = default;
 
-void MainWindow::Initialization() noexcept {
+void MainWindow::Initialization() noexcept
+{
+    // 初始化组件
     m_blueprint->Initialization();
+    m_terminal->Initialize();
 
-    this->setContentsMargins(4, 0, 4, 4);
+    // 本身属性
+    setContentsMargins(4, 0, 4, 4);
     setMouseTracking(true);
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground, false);
 
+    // 创建 Central Widget 和外层垂直布局
     QWidget* central = new QWidget;
-    QVBoxLayout* VLayout = new QVBoxLayout(central);
-    VLayout->setContentsMargins(0, 0, 0, 0);
-    VLayout->setSpacing(0);
+    QVBoxLayout* mainVLayout = new QVBoxLayout(central);
+    mainVLayout->setContentsMargins(0, 0, 0, 0);
+    mainVLayout->setSpacing(0);
 
+    // === 顶部标题栏 ===
     m_title = createTitleBar();
-    VLayout->addWidget(m_title);
+    mainVLayout->addWidget(m_title);
+
+    // === 中间内容区域（左边工具栏 + 主区域）===
+    QHBoxLayout* centerHLayout = new QHBoxLayout;
+    centerHLayout->setContentsMargins(0, 0, 0, 0);
+    centerHLayout->setSpacing(0);
+
+    // 左边工具栏
+    m_leftToolBar->Initialize();
+
+    // 右边主区域（蓝图 + 终端）
+    QWidget* rightContent = new QWidget;
+    QVBoxLayout* rightLayout = new QVBoxLayout(rightContent);
+    rightLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->setSpacing(0);
 
     QSplitter* verticalSplitter = new QSplitter(Qt::Vertical);
-
-    QSplitter* mainAreaSplitter = createMainSplitter();
-
-    m_terminal->Initialize();
-
+    QSplitter* mainAreaSplitter = createMainSplitter(); // 蓝图+预览
     verticalSplitter->addWidget(mainAreaSplitter);
     verticalSplitter->addWidget(m_terminal);
-
     verticalSplitter->setStretchFactor(0, 1);
     verticalSplitter->setStretchFactor(1, 0);
     verticalSplitter->setCollapsible(1, true);
 
-    VLayout->addWidget(verticalSplitter);
+    rightLayout->addWidget(verticalSplitter);
+    centerHLayout->addWidget(m_leftToolBar);
+    centerHLayout->addWidget(rightContent);
+
+    mainVLayout->addLayout(centerHLayout); // 中间加入主垂直布局
+
+    // === 底部状态栏 ===
+    m_bottomBar->Initialize();
+    mainVLayout->addWidget(m_bottomBar); // 最下方添加状态栏
+
+    // 设置 central widget
     setCentralWidget(central);
 
-    connect(verticalSplitter, &QSplitter::splitterMoved, this, [=](int pos, int index) {
-        Q_UNUSED(pos);
-        Q_UNUSED(index);
-        m_lastTerminalSplitterSizes = verticalSplitter->sizes();
+    // 保存终端高度
+    connect(verticalSplitter, &QSplitter::splitterMoved, this,
+            [=](int, int) {
+                m_lastTerminalSplitterSizes = verticalSplitter->sizes();
     });
+
+    connect(m_leftToolBar, &LeftToolBar::buttonClicked, m_explorer, &Explorer::SetCurrentIndex);
 }
 
 void MainWindow::Shutdown() noexcept { }
@@ -107,6 +136,7 @@ void MainWindow::changeFilePath() {
 
     if (!folderPath.isEmpty()) {
         m_explorer->loadNewPath(folderPath);
+        m_bottomBar->SetPath(folderPath);
         qDebug() << "Selected Folder:" << folderPath;
         update();
     }
@@ -150,7 +180,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
             }
         }
     }
-    L1:
+
     QMainWindow::mousePressEvent(event);
 }
 
@@ -223,6 +253,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
     } else {
         QMainWindow::mouseReleaseEvent(event);
     }
+    unsetCursor();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {

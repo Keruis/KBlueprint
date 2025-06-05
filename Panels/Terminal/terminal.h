@@ -24,8 +24,6 @@
 #include <pty.h>
 #include <QSocketNotifier>
 
-#include "CPUUsage.h"
-
 class Terminal : public QWidget {
     Q_OBJECT
 
@@ -36,11 +34,9 @@ public:
 
 private:
     void setupLayout();
-    void setupStatusBar();
     bool setupPty();
     void setupShell();
     void setupInputHandling();
-    void setupResourceMonitor();
     void setupButton();
     void setupLabel();
 
@@ -55,14 +51,8 @@ protected:
 private:
     QLabel* m_title = nullptr;
 
-    CPUUsage m_cpuUsage;
-
     QPlainTextEdit* m_terminalOutput = nullptr;
     QLineEdit* m_commandInput = nullptr;
-
-    QLabel* m_pathLabel = nullptr;
-    QLabel* m_cpuLabel = nullptr;
-    QLabel* m_memLabel = nullptr;
 
     int m_ptyMasterFd = -1;
     int m_ptySlaveFd  = -1;

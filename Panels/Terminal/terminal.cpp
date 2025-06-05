@@ -8,14 +8,12 @@ Terminal::Terminal(QWidget *parent)
 
 void Terminal::Initialize() noexcept {
     setupLayout();
-    setupStatusBar();
     if (!setupPty()) {
         m_terminalOutput->appendPlainText("Failed to initialize PTY");
         return;
     }
     setupShell();
     setupInputHandling();
-    setupResourceMonitor();
     update();
 }
 
@@ -119,26 +117,9 @@ QWidget *Terminal::createIconLabelWithText(const QString &icon, const QString &t
 }
 
 void Terminal::setupLabel() {
-    m_topInfo = createIconLabelWithText(":icons/error.svg", QString::number(m_errorNum));
-    m_middleInfo = createIconLabelWithText(":icons/warning.svg", QString::number(m_warning));
-    m_bottomInfo = createIconLabelWithText(":icons/Info.svg", QString::number(m_Info));
-}
-
-void Terminal::setupStatusBar() {
-    QWidget* statusBar = new QWidget;
-    QHBoxLayout* statusLayout = new QHBoxLayout(statusBar);
-    statusLayout->setContentsMargins(4, 2, 4, 2);
-    statusLayout->setSpacing(8);
-
-    m_pathLabel = new QLabel("Path: /your/project/path");
-    m_cpuLabel = new QLabel("CPU: 0%");
-    m_memLabel = new QLabel("Memory: 0 MB");
-
-    statusLayout->addWidget(m_pathLabel);
-    statusLayout->addStretch();
-    statusLayout->addWidget(m_cpuLabel);
-    statusLayout->addWidget(m_memLabel);
-    layout()->addWidget(statusBar);
+    m_topInfo = createIconLabelWithText(":icons/terminal/error.svg", QString::number(m_errorNum));
+    m_middleInfo = createIconLabelWithText(":icons/terminal/warning.svg", QString::number(m_warning));
+    m_bottomInfo = createIconLabelWithText(":icons/terminal/Info.svg", QString::number(m_Info));
 }
 
 bool Terminal::setupPty() {
@@ -220,17 +201,6 @@ void Terminal::setupInputHandling() {
     });
 
     m_commandInput->installEventFilter(this);
-}
-
-void Terminal::setupResourceMonitor() {
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [=]() {
-        double cpuUsage = m_cpuUsage.GetCPUUsage();
-        double memUsage = m_cpuUsage.GetMemoryUsageMB();
-        m_cpuLabel->setText(QString("CPU: %1%").arg(cpuUsage, 0, 'f', 1));
-        m_memLabel->setText(QString("Memory: %1 MB").arg(memUsage, 0, 'f', 1));
-    });
-    timer->start(1000);
 }
 
 bool Terminal::eventFilter(QObject* obj, QEvent* event) {

@@ -28,6 +28,8 @@ public:
     void SetRootPath(const QString& rootPath) noexcept ;
     void loadNewPath(const QString& newRootPath) noexcept ;
 
+    void SetCurrentIndex(int index) noexcept ;
+
 private:
     void populateTreeFromDirectory(const QString& path, QTreeWidgetItem* parent) ;
     QTreeWidget* createExplorerTree() noexcept ;

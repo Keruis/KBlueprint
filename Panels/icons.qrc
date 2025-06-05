@@ -1,7 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/error.svg</file>
-        <file>icons/warning.svg</file>
-        <file>icons/Info.svg</file>
+        <file>icons/terminal/error.svg</file>
+        <file>icons/terminal/warning.svg</file>
+        <file>icons/terminal/Info.svg</file>
+
+        <file>icons/LeftTool/folder.svg</file>
+        <file>icons/LeftTool/audio.svg</file>
+
+        <file>icons/LeftTool/terminal.svg</file>
     </qresource>
 </RCC>

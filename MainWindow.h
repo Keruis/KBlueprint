@@ -15,6 +15,8 @@
 #include "Panels/Terminal/terminal.h"
 #include "Panels/RenderPreviewWidget/RenderPreviewWidget.h"
 #include "RadialMenu/RadialMenu.h"
+#include "Panels/Auxiliary/BottomBar.h"
+#include "Panels/Auxiliary/LeftToolBar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -62,6 +64,8 @@ private:
     QPixmap m_background;
 
     TitleBar* m_title;
+    BottomBar* m_bottomBar;
+    LeftToolBar* m_leftToolBar;
     Explorer *m_explorer;
 
     Terminal* m_terminal;
