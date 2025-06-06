@@ -167,10 +167,9 @@ void BlueprintClass::wheelEvent(QWheelEvent *event) {
 
     m_isDashing = true;   // 启用平滑缩放动画
 
-    event->accept();     // 标记事件已处理
+    event->accept();
 }
 
-// 执行平滑缩放与模糊的动画过渡函数（需在定时器或帧更新中持续调用）
 void BlueprintClass::smoothZoom() noexcept {
     EventHelpers::smoothZoom(
             m_isDashing,
@@ -390,4 +389,39 @@ bool BlueprintClass::areTypesCompatible(const QString &type1, const QString &typ
     if (type1 == type2) return true;
 
     return false;
+}
+
+void BlueprintClass::ensureSceneRectCoversViewport() {
+    QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
+    QRectF sceneRect = scene()->sceneRect();
+
+    QRectF expanded = sceneRect;
+    constexpr qreal margin = 100.0;
+    constexpr qreal extendSize = 1000.0;
+
+    // 向右扩展
+    if (viewRect.right() > sceneRect.right() - margin) {
+        expanded.setRight(sceneRect.right() + extendSize);
+    }
+
+    // 向左扩展
+    if (viewRect.left() < sceneRect.left() + margin) {
+        expanded.setLeft(sceneRect.left() - extendSize);
+    }
+
+    // 向下扩展
+    if (viewRect.bottom() > sceneRect.bottom() - margin) {
+        expanded.setBottom(sceneRect.bottom() + extendSize);
+    }
+
+    // 向上扩展
+    if (viewRect.top() < sceneRect.top() + margin) {
+        expanded.setTop(sceneRect.top() - extendSize);
+    }
+
+    // 如果扩展了，就更新 sceneRect
+    if (expanded != sceneRect) {
+        scene()->setSceneRect(expanded);
+        qDebug() << "Scene rect expanded to:" << expanded;
+    }
 }

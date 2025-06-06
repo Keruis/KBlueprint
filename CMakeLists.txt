@@ -26,6 +26,7 @@ add_executable(Blueprint
         CPUFeatures.h
         Title/TitleBar.cpp
         RadialMenu/RadialMenu.cpp
+        SplashWindow/SplashWindow.cpp
         Title/icon.qrc
         resources.qrc
 )

@@ -79,8 +79,14 @@ void TitleBar::Initialize() noexcept {
 
 QLabel *TitleBar::createIconLabel() noexcept {
     auto iconLabel = new QLabel(this);
-    iconLabel->setPixmap(QPixmap(":/icons/titleIcon.jpg").scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    iconLabel->setFixedSize(24, 24);
+
+    QPixmap pixmap(":/icons/titleIcon.png");
+    iconLabel->setPixmap(pixmap.scaled(30, 30, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setFixedSize(30, 30);
+
+    iconLabel->setAttribute(Qt::WA_TranslucentBackground);
+    iconLabel->setStyleSheet("background: transparent;");
+
     return iconLabel;
 }
 

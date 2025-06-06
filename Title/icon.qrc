@@ -5,6 +5,6 @@
         <file>icons/maximize.svg</file>
         <file>icons/minimize.svg</file>
         <file>icons/restore.svg</file>
-        <file>icons/titleIcon.jpg</file>
+        <file>icons/titleIcon.png</file>
     </qresource>
 </RCC>

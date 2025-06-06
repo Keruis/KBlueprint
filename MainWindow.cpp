@@ -21,8 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() = default;
 
-void MainWindow::Initialization() noexcept
-{
+void MainWindow::Initialization() noexcept {
     // 初始化组件
     m_blueprint->Initialization();
     m_terminal->Initialize();
