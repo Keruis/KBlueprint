@@ -26,6 +26,7 @@ void MainWindow::Initialization() noexcept {
     // 初始化组件
     m_blueprint->Initialization();
     m_blueprintContainer->AddPage("blueprint", m_blueprint);
+    m_blueprintContainer->AddPage("FileViewer", m_explorer->GetFileViewer());
     m_terminal->Initialize();
 
     // 本身属性
@@ -86,6 +87,22 @@ void MainWindow::Initialization() noexcept {
     });
 
     connect(m_leftToolBar, &LeftToolBar::buttonClicked, m_explorer, &Explorer::SetCurrentIndex);
+
+    connect(m_leftToolBar, &LeftToolBar::buttonClicked, this, [=](int index) {
+        switch (index) {
+            case 0: m_blueprintContainer->ShowPage("FileViewer"); break;
+
+            case 2: m_blueprintContainer->ShowPage("blueprint"); break;
+        }
+    });
+
+    QFile file(":/style/scrollbar.qss");
+    if (file.open(QFile::ReadOnly)) {
+        QString styleSheet = QString::fromUtf8(file.readAll());
+        qDebug() << styleSheet;
+        this->setStyleSheet(styleSheet);
+        file.close();
+    }
 }
 
 void MainWindow::Shutdown() noexcept {
@@ -319,7 +336,6 @@ QSplitter* MainWindow::createMainSplitter() noexcept {
     splitter->addWidget(sidebarContainer);
 
     splitter->addWidget(m_blueprintContainer);
-    //m_blueprintContainer->ShowPage("blueprint");
     m_blueprintContainer->ShowPage("");
 
     splitter->addWidget(m_renderPreview);

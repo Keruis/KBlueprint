@@ -29,13 +29,16 @@ public:
 
     void SetCurrentIndex(int index) noexcept ;
 
+    FileViewer* GetFileViewer() noexcept ;
+
 private:
     void populateTreeFromDirectory(const QString& path, QTreeWidgetItem* parent) ;
     QTreeWidget* createExplorerTree() noexcept ;
 
 private:
+    FileViewer* m_fileViewer = nullptr;
+
     QString m_rootPath;
-    QListWidget* m_leftSidebarList;
     QStackedWidget* m_leftStackedWidget;
 
 private slots:

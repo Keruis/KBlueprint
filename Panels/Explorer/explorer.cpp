@@ -2,15 +2,14 @@
 
 Explorer::Explorer(QWidget* parent)
     : QWidget(parent),
-      m_leftSidebarList(new QListWidget(this)),
-      m_leftStackedWidget(new QStackedWidget(this))
+      m_leftStackedWidget(new QStackedWidget(this)),
+      m_fileViewer(new FileViewer())
 {
 
 }
 
 void Explorer::Initialize(QHBoxLayout* sidebarLayout) noexcept {
     // 初始化控件
-
     addSidebarPage(createExplorerTree());
     addSidebarPage(new QLabel("audio View"));
     addSidebarPage(new QLabel("blueprint View"));
@@ -112,12 +111,16 @@ void Explorer::onItemClicked(QTreeWidgetItem *item, int colum) {
     if (fileInfo.isFile()) {
         QString filePath = fileInfo.absoluteFilePath();
 
-        FileViewer* viewer = new FileViewer(filePath, this);
-        viewer->show();
+        m_fileViewer->openFile(filePath);
+        qDebug() << "clicked file : " << filePath;
     }
 }
 
 void Explorer::SetCurrentIndex(int index) noexcept {
     if (index >= 0 && index < m_leftStackedWidget->count())
         m_leftStackedWidget->setCurrentIndex(index);
+}
+
+FileViewer *Explorer::GetFileViewer() noexcept {
+    return m_fileViewer;
 }

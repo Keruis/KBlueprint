@@ -5,5 +5,7 @@
         <file>resource/folder.svg</file>
 
         <file>SplashWindow/ys.png</file>
+
+        <file>style/scrollbar.qss</file>
     </qresource>
 </RCC>
