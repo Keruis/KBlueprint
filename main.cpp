@@ -29,12 +29,12 @@ int main(int argc, char *argv[]) {
     tmp2->SetClassName(QString::fromStdString(manager.getTypeName(tmp2->GetNodeType())));
     tmp2->Initialize(1);
 
-    auto& blueprint = window->GetBlueprint();
+    auto blueprint = window->GetBlueprint();
     blueprint->SaveNodePush(tmp1);
     blueprint->SaveNodePush(tmp2);
 
     QObject::connect(splash, &SplashWindow::animationFinished, [&]() {
-        //splash->close();
+        splash->close();
         window->show();
     });
 

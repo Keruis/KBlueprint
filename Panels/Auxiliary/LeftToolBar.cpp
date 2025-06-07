@@ -25,12 +25,14 @@ void LeftToolBar::Initialize() noexcept {
 
     QStringList icons = {
             ":/icons/LeftTool/folder.svg",
-            ":/icons/LeftTool/audio.svg"
+            ":/icons/LeftTool/audio.svg",
+            ":/icons/LeftTool/blueprint.svg"
     };
 
     QStringList texts = {
             "folder",
-            "audio"
+            "audio",
+            "BP"
     };
 
     m_buttonGroup->setExclusive(true);

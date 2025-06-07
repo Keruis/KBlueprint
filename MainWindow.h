@@ -17,6 +17,7 @@
 #include "RadialMenu/RadialMenu.h"
 #include "Panels/Auxiliary/BottomBar.h"
 #include "Panels/Auxiliary/LeftToolBar.h"
+#include "widgets/DynamicWidgetContainer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -42,7 +43,7 @@ public:
     void Initialization() noexcept ;
     void Shutdown() noexcept ;
 
-    std::unique_ptr<Blueprint::BlueprintClass>& GetBlueprint() noexcept ;
+    Blueprint::BlueprintClass* GetBlueprint() noexcept ;
 
 protected:
     void paintEvent(QPaintEvent* event) override ;
@@ -78,7 +79,9 @@ private:
     QRect m_startGeometry;
     QPoint m_dragPosition;
     Ui::MainWindow* m_ui;
-    std::unique_ptr<Blueprint::BlueprintClass> m_blueprint;
+    Blueprint::BlueprintClass* m_blueprint;
+
+    DynamicWidgetContainer* m_blueprintContainer;
 };
 
 

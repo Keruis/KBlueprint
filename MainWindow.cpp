@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
       m_terminal(new Terminal(parent)),
       m_renderPreview(new RenderPreviewWidget(parent)),
       m_ui(new Ui::MainWindow()),                    //NOLINT
-      m_blueprint(std::make_unique<Blueprint::BlueprintClass>())
+      m_blueprint(new Blueprint::BlueprintClass()),
+      m_blueprintContainer(new DynamicWidgetContainer())
 {
     m_ui->setupUi(this);
 }
@@ -24,6 +25,7 @@ MainWindow::~MainWindow() = default;
 void MainWindow::Initialization() noexcept {
     // 初始化组件
     m_blueprint->Initialization();
+    m_blueprintContainer->AddPage("blueprint", m_blueprint);
     m_terminal->Initialize();
 
     // 本身属性
@@ -86,9 +88,11 @@ void MainWindow::Initialization() noexcept {
     connect(m_leftToolBar, &LeftToolBar::buttonClicked, m_explorer, &Explorer::SetCurrentIndex);
 }
 
-void MainWindow::Shutdown() noexcept { }
+void MainWindow::Shutdown() noexcept {
 
-std::unique_ptr<Blueprint::BlueprintClass> &MainWindow::GetBlueprint() noexcept {
+}
+
+Blueprint::BlueprintClass *MainWindow::GetBlueprint() noexcept {
     return m_blueprint;
 }
 
@@ -287,7 +291,6 @@ MainWindow::ResizeDirection MainWindow::calculateResizeDirection(const QPoint &p
 TitleBar* MainWindow::createTitleBar() noexcept {
     auto* title = new TitleBar(this);
     title->Initialize();
-    title->setFixedHeight(30);
 
     connect(title, &TitleBar::requestMinimize, this, &MainWindow::showMinimized);
     connect(title, &TitleBar::requestClose, this, &MainWindow::close);
@@ -314,7 +317,11 @@ QSplitter* MainWindow::createMainSplitter() noexcept {
     m_renderPreview->setMinimumWidth(20);
 
     splitter->addWidget(sidebarContainer);
-    splitter->addWidget(m_blueprint.get());
+
+    splitter->addWidget(m_blueprintContainer);
+    //m_blueprintContainer->ShowPage("blueprint");
+    m_blueprintContainer->ShowPage("");
+
     splitter->addWidget(m_renderPreview);
 
     splitter->setStretchFactor(1, 1);

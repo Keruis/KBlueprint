@@ -36,6 +36,7 @@ add_subdirectory(Container)
 add_subdirectory(BlueprintMain)
 add_subdirectory(IP/CPU)
 add_subdirectory(Panels)
+add_subdirectory(widgets)
 
 set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc)
 

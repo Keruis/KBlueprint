@@ -10,50 +10,25 @@ Explorer::Explorer(QWidget* parent)
 
 void Explorer::Initialize(QHBoxLayout* sidebarLayout) noexcept {
     // 初始化控件
-//    m_leftSidebarList->setFixedWidth(48);
-//    m_leftSidebarList->setIconSize(QSize(24, 24));
-//    m_leftSidebarList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    m_leftSidebarList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+    addSidebarPage(createExplorerTree());
+    addSidebarPage(new QLabel("audio View"));
+    addSidebarPage(new QLabel("blueprint View"));
+    addSidebarPage(new QLabel("Other View"));
 
-    addSidebarPage("📁", createExplorerTree());
-    addSidebarPage("🔍", new QLabel("Search View"));
-    addSidebarPage("Git", new QLabel("Git View"));
-    addSidebarPage("💡", new QLabel("Other View"));
-
-//    sidebarLayout->addWidget(m_leftSidebarList);
     sidebarLayout->addWidget(m_leftStackedWidget);
-
-//    m_leftSidebarList->setMinimumWidth(48);
-//    m_leftStackedWidget->setMinimumWidth(48);
 
     m_leftStackedWidget->setCurrentIndex(0);
 
-//    connect(m_leftSidebarList, &QListWidget::currentRowChanged,
-//            m_leftStackedWidget, &QStackedWidget::setCurrentIndex);
-//
-//    connect(
-//        static_cast<QTreeWidget*>(m_leftStackedWidget->currentWidget()),
-//        &QTreeWidget::itemDoubleClicked,
-//        this,
-//        &Explorer::onItemClicked
-//    );
+    connect(
+        static_cast<QTreeWidget*>(m_leftStackedWidget->currentWidget()),
+        &QTreeWidget::itemDoubleClicked,
+        this,
+        &Explorer::onItemClicked
+    );
 }
 
-void Explorer::addSidebarPage(const QString& iconText, QWidget* widget) noexcept {
-//    auto* item = new QListWidgetItem(iconText);
-//    item->setTextAlignment(Qt::AlignHCenter);
-//    m_leftSidebarList->addItem(item);
-    m_leftStackedWidget->addWidget(widget);
-}
-
-void Explorer::addSidebarPage(const QIcon& icon, const QString& tooltip, QWidget* widget) noexcept {
-    auto* item = new QListWidgetItem();
-    item->setIcon(icon);
-    item->setToolTip(tooltip);
-    item->setTextAlignment(Qt::AlignHCenter);
-    item->setText("");
-    m_leftSidebarList->addItem(item);
+void Explorer::addSidebarPage(QWidget* widget) noexcept {
     m_leftStackedWidget->addWidget(widget);
 }
 

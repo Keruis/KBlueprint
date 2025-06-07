@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QMouseEvent>
+#include <QPainter>
 
 class TitleBar : public QWidget {
     Q_OBJECT
@@ -19,6 +20,9 @@ private:
     QPushButton* createMinimizeBtn() noexcept ;
     QPushButton* createMaximizeBtn() noexcept ;
     QPushButton* createCloseBtn() noexcept ;
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
 
 signals:
     void requestSetting();

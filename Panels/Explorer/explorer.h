@@ -21,8 +21,7 @@ class Explorer : public QWidget {
 public:
     explicit Explorer(QWidget* parent = nullptr);
     void Initialize(QHBoxLayout* sidebarLayout) noexcept ;
-    void addSidebarPage(const QIcon& icon, const QString& tooltip, QWidget* widget) noexcept ;
-    void addSidebarPage(const QString& iconText, QWidget* widget) noexcept ;
+    void addSidebarPage(QWidget* widget) noexcept ;
 
     QString GetRootPath() const noexcept;
     void SetRootPath(const QString& rootPath) noexcept ;

@@ -5,7 +5,7 @@ TitleBar::TitleBar(QWidget* parent)
         : QWidget(parent)
 {
     setFixedHeight(30);
-    setStyleSheet("background-color: #CCCCCC; color: #CCCCCC;");
+    setStyleSheet("background-color: #FFFFFF; color: #FFFFFF;");
 }
 
 void TitleBar::Initialize() noexcept {
@@ -196,4 +196,10 @@ void TitleBar::toggleMaximizeRestore() noexcept {
         win->showMaximized();
         m_maximizeBtn->setIcon(QIcon(":/icons/restore.svg")); // 最大化图标替换为还原图标
     }
+}
+
+void TitleBar::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor("#5A5A5A"));
+    QWidget::paintEvent(event);
 }

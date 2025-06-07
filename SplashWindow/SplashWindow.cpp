@@ -18,6 +18,11 @@ void SplashWindow::Initialize() noexcept {
 
     setupWindowProperties();
 
+    m_imageLabel = new QLabel(this);
+    m_imageLabel->setAttribute(Qt::WA_TranslucentBackground);
+    m_imageLabel->setStyleSheet("background: transparent;");
+    m_imageLabel->setVisible(false);
+
     m_container_K = new QWidget(this);
     m_container_ERUIS = new QWidget(this);
 
@@ -110,14 +115,31 @@ void SplashWindow::StartAnimation() noexcept {
     group->addAnimation(opacityAnimK);
     group->addAnimation(opacityAnimERUIS);
 
+    connect(opacityAnimERUIS, &QPropertyAnimation::valueChanged, this, [this](const QVariant &value) {
+        if (value.toDouble() >= 1.0) {
+            static bool triggered = false;
+            if (!triggered) {
+                triggered = true;
+                AnimateDotExpansion();
+            }
+        }
+    });
+
     connect(group, &QParallelAnimationGroup::finished, this, [this]() {
         qDebug() << "Animation finished.";
+        update();
         QTimer::singleShot(1000, this, [this]() {
             emit animationFinished();
+            ClearDot();
         });
     });
 
     group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void SplashWindow::HideLabels() {
+    m_container_K->hide();
+    m_container_ERUIS->hide();
 }
 
 void SplashWindow::setupWindowProperties() noexcept {
@@ -138,5 +160,107 @@ void SplashWindow::showEvent(QShowEvent *event) {
 }
 
 void SplashWindow::paintEvent(QPaintEvent *event) {
+    QWidget::paintEvent(event);
 
+    if (!m_showIDot) return;
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Qt::white);
+
+    QFont font;
+    font.setPointSize(320);
+    font.setBold(true);
+    painter.setFont(font);
+
+    QFontMetricsF metrics(font);
+    QString text = "eruis";
+    int indexOfI = text.indexOf('i');
+    if (indexOfI == -1) return;
+
+    qreal xOffset = 0;
+    for (int i = 0; i < indexOfI; ++i) {
+        xOffset += metrics.horizontalAdvance(text[i]);
+    }
+
+    qreal iWidth = metrics.horizontalAdvance('i');
+
+    QPoint labelPos = m_container_ERUIS->pos() + m_label_ERUIS->pos();
+    qreal baselineY = labelPos.y() + metrics.ascent();
+
+    QPointF dotCenter(
+            labelPos.x() + xOffset - iWidth,
+            baselineY - metrics.ascent() * 0.73
+    );
+
+    painter.drawEllipse(dotCenter, m_dotRadius, m_dotRadius);
+}
+
+void SplashWindow::AnimateDotExpansion() {
+    m_showIDot = true;
+
+    if (m_dotExpansionAnim) {
+        m_dotExpansionAnim->stop();
+        delete m_dotExpansionAnim;
+    }
+
+    m_dotExpansionAnim = new QVariantAnimation(this);
+    m_dotExpansionAnim->setDuration(1000);
+    m_dotExpansionAnim->setStartValue(10.0);
+    m_dotExpansionAnim->setEndValue(std::max(width(), height()) * 1.2);
+    m_dotExpansionAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    connect(m_dotExpansionAnim, &QVariantAnimation::valueChanged, this, [this](const QVariant &value) {
+        m_dotRadius = value.toDouble();
+        update();  // 触发 repaint
+    });
+
+    connect(m_dotExpansionAnim, &QVariantAnimation::finished, this, [this]() {
+        qDebug() << "Dot expansion finished.";
+    });
+
+    QTimer::singleShot(500, this, [this]() {
+        QPixmap pixmap(":/SplashWindow/ys.png");
+        if (!pixmap.isNull()) {
+            HideLabels();
+            m_imageLabel->setPixmap(pixmap);
+            m_imageLabel->setScaledContents(true);
+            m_imageLabel->setFixedSize(pixmap.size());
+            m_imageLabel->move(
+                    (width() - pixmap.width()) / 2,
+                    (height() - pixmap.height()) / 2
+            );
+            m_imageLabel->setVisible(true);
+
+            // 👇 淡入动画放这里！
+            auto opacityEffect = new QGraphicsOpacityEffect(this);
+            m_imageLabel->setGraphicsEffect(opacityEffect);
+
+            auto fadeIn = new QPropertyAnimation(opacityEffect, "opacity");
+            fadeIn->setDuration(1000);
+            fadeIn->setStartValue(0.0);
+            fadeIn->setEndValue(1.0);
+            fadeIn->setEasingCurve(QEasingCurve::OutCubic);
+            fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+
+        } else {
+            qDebug() << "Failed to load image!";
+        }
+    });
+
+    m_dotExpansionAnim->start();
+}
+
+void SplashWindow::ClearDot() {
+    m_showIDot = false;
+    m_dotRadius = 10.0;
+
+    if (m_dotExpansionAnim) {
+        m_dotExpansionAnim->stop();
+        delete m_dotExpansionAnim;
+        m_dotExpansionAnim = nullptr;
+    }
+
+    update();  // 清空后重绘
 }

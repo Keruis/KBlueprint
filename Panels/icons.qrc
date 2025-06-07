@@ -6,6 +6,7 @@
 
         <file>icons/LeftTool/folder.svg</file>
         <file>icons/LeftTool/audio.svg</file>
+        <file>icons/LeftTool/blueprint.svg</file>
 
         <file>icons/LeftTool/terminal.svg</file>
     </qresource>

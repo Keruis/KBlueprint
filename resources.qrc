@@ -3,5 +3,7 @@
         <file>resource/Honkai-Impact-3rd.png</file>
         <file>resource/terminal.svg</file>
         <file>resource/folder.svg</file>
+
+        <file>SplashWindow/ys.png</file>
     </qresource>
 </RCC>
