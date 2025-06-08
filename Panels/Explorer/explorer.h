@@ -51,6 +51,7 @@ private:
     QWidget* createExplorerTree() noexcept ;
 
 private:
+    QTreeWidget* m_treeWidget = nullptr;
     ExplorerHeader* m_header = nullptr;
     FileViewer* m_fileViewer = nullptr;
 

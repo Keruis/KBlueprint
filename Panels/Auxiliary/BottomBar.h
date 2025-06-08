@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QTime>
+#include <QPainter>
 #include "../SystemMonitor/CPUUsage.h"
 
 class BottomBar : public QWidget {
@@ -18,6 +19,9 @@ public:
     void Initialize() noexcept ;
 
     void SetPath(const QString& path) noexcept ;
+
+protected:
+    void paintEvent(QPaintEvent* event) override ;
 
 private:
     void setupStatusBar() noexcept ;

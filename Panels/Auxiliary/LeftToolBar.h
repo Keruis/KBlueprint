@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QButtonGroup>
+#include <QPainter>
 
 class LeftToolBar : public QWidget {
     Q_OBJECT
@@ -15,6 +16,9 @@ public:
     ~LeftToolBar() ;
 
     void Initialize() noexcept ;
+
+protected:
+    void paintEvent(QPaintEvent* event) override ;
 
 private:
     QToolButton* createSvgButton(const QString& svgPath) noexcept ;

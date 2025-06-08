@@ -29,13 +29,13 @@ void MainWindow::Initialization() noexcept {
     initCoreModules();                                  // 初始化核心模块
     initWindowProperties();                             // 设置窗口属性
 
-    QWidget* central = new QWidget;
-    QVBoxLayout* mainVLayout = initMainLayout(central); // 外层垂直布局
+    QWidget * central = new QWidget;
+    QVBoxLayout * mainVLayout = initMainLayout(central); // 外层垂直布局
 
     m_title = createTitleBar();
     mainVLayout->addWidget(m_title);
 
-    QWidget* centerContent = initCenterContent();       // 左侧工具栏 + 右侧主内容区
+    QWidget * centerContent = initCenterContent();       // 左侧工具栏 + 右侧主内容区
     mainVLayout->addWidget(centerContent);
 
     m_bottomBar->Initialize();
@@ -139,8 +139,9 @@ Blueprint::BlueprintClass *MainWindow::GetBlueprint() noexcept {
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {
-    //QPainter painter(this);
-    //painter.drawPixmap(rect(), m_background);
+    QPainter painter(this);
+    painter.setOpacity(100.0 / 255.0);
+    painter.drawPixmap(rect(), m_background);
     QMainWindow::paintEvent(event);
 }
 

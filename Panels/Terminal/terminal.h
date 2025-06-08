@@ -32,6 +32,10 @@ public:
 
     void Initialize() noexcept ;
 
+    QPlainTextEdit* GetTerminalOutput() noexcept {
+        return m_terminalOutput;
+    }
+
 private:
     void setupLayout();
     bool setupPty();

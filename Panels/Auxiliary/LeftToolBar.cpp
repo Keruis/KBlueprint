@@ -13,7 +13,6 @@ LeftToolBar::~LeftToolBar() {
 
 void LeftToolBar::Initialize() noexcept {
     this->setFixedWidth(50);
-//    this->setStyleSheet("background-color: green;");
 
     QVBoxLayout* toolLayout = new QVBoxLayout(this);
     toolLayout->setContentsMargins(0, 0, 0, 0);
@@ -90,7 +89,7 @@ QToolButton *LeftToolBar::createSvgButton(const QString &svgPath) noexcept {
     QIcon icon(svgPath);
     button->setIcon(icon);
     button->setIconSize(QSize(24, 24));
-    button->setFixedSize(48, 48);
+    button->setFixedSize(46, 46);
     return button;
 }
 
@@ -101,10 +100,25 @@ QToolButton* LeftToolBar::createSvgButton(const QString& svgPath, const QString&
     button->setText(text);
     button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     button->setIconSize(QSize(20, 20));
-    button->setFixedSize(48, 48);
+    button->setFixedSize(46, 46);
     button->setStyleSheet("QToolButton { "
                           "     border: none; "
                           "     font-size: 5px;"
                           "}");
     return button;
+}
+
+void LeftToolBar::paintEvent(QPaintEvent* event) {
+    QWidget::paintEvent(event);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QPen pen;
+    pen.setColor(QColor(255, 255, 255, 100));
+    pen.setWidth(1);
+
+    painter.setPen(pen);
+
+    painter.drawLine(rect().right(), rect().top(), rect().right(), rect().bottom());
 }

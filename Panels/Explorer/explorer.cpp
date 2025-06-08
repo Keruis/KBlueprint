@@ -20,12 +20,55 @@ void Explorer::Initialize(QHBoxLayout* sidebarLayout) noexcept {
 
     m_leftStackedWidget->setCurrentIndex(0);
 
-    connect(
-        static_cast<QTreeWidget*>(m_leftStackedWidget->currentWidget()),
-        &QTreeWidget::itemDoubleClicked,
-        this,
-        &Explorer::onItemClicked
-    );
+    connect(m_treeWidget, &QTreeWidget::itemDoubleClicked, this, &Explorer::onItemClicked);
+
+    m_treeWidget->setStyleSheet(R"(
+        QTreeWidget {
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        QScrollBar:vertical {
+            background: rgba(45, 45, 45, 100);  /* 半透明背景 */
+            width: 8px;
+            border: none;
+        }
+
+        QScrollBar::handle:vertical {
+            background: rgba(85, 85, 85, 180);  /* 滚动块更明显 */
+            min-height: 20px;
+            border-radius: 0;
+        }
+
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical,
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {
+            background: transparent;
+            border: none;
+        }
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {
+            height: 0px;
+            subcontrol-origin: margin;
+        }
+
+        QScrollBar:horizontal {
+            background: #2d2d2d;
+            height: 8px;
+            margin: 0px 0px 0px 0px;
+            border: none;
+        }
+        QScrollBar::handle:horizontal {
+            background: #555;
+            min-width: 20px;
+            border-radius: 0px;
+        }
+        QScrollBar::add-line:horizontal,
+        QScrollBar::sub-line:horizontal {
+            width: 0px;
+            subcontrol-origin: margin;
+        }
+    )");
 }
 
 void Explorer::addSidebarPage(QWidget* widget) noexcept {
@@ -70,22 +113,69 @@ QWidget* Explorer::createExplorerTree() noexcept {
     m_header->setButtonsVisible(false);
     m_header->installEventFilter(this);
 
-    auto* explorer = new QTreeWidget();
-    explorer->setHeaderHidden(true);
-    explorer->setColumnCount(1);
-    explorer->installEventFilter(this);
+    m_treeWidget = new QTreeWidget();
+    m_treeWidget->setHeaderHidden(true);
+    m_treeWidget->setColumnCount(1);
+    m_treeWidget->installEventFilter(this);
+    m_treeWidget->setStyleSheet(R"(
+        QTreeWidget {
+            background-color: rgba(0, 0, 0, 0);
+        }
 
-    auto* rootNode = new QTreeWidgetItem(explorer);
+        QScrollBar:vertical {
+            background: rgba(45, 45, 45, 100);  /* 半透明背景 */
+            width: 8px;
+            border: none;
+        }
+
+        QScrollBar::handle:vertical {
+            background: rgba(85, 85, 85, 180);  /* 滚动块更明显 */
+            min-height: 20px;
+            border-radius: 0;
+        }
+
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical,
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {
+            background: transparent;
+            border: none;
+        }
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {
+            height: 0px;
+            subcontrol-origin: margin;
+        }
+
+        QScrollBar:horizontal {
+            background: #2d2d2d;
+            height: 8px;
+            margin: 0px 0px 0px 0px;
+            border: none;
+        }
+        QScrollBar::handle:horizontal {
+            background: #555;
+            min-width: 20px;
+            border-radius: 0px;
+        }
+        QScrollBar::add-line:horizontal,
+        QScrollBar::sub-line:horizontal {
+            width: 0px;
+            subcontrol-origin: margin;
+        }
+    )");
+
+    auto* rootNode = new QTreeWidgetItem(m_treeWidget);
     rootNode->setText(0, m_rootPath);
     rootNode->setIcon(0, QFileIconProvider().icon(QFileIconProvider::Folder));
 
     populateTreeFromDirectory(m_rootPath, rootNode);
 
-    connect(m_header, &ExplorerHeader::expandRequested, explorer, &QTreeWidget::expandAll);
-    connect(m_header, &ExplorerHeader::collapseRequested, explorer, &QTreeWidget::collapseAll);
+    connect(m_header, &ExplorerHeader::expandRequested, m_treeWidget, &QTreeWidget::expandAll);
+    connect(m_header, &ExplorerHeader::collapseRequested, m_treeWidget, &QTreeWidget::collapseAll);
 
     layout->addWidget(m_header);
-    layout->addWidget(explorer);
+    layout->addWidget(m_treeWidget);
 
     return container;
 }
@@ -107,10 +197,8 @@ void Explorer::loadNewPath(const QString& newPath) noexcept {
         return;
     }
 
-    // 清空当前树内容
     currentTree->clear();
 
-    // 创建新的根节点
     QTreeWidgetItem* newRoot = new QTreeWidgetItem(currentTree);
     newRoot->setText(0, m_rootPath);
     newRoot->setIcon(0, QFileIconProvider().icon(QFileIconProvider::Folder));

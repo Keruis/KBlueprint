@@ -3,6 +3,7 @@ add_library(Utils)
 # H
 target_sources(Blueprint PRIVATE
         xml/xml.h
+        UI/ui_helpers.h
 )
 
 # CPP

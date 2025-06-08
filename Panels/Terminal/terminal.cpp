@@ -32,7 +32,13 @@ void Terminal::setupLayout() {
     // 左侧输出区域
     m_terminalOutput = new QPlainTextEdit;
     m_terminalOutput->setReadOnly(true);
-    m_terminalOutput->setStyleSheet("color: white; font-family: Consolas;");
+    m_terminalOutput->setStyleSheet(R"(
+        QPlainTextEdit {
+            background-color: rgba(0, 0, 0, 60);
+            color: white;
+            font-family: Consolas;
+        }
+    )");
     m_terminalOutput->setMinimumHeight(40);
 
     // 右侧信息面板

@@ -55,3 +55,19 @@ void BottomBar::SetPath(const QString &path) noexcept {
         m_pathLabel->setText(path);
     }
 }
+
+void BottomBar::paintEvent(QPaintEvent *event) {
+    QWidget::paintEvent(event);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QPen pen;
+    pen.setColor(QColor(255, 255, 255, 60));
+    pen.setWidth(1);
+
+    painter.setPen(pen);
+
+    painter.drawLine(rect().left(), rect().top(), rect().right(), rect().top());
+}
+
