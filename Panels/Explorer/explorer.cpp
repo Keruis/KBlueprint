@@ -3,9 +3,10 @@
 Explorer::Explorer(QWidget* parent)
     : QWidget(parent),
       m_leftStackedWidget(new QStackedWidget(this)),
-      m_fileViewer(new FileViewer())
+      m_fileViewer(new FileViewer(this)),
+      m_header(new ExplorerHeader(this))
 {
-
+    this->installEventFilter(this);
 }
 
 void Explorer::Initialize(QHBoxLayout* sidebarLayout) noexcept {
@@ -60,20 +61,33 @@ void Explorer::populateTreeFromDirectory(const QString& path, QTreeWidgetItem* p
     }
 }
 
-QTreeWidget* Explorer::createExplorerTree() noexcept {
-    auto* explorer = new QTreeWidget();
-    explorer->setHeaderLabel("EXPLORER");
-    explorer->setColumnCount(1);
+QWidget* Explorer::createExplorerTree() noexcept {
+    auto* container = new QWidget(this);
+    auto* layout = new QVBoxLayout(container);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
-    QTreeWidgetItem* rootNode = new QTreeWidgetItem(explorer);
+    m_header->setButtonsVisible(false);
+    m_header->installEventFilter(this);
+
+    auto* explorer = new QTreeWidget();
+    explorer->setHeaderHidden(true);
+    explorer->setColumnCount(1);
+    explorer->installEventFilter(this);
+
+    auto* rootNode = new QTreeWidgetItem(explorer);
     rootNode->setText(0, m_rootPath);
     rootNode->setIcon(0, QFileIconProvider().icon(QFileIconProvider::Folder));
 
     populateTreeFromDirectory(m_rootPath, rootNode);
 
-    //explorer->expandAll();
+    connect(m_header, &ExplorerHeader::expandRequested, explorer, &QTreeWidget::expandAll);
+    connect(m_header, &ExplorerHeader::collapseRequested, explorer, &QTreeWidget::collapseAll);
 
-    return explorer;
+    layout->addWidget(m_header);
+    layout->addWidget(explorer);
+
+    return container;
 }
 
 QString Explorer::GetRootPath() const noexcept {
@@ -114,6 +128,8 @@ void Explorer::onItemClicked(QTreeWidgetItem *item, int colum) {
         m_fileViewer->openFile(filePath);
         qDebug() << "clicked file : " << filePath;
     }
+
+    emit openFile();
 }
 
 void Explorer::SetCurrentIndex(int index) noexcept {

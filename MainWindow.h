@@ -53,6 +53,13 @@ protected:
     void keyPressEvent(QKeyEvent* event) override ;
 
 private:
+    void initCoreModules() noexcept;
+    void initWindowProperties() noexcept;
+    QVBoxLayout* initMainLayout(QWidget* central) noexcept;
+    QWidget* initCenterContent() noexcept;
+    void setupSignalSlots() noexcept;
+    void loadStyleSheet(const QString& path) noexcept;
+
     ResizeDirection calculateResizeDirection(const QPoint &pos) noexcept ;
     TitleBar* createTitleBar() noexcept ;
     QSplitter* createMainSplitter() noexcept ;
@@ -61,7 +68,11 @@ private:
     void toggleTerminal();
     void changeFilePath();
 
+    void showPageIfNotCurrent(const QString& name);
+
 private:
+    Utils::Xml* m_ConfigurationRoot;
+
     QPixmap m_background;
 
     TitleBar* m_title;

@@ -7,6 +7,9 @@
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QMenu>
+#include <QToolButton>
+#include <QFile>
 
 class TitleBar : public QWidget {
     Q_OBJECT
@@ -15,6 +18,15 @@ public:
     void Initialize() noexcept ;
 
 private:
+    void applyStyleSheetFromFile(const QString& filePath);
+    void createMenuButtons(QHBoxLayout* layout);
+    QMenu* createFileMenu();
+    QMenu* createEditMenu();
+    QMenu* createViewerMenu();
+    QMenu* createNavMenu();
+    QMenu* createHelpMenu();
+    void createWindowControlButtons(QHBoxLayout* layout);
+
     QLabel* createIconLabel() noexcept ;
     QPushButton* createSettingBtn() noexcept ;
     QPushButton* createMinimizeBtn() noexcept ;

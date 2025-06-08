@@ -6,5 +6,7 @@
         <file>icons/minimize.svg</file>
         <file>icons/restore.svg</file>
         <file>icons/titleIcon.png</file>
+
+        <file>darkstyle.qss</file>
     </qresource>
 </RCC>

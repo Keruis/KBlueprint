@@ -29,9 +29,11 @@ void DynamicWidgetContainer::ShowPage(const QString& name) noexcept {
     if (target) {
         m_current = target;
         m_current->show();
+        m_currentPageName = name;
     } else if (m_default) {
         m_current = m_default;
         m_current->show();
+        m_currentPageName.clear();
     } else {
         m_current = nullptr;
     }
@@ -55,4 +57,8 @@ QWidget* DynamicWidgetContainer::CurrentPage() const noexcept {
 
 QWidget* DynamicWidgetContainer::GetPage(const QString& name) const {
     return m_pages.value(name, nullptr);
+}
+
+QString DynamicWidgetContainer::CurrentPageName() const noexcept {
+    return m_currentPageName;
 }

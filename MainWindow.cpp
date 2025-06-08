@@ -1,12 +1,13 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
 #include <QDockWidget>
-#include <QPushButton>
 #include <QStringList>
 #include <QPlainTextEdit>
+#include "utils/xml/xml.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
+      m_ConfigurationRoot(new Utils::Xml()),
       m_background(":resource/Honkai-Impact-3rd.png"),
       m_explorer(new Explorer(parent)),
       m_bottomBar(new BottomBar(parent)),
@@ -23,83 +24,107 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() = default;
 
 void MainWindow::Initialization() noexcept {
-    // 初始化组件
+    m_ConfigurationRoot->load("initialize.xml");
+
+    initCoreModules();                                  // 初始化核心模块
+    initWindowProperties();                             // 设置窗口属性
+
+    QWidget* central = new QWidget;
+    QVBoxLayout* mainVLayout = initMainLayout(central); // 外层垂直布局
+
+    m_title = createTitleBar();
+    mainVLayout->addWidget(m_title);
+
+    QWidget* centerContent = initCenterContent();       // 左侧工具栏 + 右侧主内容区
+    mainVLayout->addWidget(centerContent);
+
+    m_bottomBar->Initialize();
+    m_bottomBar->SetPath(QString::fromStdString(m_ConfigurationRoot->operator[]("CurrentFilePath").text()));
+    mainVLayout->addWidget(m_bottomBar);                // 状态栏
+
+    setCentralWidget(central);
+
+    setupSignalSlots();                                 // 所有 connect() 信号槽绑定
+
+    loadStyleSheet(":/style/scrollbar.qss");            // 加载 QSS 样式
+}
+
+void MainWindow::initCoreModules() noexcept {
     m_blueprint->Initialization();
-    m_blueprintContainer->AddPage("blueprint", m_blueprint);
-    m_blueprintContainer->AddPage("FileViewer", m_explorer->GetFileViewer());
     m_terminal->Initialize();
 
-    // 本身属性
+    m_blueprintContainer->AddPage("blueprint", m_blueprint);
+    m_blueprintContainer->AddPage("FileViewer", m_explorer->GetFileViewer());
+}
+
+void MainWindow::initWindowProperties() noexcept {
     setContentsMargins(4, 0, 4, 4);
     setMouseTracking(true);
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground, false);
+}
 
-    // 创建 Central Widget 和外层垂直布局
-    QWidget* central = new QWidget;
-    QVBoxLayout* mainVLayout = new QVBoxLayout(central);
-    mainVLayout->setContentsMargins(0, 0, 0, 0);
-    mainVLayout->setSpacing(0);
+QVBoxLayout* MainWindow::initMainLayout(QWidget* central) noexcept {
+    QVBoxLayout* layout = new QVBoxLayout(central);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    return layout;
+}
 
-    // === 顶部标题栏 ===
-    m_title = createTitleBar();
-    mainVLayout->addWidget(m_title);
-
-    // === 中间内容区域（左边工具栏 + 主区域）===
-    QHBoxLayout* centerHLayout = new QHBoxLayout;
+QWidget* MainWindow::initCenterContent() noexcept {
+    QWidget* content = new QWidget;
+    QHBoxLayout* centerHLayout = new QHBoxLayout(content);
     centerHLayout->setContentsMargins(0, 0, 0, 0);
     centerHLayout->setSpacing(0);
 
-    // 左边工具栏
     m_leftToolBar->Initialize();
+    centerHLayout->addWidget(m_leftToolBar);
 
-    // 右边主区域（蓝图 + 终端）
     QWidget* rightContent = new QWidget;
     QVBoxLayout* rightLayout = new QVBoxLayout(rightContent);
     rightLayout->setContentsMargins(0, 0, 0, 0);
     rightLayout->setSpacing(0);
 
     QSplitter* verticalSplitter = new QSplitter(Qt::Vertical);
-    QSplitter* mainAreaSplitter = createMainSplitter(); // 蓝图+预览
+    QSplitter* mainAreaSplitter = createMainSplitter();
     verticalSplitter->addWidget(mainAreaSplitter);
     verticalSplitter->addWidget(m_terminal);
     verticalSplitter->setStretchFactor(0, 1);
     verticalSplitter->setStretchFactor(1, 0);
     verticalSplitter->setCollapsible(1, true);
 
+    connect(verticalSplitter, &QSplitter::splitterMoved, this, [=](int, int) {
+        m_lastTerminalSplitterSizes = verticalSplitter->sizes();
+    });
+
     rightLayout->addWidget(verticalSplitter);
-    centerHLayout->addWidget(m_leftToolBar);
     centerHLayout->addWidget(rightContent);
 
-    mainVLayout->addLayout(centerHLayout); // 中间加入主垂直布局
+    return content;
+}
 
-    // === 底部状态栏 ===
-    m_bottomBar->Initialize();
-    mainVLayout->addWidget(m_bottomBar); // 最下方添加状态栏
-
-    // 设置 central widget
-    setCentralWidget(central);
-
-    // 保存终端高度
-    connect(verticalSplitter, &QSplitter::splitterMoved, this,
-            [=](int, int) {
-                m_lastTerminalSplitterSizes = verticalSplitter->sizes();
-    });
-
+void MainWindow::setupSignalSlots() noexcept {
     connect(m_leftToolBar, &LeftToolBar::buttonClicked, m_explorer, &Explorer::SetCurrentIndex);
 
-    connect(m_leftToolBar, &LeftToolBar::buttonClicked, this, [=](int index) {
-        switch (index) {
-            case 0: m_blueprintContainer->ShowPage("FileViewer"); break;
-
-            case 2: m_blueprintContainer->ShowPage("blueprint"); break;
-        }
+    connect(m_explorer, &Explorer::openFile, this, [=] {
+        showPageIfNotCurrent("FileViewer");
     });
 
-    QFile file(":/style/scrollbar.qss");
+    connect(m_leftToolBar, &LeftToolBar::buttonClicked, this, [=, this](int index) {
+        qDebug() << "clicked : " << index;
+        switch (index) {
+            case -1: toggleTerminal(); break;
+            case 0: m_blueprintContainer->ShowPage("FileViewer"); break;
+            case 2: m_blueprintContainer->ShowPage("blueprint"); break;
+            case 1: break;
+        }
+    });
+}
+
+void MainWindow::loadStyleSheet(const QString& path) noexcept {
+    QFile file(path);
     if (file.open(QFile::ReadOnly)) {
         QString styleSheet = QString::fromUtf8(file.readAll());
-        qDebug() << styleSheet;
         this->setStyleSheet(styleSheet);
         file.close();
     }
@@ -157,6 +182,10 @@ void MainWindow::changeFilePath() {
     if (!folderPath.isEmpty()) {
         m_explorer->loadNewPath(folderPath);
         m_bottomBar->SetPath(folderPath);
+        Utils::Xml root;
+        root.load("initialize.xml");
+        root["CurrentFilePath"].text(folderPath.toUtf8().toStdString());
+        root.save("initialize.xml");
         qDebug() << "Selected Folder:" << folderPath;
         update();
     }
@@ -174,6 +203,13 @@ void MainWindow::showOptionMenu(const QPoint &pos) {
 
             case 1:
                 changeFilePath();
+                break;
+
+            case 2:
+                break;
+
+            case 3:
+                m_blueprintContainer->ShowPage("blueprint");
                 break;
         }
     });
@@ -324,14 +360,14 @@ QSplitter* MainWindow::createMainSplitter() noexcept {
     sidebarLayout->setContentsMargins(0, 0, 0, 0);
     sidebarLayout->setSpacing(0);
 
-   // m_explorer->SetRootPath("/home/keruis/extra/ASMDSL/");
+    m_explorer->SetRootPath(QString::fromStdString(m_ConfigurationRoot->operator[]("CurrentFilePath").text()));
     m_explorer->Initialize(sidebarLayout);
 
     sidebarContainer->setMinimumWidth(48);
     sidebarContainer->setMaximumWidth(400);
     sidebarContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    m_renderPreview->setMinimumWidth(20);
+    m_renderPreview->setMinimumWidth(110);
 
     splitter->addWidget(sidebarContainer);
 
@@ -342,7 +378,13 @@ QSplitter* MainWindow::createMainSplitter() noexcept {
 
     splitter->setStretchFactor(1, 1);
     splitter->setStretchFactor(2, 1);
-    splitter->setCollapsible(0, false);
+    //splitter->setCollapsible(0, false);
 
     return splitter;
+}
+
+void MainWindow::showPageIfNotCurrent(const QString& name) {
+    if (m_blueprintContainer->CurrentPageName() != name) {
+        m_blueprintContainer->ShowPage(name);
+    }
 }

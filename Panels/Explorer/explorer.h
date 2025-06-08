@@ -12,8 +12,11 @@
 #include <QFileInfo>
 #include <QFileIconProvider>
 #include <QVariant>
+#include <QPushButton>
+#include <QEvent>
 
 #include "FileViewer.h"
+#include "explorerHeader.h"
 
 class Explorer : public QWidget {
     Q_OBJECT
@@ -31,11 +34,24 @@ public:
 
     FileViewer* GetFileViewer() noexcept ;
 
-private:
-    void populateTreeFromDirectory(const QString& path, QTreeWidgetItem* parent) ;
-    QTreeWidget* createExplorerTree() noexcept ;
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) {
+        if (event->type() == QEvent::Enter) {
+            m_header->setButtonsVisible(true);
+        } else if (event->type() == QEvent::Leave) {
+            m_header->setButtonsVisible(false);
+        }
+        return QWidget::eventFilter(obj, event);
+    }
+signals:
+    void openFile();
 
 private:
+    void populateTreeFromDirectory(const QString& path, QTreeWidgetItem* parent) ;
+    QWidget* createExplorerTree() noexcept ;
+
+private:
+    ExplorerHeader* m_header = nullptr;
     FileViewer* m_fileViewer = nullptr;
 
     QString m_rootPath;

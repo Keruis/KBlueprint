@@ -5,72 +5,107 @@ TitleBar::TitleBar(QWidget* parent)
         : QWidget(parent)
 {
     setFixedHeight(30);
-    setStyleSheet("background-color: #FFFFFF; color: #FFFFFF;");
+    applyStyleSheetFromFile(":/darkstyle.qss");
 }
 
 void TitleBar::Initialize() noexcept {
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(5, 0, 5, 0);
-    layout->setSpacing(12); // 控制整体间距
+    layout->setSpacing(12);
 
-    auto iconLabel = createIconLabel();
+    layout->addWidget(createIconLabel());
+    layout->addSpacing(10);
 
-    // 创建菜单按钮
-    auto fileBtn = new QPushButton("文件", this);
-    auto editBtn = new QPushButton("编辑", this);
-    auto viewBtn = new QPushButton("视图", this);
-    auto navBtn  = new QPushButton("导航", this);
-    auto helpBtn = new QPushButton("帮助", this);
+    createMenuButtons(layout);
+    layout->addStretch();
+    createWindowControlButtons(layout);
+}
 
-    // 设置统一样式
-    auto style = QString(
-            "QPushButton {"
-            "   border: none;"
-            "   background-color: transparent;"
-            "   color: white;"
-            "   font-weight: bold;"
-            "   padding: 0 6px;"
-            "}"
-            "QPushButton:hover {"
-            "   background-color: #5A5A5A;"
-            "}"
-            "QPushButton:pressed {"
-            "   background-color: #3A3A3A;"
-            "}"
-    );
+void TitleBar::applyStyleSheetFromFile(const QString& filePath) {
+    QFile file(filePath);
+    if (file.open(QFile::ReadOnly)) {
+        QString style = QLatin1String(file.readAll());
+        this->setStyleSheet(style);
+        file.close();
+    }
+}
 
-    fileBtn->setStyleSheet(style);
-    editBtn->setStyleSheet(style);
-    viewBtn->setStyleSheet(style);
-    navBtn->setStyleSheet(style);
-    helpBtn->setStyleSheet(style);
+void TitleBar::createMenuButtons(QHBoxLayout* layout) {
+    struct MenuItem {
+        QString name;
+        QMenu* (TitleBar::*menuCreator)();
+    };
 
-    // 创建右侧按钮
+    std::vector<MenuItem> items = {
+            {"文件", &TitleBar::createFileMenu},
+            {"编辑", &TitleBar::createEditMenu},
+            {"视图", &TitleBar::createViewerMenu},
+            {"导航", &TitleBar::createNavMenu},
+            {"帮助", &TitleBar::createHelpMenu}
+    };
+
+    for (const auto& item : items) {
+        QToolButton* btn = new QToolButton(this);
+        btn->setText(item.name);
+        btn->setPopupMode(QToolButton::InstantPopup);
+        btn->setMenu((this->*item.menuCreator)());
+        layout->addWidget(btn);
+    }
+}
+
+QMenu* TitleBar::createFileMenu() {
+    auto menu = new QMenu(this);
+    menu->addAction("新建文件", this, []() { qDebug() << "[文件] -> 新建文件"; });
+    menu->addAction("打开文件", this, []() { qDebug() << "[文件] -> 打开文件"; });
+    menu->addSeparator();
+    menu->addAction("保存", this, []() { qDebug() << "[文件] -> 保存"; });
+    menu->addAction("另存为", this, []() { qDebug() << "[文件] -> 另存为"; });
+    menu->addSeparator();
+    menu->addAction("退出", this, []() { qDebug() << "[文件] -> 退出"; qApp->quit(); });
+    return menu;
+}
+
+QMenu* TitleBar::createEditMenu() {
+    auto menu = new QMenu(this);
+    menu->addAction("复制", this, []() { qDebug() << "[编辑] -> 复制"; });
+    menu->addAction("粘贴", this, []() { qDebug() << "[编辑] -> 粘贴"; });
+    menu->addAction("剪切", this, []() { qDebug() << "[编辑] -> 剪切"; });
+    return menu;
+}
+
+QMenu* TitleBar::createViewerMenu() {
+    auto menu = new QMenu(this);
+    menu->addAction("放大", this, []() { qDebug() << "[视图] -> 放大"; });
+    menu->addAction("缩小", this, []() { qDebug() << "[视图] -> 缩小"; });
+    menu->addAction("全屏", this, []() { qDebug() << "[视图] -> 全屏"; });
+    return menu;
+}
+
+QMenu* TitleBar::createNavMenu() {
+    auto menu = new QMenu(this);
+    menu->addAction("转到定义", this, []() { qDebug() << "[导航] -> 转到定义"; });
+    menu->addAction("跳转到行", this, []() { qDebug() << "[导航] -> 跳转到行"; });
+    return menu;
+}
+
+QMenu* TitleBar::createHelpMenu() {
+    auto menu = new QMenu(this);
+    menu->addAction("文档", this, []() { qDebug() << "[帮助] -> 文档"; });
+    menu->addAction("关于", this, []() { qDebug() << "[帮助] -> 关于"; });
+    return menu;
+}
+
+void TitleBar::createWindowControlButtons(QHBoxLayout* layout) {
     auto settingBtn = createSettingBtn();
     auto minimizeBtn = createMinimizeBtn();
     auto maximizeBtn = createMaximizeBtn();
     auto closeBtn = createCloseBtn();
 
-    // 添加控件到布局
-    layout->addWidget(iconLabel);
-
-    // 添加菜单按钮
-    layout->addSpacing(10); // 图标与菜单间距
-    layout->addWidget(fileBtn);
-    layout->addWidget(editBtn);
-    layout->addWidget(viewBtn);
-    layout->addWidget(navBtn);
-    layout->addWidget(helpBtn);
-
-    layout->addStretch(); // 推动右边按钮到最右侧
-
-    // 添加右侧控制按钮
     layout->addWidget(settingBtn);
     layout->addWidget(minimizeBtn);
     layout->addWidget(maximizeBtn);
     layout->addWidget(closeBtn);
 
-    // 信号连接
     connect(settingBtn, &QPushButton::clicked, this, &TitleBar::requestSetting);
     connect(minimizeBtn, &QPushButton::clicked, this, &TitleBar::requestMinimize);
     connect(maximizeBtn, &QPushButton::clicked, this, &TitleBar::toggleMaximizeRestore);
@@ -104,7 +139,7 @@ QPushButton *TitleBar::createSettingBtn() noexcept {
             "}"
 
             "QPushButton:hover {"
-            "   background-color: #5A5A5A;"
+            "   background-color: #505050;"
             "}"
 
             "QPushButton:pressed {"
@@ -128,7 +163,7 @@ QPushButton *TitleBar::createMinimizeBtn() noexcept {
             "}"
 
             "QPushButton:hover {"
-            "   background-color: #5A5A5A;"
+            "   background-color: #505050;"
             "}"
 
             "QPushButton:pressed {"
@@ -152,7 +187,7 @@ QPushButton *TitleBar::createMaximizeBtn() noexcept {
             "}"
 
             "QPushButton:hover {"
-            "   background-color: #5A5A5A;"
+            "   background-color: #505050;"
             "}"
 
             "QPushButton:pressed {"
@@ -176,7 +211,7 @@ QPushButton *TitleBar::createCloseBtn() noexcept {
             "}"
 
             "QPushButton:hover {"
-            "   background-color: #5A5A5A;"
+            "   background-color: #505050;"
             "}"
 
             "QPushButton:pressed {"

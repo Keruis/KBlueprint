@@ -4,13 +4,40 @@
 #include <QFileInfo>
 
 FileViewer::FileViewer(QWidget* parent)
-        : QWidget(parent), m_tabWidget(new QTabWidget(this)) {
-
+        : QWidget(parent),
+        m_tabWidget(new QTabWidget(this))
+{
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_tabWidget);
 
     m_tabWidget->setTabsClosable(true);
+    m_tabWidget->setDocumentMode(true); // 更扁平的外观
+    m_tabWidget->setMovable(true);      // 可拖动 tab
+
+    m_tabWidget->setStyleSheet(R"(
+    QTabBar::tab {
+        background: #2d2d2d;
+        color: #cccccc;
+        padding: 6px 12px;
+        border: 1px solid #444;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+        margin-right: 1px;
+    }
+    QTabBar::tab:selected {
+        background: #1e1e1e;
+        color: white;
+        font-weight: bold;
+    }
+    QTabBar::tab:hover {
+        background: #3d3d3d;
+    }
+    QTabWidget::pane {
+        border: 1px solid #444;
+        top: -1px;
+    }
+)");
 
     connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, [=](int index) {
         QString filePath = m_openedFiles.key(static_cast<QTextEdit*>(m_tabWidget->widget(index)));
@@ -43,6 +70,7 @@ void FileViewer::openFile(const QString& filePath) {
     QFileInfo info(filePath);
     m_tabWidget->addTab(editor, info.fileName());
     m_tabWidget->setCurrentWidget(editor);
+    m_tabWidget->setTabToolTip(m_tabWidget->indexOf(editor), filePath);
 
     m_openedFiles[filePath] = editor;
 }

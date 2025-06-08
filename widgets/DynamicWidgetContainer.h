@@ -19,8 +19,10 @@ public:
     void SetDefaultPage(QWidget* widget) noexcept;
     QWidget* CurrentPage() const noexcept;
     QWidget* GetPage(const QString& name) const;
+    QString CurrentPageName() const noexcept ;
 
 private:
+    QString m_currentPageName;
     QWidget* m_current = nullptr;
     QWidget* m_default = nullptr;
     QMap<QString, QWidget*> m_pages;

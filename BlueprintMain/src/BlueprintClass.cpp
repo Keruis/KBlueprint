@@ -13,8 +13,8 @@ BlueprintClass::BlueprintClass(QWidget *parent)
     m_blurEffect(new QGraphicsBlurEffect(this))
 {
     m_ui->setupUi(this);
-//    setViewport(new QOpenGLWidget(this));
-//    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    setViewport(new QOpenGLWidget(this));
+    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     m_scene->setSceneRect(-1000, -1000, 2000, 2000);
     setScene(m_scene.get());
 }

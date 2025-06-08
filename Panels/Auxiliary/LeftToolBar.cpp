@@ -80,7 +80,9 @@ void LeftToolBar::Initialize() noexcept {
                 background-color: rgba(255, 255, 255, 0.1);
             }
         )");
-
+    connect(btnTerminal, &QToolButton::clicked, this, [this](){
+        emit buttonClicked(-1);
+    });
 }
 
 QToolButton *LeftToolBar::createSvgButton(const QString &svgPath) noexcept {

@@ -9,5 +9,9 @@
         <file>icons/LeftTool/blueprint.svg</file>
 
         <file>icons/LeftTool/terminal.svg</file>
+
+        <file>icons/explorer/add.svg</file>
+        <file>icons/explorer/expandSelected.svg</file>
+        <file>icons/explorer/collapseAll.svg</file>
     </qresource>
 </RCC>
