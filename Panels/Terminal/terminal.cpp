@@ -61,7 +61,9 @@ void Terminal::setupLayout() {
     inputLayout->setContentsMargins(50, 0, 0, 0);
     m_commandInput = new QLineEdit;
     m_commandInput->setPlaceholderText("Enter command...");
-    m_commandInput->setStyleSheet("color: white; font-family: Consolas;");
+    m_commandInput->setStyleSheet("background-color: rgba(0, 0, 0, 80);"
+                                  "color: white; "
+                                  "font-family: Consolas;");
     inputLayout->addWidget(m_commandInput);
 
     setupButton();

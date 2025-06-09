@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "HTTP/HttpClient.h"
+
 import NodeType;
 
 int main(int argc, char *argv[]) {

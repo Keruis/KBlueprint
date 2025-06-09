@@ -37,6 +37,7 @@ add_subdirectory(BlueprintMain)
 add_subdirectory(IP/CPU)
 add_subdirectory(Panels)
 add_subdirectory(widgets)
+add_subdirectory(HTTP)
 
 set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc)
 
@@ -51,7 +52,7 @@ target_link_libraries(Blueprint PRIVATE
         Qt6::OpenGLWidgets
         Qt6::Svg
 
-        Utils Container BlueprintModules
+        Utils Container BlueprintModules Http
 )
 
 #target_compile_options(Blueprint PRIVATE -fmodules)

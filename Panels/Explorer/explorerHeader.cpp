@@ -31,7 +31,7 @@ void ExplorerHeader::setupUi() {
     m_addBtn = createIconButton(":/icons/explorer/add.svg", "Add");
     m_expandBtn = createIconButton(":/icons/explorer/expandSelected.svg", "Expand All");
     m_collapseBtn = createIconButton(":/icons/explorer/collapseAll.svg", "Collapse All");
-    m_collapseBtn->setIconSize(QSize(18, 18));
+    m_collapseBtn->setIconSize(QSize(13, 13));
 
     layout->addWidget(label);
     layout->addStretch();
@@ -48,7 +48,7 @@ QPushButton* ExplorerHeader::createIconButton(const QString& iconPath, const QSt
     button->setFlat(true);
     button->setCursor(Qt::PointingHandCursor);
     button->setFixedSize(25, 25);
-    button->setIconSize(QSize(20, 20));
+    button->setIconSize(QSize(15, 15));
     button->setStyleSheet(R"(
         QPushButton {
             background-color: transparent;
