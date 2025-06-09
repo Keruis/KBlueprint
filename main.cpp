@@ -8,11 +8,14 @@
 #include <iostream>
 
 #include "HTTP/HttpClient.h"
-
+#include "UserGuide/UserGuide.h"
 import NodeType;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+
+    UserGuide u;
+    u.start();
 
     SplashWindow* splash = new SplashWindow();
     splash->Initialize();

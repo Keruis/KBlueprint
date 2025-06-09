@@ -1,0 +1,10 @@
+<Connection>
+    <Color>
+        <MAIN>#FF0000</MAIN>
+        <FUNCTION>#0000FF</FUNCTION>
+        <INPUT>#FFC800</INPUT>
+        <OUTPUT>#00FFAA</OUTPUT>
+        <CONDITION>#00CCFF</CONDITION>
+        <BRANCH>#00FF00</BRANCH>
+    </Color>
+</Connection>

@@ -1,0 +1,41 @@
+<NodeStyle>
+    <Style-1 NodeType="FUNCTION, INPUT">
+        <Background>
+            <Color>128, 128, 128, 200</Color>
+            <linearGradient type="vertical">
+                <stop offset="0%" color="#FFA0A0A0"/>
+                <stop offset="100%" color="#FF808080"/>
+            </linearGradient>
+            <BorderWidth>1</BorderWidth>
+            <BorderColor>Qt::black</BorderColor>
+            <Radius>20</Radius>
+            <xRadius>10</xRadius>
+            <yRadius>10</yRadius>
+            <BorderStyle>Qt::NoBrush</BorderStyle>
+        </Background>
+        <FUNCTION>
+            <InnerBorderColor>Qt::black</InnerBorderColor>
+            <InnerBorderWidth>1</InnerBorderWidth>
+        </FUNCTION>
+        <INPUT>
+            <InnerBorderColor>Qt::black</InnerBorderColor>
+            <InnerBorderWidth>1</InnerBorderWidth>
+        </INPUT>
+        <FontSize>10</FontSize>
+        <FontColor>Qt::white</FontColor>
+        <FontFlagStyle>Qt::AlignHCenter</FontFlagStyle>
+        <DividerColor>Qt::black</DividerColor>
+        <DividerWidth>1</DividerWidth>
+        <TitleBackgroundColor>0, 0, 0, 200</TitleBackgroundColor>
+    </Style-1>
+
+    <Style-2>
+
+    </Style-2>
+    <Style-3>
+
+    </Style-3>
+    <Style-4>
+
+    </Style-4>
+</NodeStyle>
