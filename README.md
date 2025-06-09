@@ -1,7 +1,6 @@
 # KBlueprint
 ## This is a simple blueprint implemented with Qt
 
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Keruis&repo=KBlueprint&layout=compact)](https://github.com/Keruis/KBlueprint)
 <h1 style="
   text-align: center;
   font-size: 48px;
