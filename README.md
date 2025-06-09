@@ -1,8 +1,8 @@
 # KBlueprint
 ## This is a simple blueprint implemented with Qt
 
-![Languages](https://img.shields.io/github/languages/count/<Keruis>/<KBlueprint>)
-![Top Language](https://img.shields.io/github/languages/top/<Keruis>/<KBlueprint>)
+![Languages](https://img.shields.io/github/languages/count/Keruis/KBlueprint)
+![Top Language](https://img.shields.io/github/languages/top/Keruis/KBlueprint)
 
 <h1 style="
   text-align: center;
