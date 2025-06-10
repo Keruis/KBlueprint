@@ -2,6 +2,7 @@
 #define BLUEPRINT_USERGUIDE_H
 
 extern "C" void StartServer();
+extern "C" void ShutdownServer();
 
 #include <cstdio>
 #include <cstdlib>

@@ -13,8 +13,5 @@ void UserGuide::start() {
 }
 
 void UserGuide::exit() {
-    if (pid > 0) {
-        std::string cmd = "kill " + std::to_string(pid);
-        std::system(cmd.c_str());
-    }
+    ShutdownServer();
 }

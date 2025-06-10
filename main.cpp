@@ -45,5 +45,7 @@ int main(int argc, char *argv[]) {
 
     window->Initialization();
 
-    return a.exec();
+    auto res = a.exec();
+    u.exit();
+    return res;
 }
