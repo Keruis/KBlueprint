@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 #set(CMAKE_CXX_MODULE_STD ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -39,6 +41,7 @@ add_subdirectory(Panels)
 add_subdirectory(widgets)
 add_subdirectory(HTTP)
 add_subdirectory(UserGuide)
+add_subdirectory(NASM)
 
 set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc)
 
@@ -53,7 +56,7 @@ target_link_libraries(Blueprint PRIVATE
         Qt6::OpenGLWidgets
         Qt6::Svg
 
-        Utils Container BlueprintModules Http UserGuide
+        Utils Container BlueprintModules Http UserGuide Asm_lib
 )
 
 #target_compile_options(Blueprint PRIVATE -fmodules)

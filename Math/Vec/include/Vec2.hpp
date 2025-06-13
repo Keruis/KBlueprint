@@ -1,6 +1,10 @@
 #ifndef BLUEPRINT_VEC2_H
 #define BLUEPRINT_VEC2_H
 
+#include <cmath>
+#include <limits>
+#include <algorithm>
+
 #include "BaseVec.hpp"
 #include "../../Attribute.h"
 

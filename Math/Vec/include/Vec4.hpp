@@ -158,5 +158,6 @@ namespace Math::Vec {
     ALWAYS_INLINE constexpr vec<4, bool> operator||(vec<4, bool> const& v1, vec<4, bool> const& v2);
 }
 
+#include "../src/Vec4.inl"
 
 #endif //BLUEPRINT_VEC4_H
