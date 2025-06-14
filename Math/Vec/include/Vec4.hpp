@@ -1,8 +1,12 @@
 #ifndef BLUEPRINT_VEC4_H
 #define BLUEPRINT_VEC4_H
-
+#include <cmath>
+#include <limits>
+#include <algorithm>
 #include "BaseVec.hpp"
 #include "../../Attribute.h"
+#include "../../detail/type_traits.h"
+#include "../../detail/simd.h"
 
 namespace Math::Vec {
     template <typename Ty_>
@@ -15,6 +19,41 @@ namespace Math::Vec {
         ValueType z;
         ValueType w;
 
+        template <typename T, typename = void>
+        struct has_simd_traits : std::false_type {};
+
+        template <typename T>
+        struct has_simd_traits<T, std::void_t<decltype(T::load)>> : std::true_type {};
+
+        template <typename U_>
+        struct SimdHelper {
+            using Traits = std::conditional_t<
+                    sizeof(Ty_) == 8,
+                    typename detail::SimdTraits<Ty_>,
+                    typename detail::SimdTraits<Ty_>::sse_traits
+            >;
+            using SimdType = std::conditional_t<
+                    sizeof(Ty_) == 8,
+                    typename detail::SimdTraits<Ty_>::avx_type,
+                    typename detail::SimdTraits<Ty_>::sse_traits::type
+            >;
+
+            using LoadArg = Traits::load_arg;
+            using StoreArg = Traits::store_arg;
+
+            static constexpr auto Load  = Traits::load;
+            static constexpr auto Store = Traits::store;
+            static constexpr auto Set   = Traits::set;
+
+            template<SimdType (*Op)(SimdType, SimdType)>
+            static ALWAYS_INLINE void simd_scalar_op(Ty_* data, U_ scalar) {
+                SimdType s = Set(static_cast<Ty_>(scalar));
+                SimdType v = Load(reinterpret_cast<LoadArg>(data));
+                v = Op(v, s);
+                Store(reinterpret_cast<StoreArg>(data), v);
+            }
+        };
+
         constexpr vec();
         constexpr vec(vec<4, Ty_> const& v);
         explicit constexpr vec(Ty_ scalar);
@@ -25,6 +64,8 @@ namespace Math::Vec {
         template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(X_ _x, vec<1, Y_> const& _y, Z_ _z, W_ _w);
         template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(vec<1, X_> const& _x, vec<1, Y_> const& _y, Z_ _z, W_ _w);
         template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(X_ _x, Y_ _y, vec<1, Z_> const& _z, W_ _w);
+        template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(X_ _x, Y_ _y, Z_ _z, vec<1, W_> const& _w);
+        template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(X_ _x, vec<1, Y_> const& _y, Z_ _z, vec<1, W_> const& _w);
         template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(vec<1, X_> const& _x, Y_ _y, vec<1, Z_> const& _z, W_ _w);
         template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(X_ _x, vec<1, Y_> const& _y, vec<1, Z_> const& _z, W_ _w);
         template <typename X_, typename Y_, typename Z_, typename W_> constexpr vec(vec<1, X_> const& _x, vec<1, Y_> const& _y, vec<1, Z_> const& _z, W_ _w);

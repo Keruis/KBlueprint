@@ -134,8 +134,8 @@ namespace Math::detail {
     struct SimdTraits<int> {
         using avx_type = __m256i;
         using avx_low_type = __m128i;
-        using load_arg = const void *;
-        using store_arg = void *;
+        using load_arg = const __m256i*;
+        using store_arg = __m256i*;
 
         static constexpr auto load = _mm256_load_si256;
         static constexpr auto loadu = _mm256_loadu_si256;
@@ -169,8 +169,8 @@ namespace Math::detail {
 
         struct sse_traits {
             using type = __m128i;
-            using load_arg = const void *;
-            using store_arg = void *;
+            using load_arg = const __m128i *;
+            using store_arg = __m128i *;
 
             static constexpr auto load = _mm_load_si128;
             static constexpr auto loadu = _mm_loadu_si128;
@@ -198,8 +198,8 @@ namespace Math::detail {
     template<> struct SimdTraits<int64_t> {
         using avx_type     = __m256i;
         using avx_low_type = __m128i;
-        using load_arg     = const void*;
-        using store_arg    = void*;
+        using load_arg     = const __m256i*;
+        using store_arg    = __m256i*;
 
         static constexpr auto load      = _mm256_load_si256;
         static constexpr auto loadu     = _mm256_loadu_si256;
@@ -255,8 +255,8 @@ namespace Math::detail {
 
         struct sse_traits {
             using type       = __m128i;
-            using load_arg   = const void*;
-            using store_arg  = void*;
+            using load_arg   = const long int*;
+            using store_arg  = long int*;
 
             static constexpr auto load      = _mm_load_si128;
             static constexpr auto loadu     = _mm_loadu_si128;

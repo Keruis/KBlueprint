@@ -228,34 +228,678 @@ constexpr Math::Vec::vec<3, Ty_> &Math::Vec::vec<3, Ty_>::operator=(const vec<3,
 
 template <typename Ty_>
 template <typename U_>
-constexpr Math::Vec::vec<3, Ty_> &Math::Vec::vec<3, Ty_>::operator+=(U_ scalar) noexcept {
-    if consteval {
-        scalar_op(scalar, std::plus<>{});
-    } else {
-        if constexpr (std::is_same_v<Ty_, float>) {
-            __m128 s = _mm_set1_ps(static_cast<float>(scalar));
-            __m128 v = _mm_load_ps(data);
-            v = _mm_add_ps(v, s);
-            _mm_store_ps(data, v);
-        } else if constexpr (std::is_same_v<Ty_, double>) {
-            __m256d s = _mm256_set1_pd(static_cast<double>(scalar));
-            __m256d v = _mm256_load_pd(data);
-            v = _mm256_add_pd(v, s);
-            _mm256_store_pd(data, v);
-        } else if constexpr (std::is_integral_v<Ty_> && sizeof(Ty_) == 4) {
-            __m128i s = _mm_set1_epi32(static_cast<int32_t>(scalar));
-            __m128i v = _mm_load_si128(reinterpret_cast<const __m128i*>(data));
-            v = _mm_add_epi32(v, s);
-            _mm_store_si128(reinterpret_cast<__m128i*>(data), v);
-        } else if constexpr (std::is_integral_v<Ty_> && sizeof(Ty_) == 8) {
-            __m256i s = _mm256_set1_epi64x(static_cast<int64_t>(scalar));
-            __m256i v = _mm256_load_si256(reinterpret_cast<const __m256i*>(data));
-            v = _mm256_add_epi64(v, s);
-            _mm256_store_si256(reinterpret_cast<__m256i*>(data), v);
-        } else {
-            scalar_op(scalar, std::plus<>{});
-        }
-    }
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator+=(U_ scalar) noexcept {
+    x += static_cast<Ty_>(scalar);
+    y += static_cast<Ty_>(scalar);
+    z += static_cast<Ty_>(scalar);
     return *this;
 }
 
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator+=(const vec<1, U_> &v) noexcept {
+    return *this += v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator+=(const vec<3, U_> &v) noexcept {
+    x += static_cast<Ty_>(v.x);
+    y += static_cast<Ty_>(v.y);
+    z += static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator-=(U_ scalar) noexcept {
+    x -= static_cast<Ty_>(scalar);
+    y -= static_cast<Ty_>(scalar);
+    z -= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator-=(const vec<1, U_> &v) noexcept {
+    return *this -= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator-=(const vec<3, U_> &v) noexcept {
+    x -= static_cast<Ty_>(v.x);
+    y -= static_cast<Ty_>(v.y);
+    z -= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator*=(U_ scalar) noexcept {
+    x *= static_cast<Ty_>(scalar);
+    y *= static_cast<Ty_>(scalar);
+    z *= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator*=(const vec<1, U_> &v) noexcept {
+    return *this *= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator*=(const vec<3, U_> &v) noexcept {
+    x *= static_cast<Ty_>(v.x);
+    y *= static_cast<Ty_>(v.y);
+    z *= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator/=(U_ scalar) noexcept {
+    x /= static_cast<Ty_>(scalar);
+    y /= static_cast<Ty_>(scalar);
+    z /= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator/=(const vec<1, U_> &v) noexcept {
+    return *this /= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator/=(const vec<3, U_> &v) noexcept {
+    x /= static_cast<Ty_>(v.x);
+    y /= static_cast<Ty_>(v.y);
+    z /= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator%=(U_ scalar) noexcept {
+    x %= static_cast<Ty_>(scalar);
+    y %= static_cast<Ty_>(scalar);
+    z %= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator%=(const vec<1, U_> &v) noexcept {
+    return *this %= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator%=(const vec<3, U_> &v) noexcept {
+    x %= static_cast<Ty_>(v.x);
+    y %= static_cast<Ty_>(v.y);
+    z %= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator&=(U_ scalar) noexcept {
+    x &= static_cast<Ty_>(scalar);
+    y &= static_cast<Ty_>(scalar);
+    z &= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator&=(const vec<1, U_> &v) noexcept {
+    return *this &= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator&=(const vec<3, U_> &v) noexcept {
+    x &= static_cast<Ty_>(v.x);
+    y &= static_cast<Ty_>(v.y);
+    z &= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator|=(U_ scalar) noexcept {
+    x |= static_cast<Ty_>(scalar);
+    y |= static_cast<Ty_>(scalar);
+    z |= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator|=(const vec<1, U_> &v) noexcept {
+    return *this |= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator|=(const vec<3, U_> &v) noexcept {
+    x |= static_cast<Ty_>(v.x);
+    y |= static_cast<Ty_>(v.y);
+    z |= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator^=(U_ scalar) noexcept {
+    x ^= static_cast<Ty_>(scalar);
+    y ^= static_cast<Ty_>(scalar);
+    z ^= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator^=(const vec<1, U_> &v) noexcept {
+    return *this ^= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator^=(const vec<3, U_> &v) noexcept {
+    x ^= static_cast<Ty_>(v.x);
+    y ^= static_cast<Ty_>(v.y);
+    z ^= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator<<=(U_ scalar) noexcept {
+    x <<= static_cast<Ty_>(scalar);
+    y <<= static_cast<Ty_>(scalar);
+    z <<= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator<<=(const vec<1, U_> &v) noexcept {
+    return *this <<= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator<<=(const vec<3, U_> &v) noexcept {
+    x <<= static_cast<Ty_>(v.x);
+    y <<= static_cast<Ty_>(v.y);
+    z <<= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator>>=(U_ scalar) noexcept {
+    x >>= static_cast<Ty_>(scalar);
+    y >>= static_cast<Ty_>(scalar);
+    z >>= static_cast<Ty_>(scalar);
+    return *this;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator>>=(const vec<1, U_> &v) noexcept {
+    return *this >>= v.x;
+}
+
+template <typename Ty_>
+template <typename U_>
+constexpr Math::Vec::vec<3, Ty_>& Math::Vec::vec<3, Ty_>::operator>>=(const vec<3, U_> &v) noexcept {
+    x >>= static_cast<Ty_>(v.x);
+    y >>= static_cast<Ty_>(v.y);
+    z >>= static_cast<Ty_>(v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> &Math::Vec::vec<3, Ty_>::operator++() noexcept {
+    ++this->x;
+    ++this->y;
+    ++this->z;
+    return *this;
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> &Math::Vec::vec<3, Ty_>::operator--() noexcept {
+    --this->x;
+    --this->y;
+    --this->z;
+    return *this;
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::vec<3, Ty_>::operator++(int) noexcept {
+    vec<3, Ty_> res(*this);
+    ++*this;
+    return res;
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::vec<3, Ty_>::operator--(int) noexcept {
+    vec<3, Ty_> res(*this);
+    --*this;
+    return res;
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator+(const vec<3, Ty_> &v) {
+    return v;
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator-(const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            -v.x,
+            -v.y
+            -v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator+(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x + scalar,
+            v.y + scalar,
+            v.z + scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator+(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x + v2.x,
+            v1.y + v2.x,
+            v1.z + v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator+(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar + v.x,
+            scalar + v.y,
+            scalar + v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator+(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x + v2.x,
+            v1.x + v2.y,
+            v1.x + v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator+(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x + v2.x,
+            v1.y + v2.y,
+            v1.z + v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator-(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x - scalar,
+            v.y - scalar,
+            v.z - scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator-(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x - v2.x,
+            v1.y - v2.x,
+            v1.z - v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator-(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar - v.x,
+            scalar - v.y,
+            scalar - v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator-(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x - v2.x,
+            v1.x - v2.y,
+            v1.x - v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator-(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x - v2.x,
+            v1.y - v2.y,
+            v1.z - v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator*(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x * scalar,
+            v.y * scalar,
+            v.z * scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator*(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x * v2.x,
+            v1.y * v2.x,
+            v1.z * v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator*(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar * v.x,
+            scalar * v.y,
+            scalar * v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator*(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x * v2.x,
+            v1.x * v2.y,
+            v1.x * v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator*(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x * v2.x,
+            v1.y * v2.y,
+            v1.z * v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator/(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x / scalar,
+            v.y / scalar,
+            v.z / scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator/(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x / v2.x,
+            v1.y / v2.x,
+            v1.z / v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator/(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar / v.x,
+            scalar / v.y,
+            scalar / v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator/(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x / v2.x,
+            v1.x / v2.y,
+            v1.x / v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator/(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x / v2.x,
+            v1.y / v2.y,
+            v1.z / v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator%(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x % scalar,
+            v.y % scalar,
+            v.z % scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator%(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x % v2.x,
+            v1.y % v2.x,
+            v1.z % v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator%(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar % v.x,
+            scalar % v.y,
+            scalar % v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator%(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x % v2.x,
+            v1.x % v2.y,
+            v1.x % v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator%(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x % v2.x,
+            v1.y % v2.y,
+            v1.z % v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator&(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x & scalar,
+            v.y & scalar,
+            v.z & scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator&(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x & v2.x,
+            v1.y & v2.x,
+            v1.z & v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator&(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar & v.x,
+            scalar & v.y,
+            scalar & v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator&(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x & v2.x,
+            v1.x & v2.y,
+            v1.x & v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator&(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x & v2.x,
+            v1.y & v2.y,
+            v1.z & v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator|(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x | scalar,
+            v.y | scalar,
+            v.z | scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator|(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x | v2.x,
+            v1.y | v2.x,
+            v1.z | v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator|(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar | v.x,
+            scalar | v.y,
+            scalar | v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator|(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x | v2.x,
+            v1.x | v2.y,
+            v1.x | v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator|(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x | v2.x,
+            v1.y | v2.y,
+            v1.z | v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator^(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x ^ scalar,
+            v.y ^ scalar,
+            v.z ^ scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator^(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x ^ v2.x,
+            v1.y ^ v2.x,
+            v1.z ^ v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator^(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar ^ v.x,
+            scalar ^ v.y,
+            scalar ^ v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator^(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x ^ v2.x,
+            v1.x ^ v2.y,
+            v1.x ^ v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator^(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x ^ v2.x,
+            v1.y ^ v2.y,
+            v1.z ^ v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator<<(const vec<3, Ty_> &v, Ty_ scalar) {
+    return vec<3, Ty_>(
+            v.x << scalar,
+            v.y << scalar,
+            v.z << scalar);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator<<(const vec<3, Ty_> &v1, const vec<1, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x << v2.x,
+            v1.y << v2.x,
+            v1.z << v2.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator<<(Ty_ scalar, const vec<3, Ty_> &v) {
+    return vec<3, Ty_>(
+            scalar << v.x,
+            scalar << v.y,
+            scalar << v.z);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator<<(const vec<1, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x << v2.x,
+            v1.x << v2.y,
+            v1.x << v2.y);
+}
+
+template <typename Ty_>
+constexpr Math::Vec::vec<3, Ty_> Math::Vec::operator<<(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return vec<3, Ty_>(
+            v1.x << v2.x,
+            v1.y << v2.y,
+            v1.z << v2.z);
+}
+
+template <typename Ty_>
+constexpr bool Math::Vec::operator==(const vec<3, Ty_>& v1, const vec<3, Ty_>& v2) {
+    if constexpr (std::numeric_limits<Ty_>::is_iec559) { // 浮点数
+        if (std::isnan(v1.x) || std::isnan(v2.x)) return false;
+        if (std::isinf(v1.x) || std::isinf(v2.x))
+            if (!(std::signbit(v1.x) == std::signbit(v2.x) && v1.x == v2.x)) return false;
+        const Ty_ abs_diff_x = std::abs(v1.x - v2.x);
+        const Ty_ max_abs_x = std::max(std::abs(v1.x), std::abs(v2.x));
+        const bool x_equal = abs_diff_x <= std::numeric_limits<Ty_>::epsilon() * max_abs_x;
+        if (!x_equal) return false;
+
+        if (std::isnan(v1.y) || std::isnan(v2.y)) return false;
+        if (std::isinf(v1.y) || std::isinf(v2.y))
+            if (!(std::signbit(v1.y) == std::signbit(v2.y) && v1.y == v2.y)) return false;
+        const Ty_ abs_diff_y = std::abs(v1.y - v2.y);
+        const Ty_ max_abs_y = std::max(std::abs(v1.y), std::abs(v2.y));
+        const bool y_equal = abs_diff_y <= std::numeric_limits<Ty_>::epsilon() * max_abs_y;
+        if (!y_equal) return false;
+
+        if (std::isnan(v1.z) || std::isnan(v2.z)) return false;
+        if (std::isinf(v1.z) || std::isinf(v2.z))
+            if (!(std::signbit(v1.z) == std::signbit(v2.z) && v1.z == v2.z)) return false;
+        const Ty_ abs_diff_z = std::abs(v1.z - v2.z);
+        const Ty_ max_abs_z = std::max(std::abs(v1.z), std::abs(v2.z));
+        const bool z_equal = abs_diff_z <= std::numeric_limits<Ty_>::epsilon() * max_abs_z;
+        return z_equal;
+
+    } else {
+        return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
+    }
+}
+
+template <typename Ty_>
+constexpr bool Math::Vec::operator!=(const vec<3, Ty_> &v1, const vec<3, Ty_> &v2) {
+    return !(v1 == v2);
+}
+
+constexpr Math::Vec::vec<3, bool> Math::Vec::operator&&(const vec<3, bool> &v1, const vec<3, bool> &v2) {
+    return vec<3, bool>(v1.x && v2.x, v1.y && v2.y, v1.z && v2.z);
+}
+
+constexpr Math::Vec::vec<3, bool> Math::Vec::operator||(const vec<3, bool> &v1, const vec<3, bool> &v2) {
+    return vec<3, bool>(v1.x || v2.x, v1.y || v2.y, v1.z || v2.z);
+}

@@ -33,6 +33,8 @@ add_executable(Blueprint
         resources.qrc
 )
 
+add_compile_options(-Wno-ignored-attributes)
+
 add_subdirectory(utils)
 add_subdirectory(Container)
 add_subdirectory(BlueprintMain)

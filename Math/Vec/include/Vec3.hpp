@@ -4,6 +4,9 @@
 #include <type_traits>
 #include <functional>
 #include <immintrin.h>
+#include <cmath>
+#include <limits>
+#include <algorithm>
 
 #include "BaseVec.hpp"
 #include "../../Attribute.h"
@@ -12,16 +15,11 @@
 
 namespace Math::Vec {
     template <typename Ty_>
-    struct alignas(Math::detail::align_selector<Ty_>::value) vec<3, Ty_> {
+    struct vec<3, Ty_> {
         using ValueType = Ty_;
         using VecType = vec<3, ValueType>;
 
-        union {
-            struct {
-                ValueType x, y, z, _padding{};
-            };
-            ValueType data[4];
-        };
+        ValueType x, y, z;
 
     private:
         template <typename U_, typename Op_>
@@ -93,10 +91,10 @@ namespace Math::Vec {
         template <typename U_> ALWAYS_INLINE constexpr vec<3, Ty_>& operator>>=(vec<1, U_> const& v) noexcept ;
         template <typename U_> ALWAYS_INLINE constexpr vec<3, Ty_>& operator>>=(vec<3, U_> const& v) noexcept ;
 
-        ALWAYS_INLINE constexpr vec<3, Ty_>& operator++();
-        ALWAYS_INLINE constexpr vec<3, Ty_>& operator--();
-        ALWAYS_INLINE constexpr vec<3, Ty_> operator++(int);
-        ALWAYS_INLINE constexpr vec<3, Ty_> operator--(int);
+        ALWAYS_INLINE constexpr vec<3, Ty_>& operator++() noexcept ;
+        ALWAYS_INLINE constexpr vec<3, Ty_>& operator--() noexcept ;
+        ALWAYS_INLINE constexpr vec<3, Ty_> operator++(int) noexcept ;
+        ALWAYS_INLINE constexpr vec<3, Ty_> operator--(int) noexcept ;
     };
     template <typename Ty_> ALWAYS_INLINE constexpr vec<3, Ty_> operator+(vec<3, Ty_> const& v);
     template <typename Ty_> ALWAYS_INLINE constexpr vec<3, Ty_> operator-(vec<3, Ty_> const& v);
