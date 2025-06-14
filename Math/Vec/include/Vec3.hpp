@@ -1,19 +1,37 @@
 #ifndef BLUEPRINT_VEC3_H
 #define BLUEPRINT_VEC3_H
 
+#include <type_traits>
+#include <functional>
+#include <immintrin.h>
+
 #include "BaseVec.hpp"
 #include "../../Attribute.h"
+#include "../../detail/type_traits.h"
+#include "../../detail/simd.h"
 
 namespace Math::Vec {
     template <typename Ty_>
-    struct vec<3, Ty_> {
+    struct alignas(Math::detail::align_selector<Ty_>::value) vec<3, Ty_> {
         using ValueType = Ty_;
         using VecType = vec<3, ValueType>;
 
-        ValueType x;
-        ValueType y;
-        ValueType z;
+        union {
+            struct {
+                ValueType x, y, z, _padding{};
+            };
+            ValueType data[4];
+        };
 
+    private:
+        template <typename U_, typename Op_>
+        constexpr void scalar_op(U_ scalar, Op_ op) noexcept {
+            x = op(x, scalar);
+            y = op(y, scalar);
+            z = op(z, scalar);
+        }
+
+    public:
         constexpr vec();
         constexpr vec(vec const& v);
         explicit constexpr vec(Ty_ scalar);
