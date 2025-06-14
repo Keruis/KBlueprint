@@ -16,7 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
       m_renderPreview(new RenderPreviewWidget(parent)),
       m_ui(new Ui::MainWindow()),                    //NOLINT
       m_blueprint(new Blueprint::BlueprintClass()),
-      m_blueprintContainer(new DynamicWidgetContainer())
+      m_blueprintContainer(new DynamicWidgetContainer()),
+      m_moeChat(new ChatWindow())
 {
     m_ui->setupUi(this);
 }
@@ -55,6 +56,7 @@ void MainWindow::initCoreModules() noexcept {
 
     m_blueprintContainer->AddPage("blueprint", m_blueprint);
     m_blueprintContainer->AddPage("FileViewer", m_explorer->GetFileViewer());
+    m_blueprintContainer->AddPage("MoeChat", m_moeChat);
 }
 
 void MainWindow::initWindowProperties() noexcept {
@@ -115,8 +117,8 @@ void MainWindow::setupSignalSlots() noexcept {
         switch (index) {
             case -1: toggleTerminal(); break;
             case 0: m_blueprintContainer->ShowPage("FileViewer"); break;
+            case 1: m_blueprintContainer->ShowPage("MoeChat"); break;
             case 2: m_blueprintContainer->ShowPage("blueprint"); break;
-            case 1: break;
         }
     });
 }

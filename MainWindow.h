@@ -19,6 +19,8 @@
 #include "Panels/Auxiliary/LeftToolBar.h"
 #include "widgets/DynamicWidgetContainer.h"
 
+#include "Expand_MoeChat/ChatWidget.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -71,6 +73,8 @@ private:
     void showPageIfNotCurrent(const QString& name);
 
 private:
+    ChatWindow* m_moeChat;
+
     Utils::Xml* m_ConfigurationRoot;
 
     QPixmap m_background;

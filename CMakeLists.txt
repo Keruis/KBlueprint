@@ -31,6 +31,7 @@ add_executable(Blueprint
         SplashWindow/SplashWindow.cpp
         Title/icon.qrc
         resources.qrc
+        Expand_MoeChat/resource.qrc
 )
 
 add_compile_options(-Wno-ignored-attributes)
@@ -44,8 +45,9 @@ add_subdirectory(widgets)
 add_subdirectory(HTTP)
 add_subdirectory(UserGuide)
 add_subdirectory(NASM)
+add_subdirectory(Expand_MoeChat)
 
-set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc)
+set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc Expand_MoeChat/resource.qrc)
 
 qt_add_resources(Blueprint
         RESOURCE_FILES ${RESOURCE_FILES_BLUEPRINT}
@@ -58,7 +60,7 @@ target_link_libraries(Blueprint PRIVATE
         Qt6::OpenGLWidgets
         Qt6::Svg
 
-        Utils Container BlueprintModules Http UserGuide Asm_lib
+        Utils Container BlueprintModules Http UserGuide Asm_lib MoeChat
 )
 
 #target_compile_options(Blueprint PRIVATE -fmodules)
