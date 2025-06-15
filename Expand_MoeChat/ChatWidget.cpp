@@ -1,4 +1,5 @@
 #include "ChatWidget.h"
+#include "FloatingSidebar.h"
 
 ChatWindow::ChatWindow(QWidget* parent)
     : QWidget(parent)
@@ -52,18 +53,8 @@ void ChatWindow::setupOverlay() {
 }
 
 void ChatWindow::setupSidebar() {
-    m_sidebar = new QWidget(m_contentContainer);
+    m_sidebar = new FloatingSidebar(m_contentContainer);
     m_sidebar->setFixedWidth(200);
-    m_sidebar->setStyleSheet(R"(
-            background-color: #2c2c2c;
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-        )");
-
-    auto* sidebarLayout = new QVBoxLayout(m_sidebar);
-    sidebarLayout->setContentsMargins(10, 10, 10, 10);
-    sidebarLayout->addWidget(new QLabel("我是浮动侧边栏"));
-    sidebarLayout->addStretch();
 
     m_sidebar->move(-200, 0);
     m_sidebar->resize(200, m_contentContainer->height());

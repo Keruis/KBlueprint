@@ -26,7 +26,13 @@ QLabel* ChatMessageItem::createNameLabel() {
 
 QLabel* ChatMessageItem::createTimeLabel() {
     auto* timeLabel = new QLabel(m_time);
-    timeLabel->setStyleSheet("color: gray; font-size: 10px;");
+    timeLabel->setStyleSheet(R"(
+        color: gray;
+        font-size: 10px;
+        padding: 0px;
+        margin: 0px;
+        line-height: 1;
+    )");
     timeLabel->setAlignment(m_fromSelf ? Qt::AlignRight : Qt::AlignLeft);
     return timeLabel;
 }
@@ -37,7 +43,7 @@ QWidget* ChatMessageItem::createAvatarWidget() {
 
 QVBoxLayout* ChatMessageItem::createNameAndBubbleLayout() {
     auto* layout = new QVBoxLayout;
-    layout->setSpacing(2);
+    layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(createNameLabel());
     layout->addWidget(new ChatBubble(m_message, m_fromSelf));

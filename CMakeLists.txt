@@ -18,6 +18,7 @@ find_package(Qt6 COMPONENTS
         Widgets
         OpenGLWidgets
         Svg
+        Multimedia
         REQUIRED)
 
 add_executable(Blueprint
@@ -59,6 +60,7 @@ target_link_libraries(Blueprint PRIVATE
         Qt6::Gui
         Qt6::OpenGLWidgets
         Qt6::Svg
+        Qt6::Multimedia
 
         Utils Container BlueprintModules Http UserGuide Asm_lib MoeChat
 )

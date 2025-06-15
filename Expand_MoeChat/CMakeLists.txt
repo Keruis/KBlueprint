@@ -4,6 +4,8 @@ find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
+        Network
+        Multimedia
         REQUIRED)
 
 # H
@@ -14,6 +16,10 @@ target_sources(MoeChat PRIVATE
         AvatarWidget.h
         ChatMessageItem.h
         ChatMessageBubble.h
+        Markdown.h
+        FloatingSidebar.h
+        AudioPlayer.h
+        TipButton.h
 )
 
 # CPP
@@ -24,6 +30,9 @@ target_sources(MoeChat PRIVATE
         AvatarWidget.cpp
         ChatMessageItem.cpp
         ChatMessageBubble.cpp
+        FloatingSidebar.cpp
+        TipButton.cpp
+        AudioPlayer.cpp
         resource.qrc
 )
 
@@ -35,4 +44,7 @@ target_link_libraries(MoeChat PRIVATE
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
+        Qt6::Network
+        Qt6::Multimedia
+        Http
 )

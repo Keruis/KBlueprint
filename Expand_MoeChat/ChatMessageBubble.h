@@ -3,7 +3,10 @@
 
 
 #include <QWidget>
+#include <QTextDocument>
 #include <QString>
+#include <QDesktopServices>
+#include <QAbstractTextDocumentLayout>
 
 class ChatBubble : public QWidget {
     Q_OBJECT
@@ -13,8 +16,10 @@ public:
 
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override ;
 
 private:
+    QTextDocument m_cachedDoc;
     QString m_message;
     bool m_fromSelf;
     QRect m_textRect;
