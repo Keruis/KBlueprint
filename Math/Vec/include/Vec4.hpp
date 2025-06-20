@@ -5,8 +5,6 @@
 #include <algorithm>
 #include "BaseVec.hpp"
 #include "../../../Attribute.h"
-#include "../../detail/type_traits.h"
-#include "../../detail/simd.h"
 
 namespace Math::Vec {
     template <typename Ty_>
@@ -18,41 +16,6 @@ namespace Math::Vec {
         ValueType y;
         ValueType z;
         ValueType w;
-
-        template <typename T, typename = void>
-        struct has_simd_traits : std::false_type {};
-
-        template <typename T>
-        struct has_simd_traits<T, std::void_t<decltype(T::load)>> : std::true_type {};
-
-        template <typename U_>
-        struct SimdHelper {
-            using Traits = std::conditional_t<
-                    sizeof(Ty_) == 8,
-                    typename detail::SimdTraits<Ty_>,
-                    typename detail::SimdTraits<Ty_>::sse_traits
-            >;
-            using SimdType = std::conditional_t<
-                    sizeof(Ty_) == 8,
-                    typename detail::SimdTraits<Ty_>::avx_type,
-                    typename detail::SimdTraits<Ty_>::sse_traits::type
-            >;
-
-            using LoadArg = Traits::load_arg;
-            using StoreArg = Traits::store_arg;
-
-            static constexpr auto Load  = Traits::load;
-            static constexpr auto Store = Traits::store;
-            static constexpr auto Set   = Traits::set;
-
-            template<SimdType (*Op)(SimdType, SimdType)>
-            static ALWAYS_INLINE void simd_scalar_op(Ty_* data, U_ scalar) {
-                SimdType s = Set(static_cast<Ty_>(scalar));
-                SimdType v = Load(reinterpret_cast<LoadArg>(data));
-                v = Op(v, s);
-                Store(reinterpret_cast<StoreArg>(data), v);
-            }
-        };
 
         constexpr vec();
         constexpr vec(vec<4, Ty_> const& v);

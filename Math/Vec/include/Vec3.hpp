@@ -10,8 +10,6 @@
 
 #include "BaseVec.hpp"
 #include "../../../Attribute.h"
-#include "../../detail/type_traits.h"
-#include "../../detail/simd.h"
 
 namespace Math::Vec {
     template <typename Ty_>
