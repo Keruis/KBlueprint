@@ -6,10 +6,9 @@
 #include <utility>
 #include "../../Attribute.h"
 
-template <auto Value>
-struct ConstValue {
-    static constexpr auto value = Value;
-};
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 template <auto MatchValue, typename Func>
 struct Case {
@@ -17,50 +16,43 @@ struct Case {
     Func func;
 
     template <auto Input>
-    ALWAYS_INLINE void try_run() const {
+    constexpr void try_run(bool& matched) const {
         if constexpr (Input == MatchValue) {
             func();
+            matched = true;
         }
     }
 };
 
-template <auto InputValue, typename... Cases>
-struct ConstexprSwitch;
+template <auto InputValue, typename... Cs>
+struct ConstexprSwitch {
+    std::tuple<Cs...> cases;
 
-template <auto InputValue>
-struct ConstexprSwitch<InputValue> {
+    constexpr ConstexprSwitch(Cs... cs) : cases(std::move(cs)...) {}
+
     template <auto MatchValue, typename Func>
-    ALWAYS_INLINE auto case_(Func func) const {
-        return ConstexprSwitch<InputValue, Case<MatchValue, Func>>{ Case<MatchValue, Func>{func} };
+    constexpr auto case_(Func func) const {
+        auto new_case = std::make_tuple(Case<MatchValue, Func>{func});
+        auto new_cases = std::tuple_cat(cases, new_case);
+
+        return std::apply([](auto... args) {
+            return ConstexprSwitch<InputValue, decltype(args)...>{args...};
+        }, new_cases);
     }
 
     template <typename Func>
-    ALWAYS_INLINE void default_(Func func) const {
-        func();
-    }
-};
-
-template <auto InputValue, typename FirstCase, typename... Rest>
-struct ConstexprSwitch<InputValue, FirstCase, Rest...> {
-    std::tuple<FirstCase, Rest...> cases;
-
-    template <auto MatchValue, typename Func>
-    ALWAYS_INLINE auto case_(Func func) const {
-        return ConstexprSwitch<InputValue, FirstCase, Rest..., Case<MatchValue, Func>>{ std::tuple_cat(cases, std::make_tuple(Case<MatchValue, Func>{func})) };
-    }
-
-    template <typename Func>
-    ALWAYS_INLINE void default_(Func func) const {
+    constexpr void default_(Func func) const {
         bool matched = false;
         std::apply([&](const auto&... cs) {
-            ((cs.template try_run<InputValue>()), ...);
+            (cs.template try_run<InputValue>(matched), ...);
         }, cases);
-        if constexpr (InputValue != InputValue) func();
+
+        if (!matched) func();
     }
 };
 
 template <auto Value>
-constexpr ALWAYS_INLINE auto constexpr_switch() {
+constexpr auto constexpr_switch() {
     return ConstexprSwitch<Value>{};
 }
 

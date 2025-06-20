@@ -65,7 +65,7 @@ void Render::utils::AsyncFrameRateCounter<Mode>::loop() {
 
             if (new_fps < current_min) min_fps.store(new_fps);
             if (new_fps > current_max) max_fps.store(new_fps);
-
+__asm__ __volatile__("nop\n\t");
             constexpr_switch<Mode>()
                     .template case_<SmoothingMode::Average>(
                             [&]{
@@ -91,7 +91,7 @@ void Render::utils::AsyncFrameRateCounter<Mode>::loop() {
 
                             }
                     );
-
+            __asm__ __volatile__("nop\n\t");
         } else {
             fps_value.store(0.0f);
             avg_fps.store(0.0f);

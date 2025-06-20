@@ -47,14 +47,14 @@ namespace Math::Mat {
 
         template<typename U>
         explicit constexpr mat(mat<2, 4, U> const& m);
-        explicit constexpr mat(mat<2, 2, Ty_> const& x);
-        explicit constexpr mat(mat<3, 3, Ty_> const& x);
-        explicit constexpr mat(mat<4, 4, Ty_> const& x);
-        explicit constexpr mat(mat<2, 3, Ty_> const& x);
-        explicit constexpr mat(mat<3, 2, Ty_> const& x);
-        explicit constexpr mat(mat<3, 4, Ty_> const& x);
-        explicit constexpr mat(mat<4, 2, Ty_> const& x);
-        explicit constexpr mat(mat<4, 3, Ty_> const& x);
+        explicit constexpr mat(mat<2, 2, Ty_> const& m);
+        explicit constexpr mat(mat<3, 3, Ty_> const& m);
+        explicit constexpr mat(mat<4, 4, Ty_> const& m);
+        explicit constexpr mat(mat<2, 3, Ty_> const& m);
+        explicit constexpr mat(mat<3, 2, Ty_> const& m);
+        explicit constexpr mat(mat<3, 4, Ty_> const& m);
+        explicit constexpr mat(mat<4, 2, Ty_> const& m);
+        explicit constexpr mat(mat<4, 3, Ty_> const& m);
 
         template<typename U>
         constexpr mat<2, 4, Ty_> & operator=(mat<2, 4, U> const& m);
@@ -95,5 +95,7 @@ namespace Math::Mat {
     template <typename Ty_> constexpr bool operator==(mat<2, 4, Ty_> const& m1, mat<2, 4, Ty_> const& m2);
     template <typename Ty_> constexpr bool operator!=(mat<2, 4, Ty_> const& m1, mat<2, 4, Ty_> const& m2);
 }
+
+#include "../src/Mat2x4.inl"
 
 #endif //BLUEPRINT_MAT2X4_H

@@ -95,4 +95,6 @@ namespace Math::Mat {
     template <typename Ty_> constexpr bool operator!=(mat<2, 3, Ty_> const& m1, mat<2, 3, Ty_> const& m2);
 }
 
+#include "../src/Mat2x3.inl"
+
 #endif //BLUEPRINT_MAT2X3_H
