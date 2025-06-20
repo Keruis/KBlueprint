@@ -27,6 +27,7 @@ add_executable(Blueprint
         MainWindow.h
         MainWindow.ui
         CPUFeatures.h
+        Attribute.h
         Title/TitleBar.cpp
         RadialMenu/RadialMenu.cpp
         SplashWindow/SplashWindow.cpp
@@ -47,6 +48,7 @@ add_subdirectory(HTTP)
 add_subdirectory(UserGuide)
 add_subdirectory(NASM)
 add_subdirectory(Expand_MoeChat)
+add_subdirectory(RENDER)
 
 set(QRC_RESOURCE ${RESOURCE_FILES_BLUEPRINT} ${PANELS_ICON_QRC} Title/icon.qrc resources.qrc Expand_MoeChat/resource.qrc)
 
@@ -62,7 +64,7 @@ target_link_libraries(Blueprint PRIVATE
         Qt6::Svg
         Qt6::Multimedia
 
-        Utils Container BlueprintModules Http UserGuide Asm_lib MoeChat
+        Utils Container BlueprintModules Http UserGuide Asm_lib MoeChat Render
 )
 
 #target_compile_options(Blueprint PRIVATE -fmodules)

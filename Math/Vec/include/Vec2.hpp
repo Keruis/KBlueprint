@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "BaseVec.hpp"
-#include "../../Attribute.h"
+#include "../../../Attribute.h"
 
 namespace Math::Vec {
     template <typename Ty_>

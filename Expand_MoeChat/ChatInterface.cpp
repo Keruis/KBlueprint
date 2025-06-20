@@ -107,7 +107,7 @@ void ChatInterface::appendMessageToUI(const QString& message) {
 #include <QNetworkAccessManager>
 
 QNetworkReply* ChatInterface::sendToTTS(const QString& base64Audio) {
-    QNetworkRequest asrRequest(QUrl("http://localhost:18080/api/tts"));
+    QNetworkRequest asrRequest(QUrl("http://localhost:8001/api/tts"));
     asrRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject obj;
@@ -143,7 +143,7 @@ void ChatInterface::sendMessage() {
     QJsonObject payload;
     payload["msg"] = messages;
 
-    QNetworkRequest request(QUrl("http://localhost:18080/chat-stream"));
+    QNetworkRequest request(QUrl("http://localhost:8001/api/chat"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "text/event-stream");
 

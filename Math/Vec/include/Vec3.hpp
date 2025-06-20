@@ -9,7 +9,7 @@
 #include <algorithm>
 
 #include "BaseVec.hpp"
-#include "../../Attribute.h"
+#include "../../../Attribute.h"
 #include "../../detail/type_traits.h"
 #include "../../detail/simd.h"
 

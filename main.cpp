@@ -4,7 +4,6 @@
 #include "MainWindow.h"
 #include "BlueprintMain/include/BlueprintNode.h"
 #include "SplashWindow/SplashWindow.h"
-
 #include <iostream>
 
 import NodeType;
