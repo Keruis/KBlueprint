@@ -35,7 +35,7 @@ void X11Window::setTitle(const std::string& title) {
     XFlush(display_);
 }
 
-Window X11Window::getWindowHandle() const {
+Window& X11Window::getWindowHandle() {
     return window_;
 }
 

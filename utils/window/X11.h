@@ -44,7 +44,7 @@ public:
     void show();
     void hide();
     void setTitle(const std::string& title);
-    Window getWindowHandle() const;
+    Window& getWindowHandle();
     Display* getDisplay() const;
     GC getGraphicsContext() const;
     int getScreen() const;
@@ -261,7 +261,7 @@ private:
                 break;
             case ClientMessage:
                 if (event.xclient.data.l[0] == XInternAtom(display_, "WM_DELETE_WINDOW", False)) {
-                    quitRequested_.store(true); // 设置退出标志
+                    quitRequested_.store(true);
                 }
                 for (const auto& callback : clientMessageCallbacks_) {
                     if (callback) {
