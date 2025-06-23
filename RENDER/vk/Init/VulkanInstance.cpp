@@ -9,13 +9,28 @@ void Vulkan::Init::VulkanInstance::Initialize() noexcept {
 }
 
 void Vulkan::Init::VulkanInstance::createInstance() {
-    Utils::K_MixedAll(enableValidationLayers, !checkValidationLayerSupport())
-        .then([](){
-            throw std::runtime_error("validation layers requested, but not available!");
-        })
-        .otherwise([](){
-            kDebug() << "Validation layers are available.";
-        });
+    Utils::K_constexpr_if<enableValidationLayers>([&](){
+        checkValidationLayerSupport()
+            .and_then([](bool) -> std::expected<void, std::vector<std::string>> {
+                kDebug() << "Validation layers are available.";
+                return std::expected<void, std::vector<std::string>>{};
+            })
+            .or_else([](std::vector<std::string> err)
+                -> std::expected<void, std::vector<std::string>> {
+                throw std::runtime_error("missing layers: [ " +
+                     (err.empty() ? "" : std::accumulate(
+                         std::next(err.begin()), err.end(), err[0],
+                         [](std::string a, const std::string& b)
+                            -> std::string {
+                             return "\033[31m"
+                                + std::move(a) + " \033[0m## \033[31m"
+                                + b + "\033[0m";
+                         })
+                     )
+                     + " ]"
+                );}
+            );
+    });
 
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -55,57 +70,65 @@ void Vulkan::Init::VulkanInstance::createInstance() {
 }
 
 void Vulkan::Init::VulkanInstance::setupDebugMessenger() {
-    if constexpr (enableValidationLayers) {
+    Utils::K_constexpr_if<enableValidationLayers>([&](){
         VkDebugUtilsMessengerCreateInfoEXT createInfo;
         populateDebugMessengerCreateInfo(createInfo);
 
         CreateDebugMessenger(&createInfo)
             .and_then([this](VkDebugUtilsMessengerEXT messenger)
                 -> std::expected<void, VkResult> {
-                    m_debugMessenger = messenger;
-                    return std::expected<void, VkResult>{};
-                })
-                .or_else([](VkResult err)
+                m_debugMessenger = messenger;
+                return std::expected<void, VkResult>{};
+            })
+            .or_else([](VkResult err)
                 -> std::expected<void, VkResult> {
-                    std::cerr << "Create failed with: " << err << "\n";
-                    return std::unexpected(err);
-                }
-            );
+                throw std::runtime_error("CreateDebugMessenger failed with code: "
+                + std::to_string(err));
+            });
 
-    }
+    });
 }
 
-bool Vulkan::Init::VulkanInstance::checkValidationLayerSupport() noexcept {
-    std::vector<VkLayerProperties> availableLayers =
+std::expected<bool, std::vector<std::string>>
+Vulkan::Init::VulkanInstance::checkValidationLayerSupport() noexcept {
+    const auto availableLayers =
             Utils::K_vkEnumerateVector<VkLayerProperties>
                     (vkEnumerateInstanceLayerProperties);
 
-    auto isLayerAvailable = [&](const char* layerName) -> bool {
-        return std::ranges::any_of(
-            availableLayers,
-            [&](const VkLayerProperties& props) {
-                return std::strcmp(layerName, props.layerName) == 0;
-            });
-    };
+    auto&& missingLayers = validationLayers
+        | std::views::filter([&](const char* layerName)
+            -> bool {
+            return !std::ranges::any_of(
+                availableLayers,
+                [&](const VkLayerProperties& props) {
+                    return std::strcmp(layerName, props.layerName) == 0;
+                });
+            })
+        | std::views::transform([](const char* name)
+            -> std::string {
+                return std::string{name};
+            })
+        | std::ranges::to<std::vector>();
 
-    return std::ranges::all_of(validationLayers, isLayerAvailable);
+    return missingLayers.empty() ? std::expected<bool, std::vector<std::string>>{true}
+                           : std::unexpected(std::move(missingLayers));
 }
 
-std::vector<const char *> Vulkan::Init::VulkanInstance::getRequiredExtensions() noexcept {
-    std::vector<const char*> extensions;
-
-    extensions.push_back("VK_KHR_surface");
-
-#ifdef _WIN32
-    extensions.push_back("VK_KHR_win32_surface");
+std::vector<const char*> Vulkan::Init::VulkanInstance::getRequiredExtensions() noexcept {
+    auto base_extensions = {
+            "VK_KHR_surface",
+#if defined(_WIN32)
+            "VK_KHR_win32_surface",
 #elif defined(__linux__)
-    extensions.push_back("VK_KHR_xlib_surface");
+            "VK_KHR_xlib_surface",
 #endif
+    };
 
-    Utils::K_MixedAll(enableValidationLayers)
-        .then([&](){
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        });
+    std::vector<const char*> extensions{base_extensions};
+
+    Utils::K_constexpr_if<enableValidationLayers>([&](){
+        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    });
 
     return extensions;
 }
@@ -126,7 +149,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Vulkan::Init::VulkanInstance::debugCallback(VkDeb
                                                     VkDebugUtilsMessageTypeFlagsEXT messageType,
                                                     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
                                                     void* pUserData) {
-    std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+    kDebug() << "validation layer: " << pCallbackData->pMessage;
     return VK_FALSE;
 }
 
@@ -148,16 +171,25 @@ Vulkan::Init::VulkanInstance::CreateDebugMessenger(const VkDebugUtilsMessengerCr
 }
 
 void Vulkan::Init::VulkanInstance::DestroyDebugUtilsMessengerEXT() noexcept {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(m_instance, m_debugMessenger, nullptr);
+    if (m_debugMessenger != VK_NULL_HANDLE && m_instance != VK_NULL_HANDLE) {
+        auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT"));
+        if (func) {
+            func(m_instance, m_debugMessenger, nullptr);
+            m_debugMessenger = VK_NULL_HANDLE;
+        }
     }
 }
 
 void Vulkan::Init::VulkanInstance::DestroyInstance() noexcept {
-    vkDestroyInstance(m_instance, nullptr);
+    DestroyDebugUtilsMessengerEXT();
+
+    if (m_instance != VK_NULL_HANDLE) {
+        vkDestroyInstance(m_instance, nullptr);
+        m_instance = VK_NULL_HANDLE;
+    }
 }
 
-VkInstance &Vulkan::Init::VulkanInstance::GetInstance() noexcept {
+VkInstance Vulkan::Init::VulkanInstance::GetInstance() noexcept {
     return m_instance;
 }

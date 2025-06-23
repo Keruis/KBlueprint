@@ -2,6 +2,7 @@
 #define BLUEPRINT_VULKANCONFIG_H
 
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
@@ -11,6 +12,10 @@ constexpr bool enableValidationLayers = true;
 
 const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
+};
+
+const std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 #endif //BLUEPRINT_VULKANCONFIG_H
