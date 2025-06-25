@@ -1,6 +1,10 @@
 #ifndef BLUEPRINT_VULKANRENDERPASS_H
 #define BLUEPRINT_VULKANRENDERPASS_H
 
+#include <stdexcept>
+
+#include <vulkan/vulkan.h>
+
 namespace Vulkan::Init {
     class VulkanRenderPass {
     public:
@@ -8,10 +12,12 @@ namespace Vulkan::Init {
 
         void Initialize() noexcept;
 
-        void createRenderPass() noexcept;
+        void createRenderPass(VkDevice device, VkFormat swapChainImageFormat);
+
+        VkRenderPass GetRenderPass() noexcept;
 
     private:
-
+        VkRenderPass renderPass;
     };
 }
 

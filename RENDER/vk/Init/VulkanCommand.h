@@ -1,6 +1,12 @@
 #ifndef BLUEPRINT_VULKANCOMMAND_H
 #define BLUEPRINT_VULKANCOMMAND_H
 
+#include <stdexcept>
+
+#include <vulkan/vulkan.h>
+
+#include "VulkanFuncUtils.h"
+
 namespace Vulkan::Init {
     class VulkanCommand {
     public:
@@ -8,12 +14,15 @@ namespace Vulkan::Init {
 
         void Initialize() noexcept;
 
-        void createCommandPool() noexcept;
+        void createCommandPool(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surfaceKhr);
+        void createCommandBuffer(VkDevice device);
 
-        void createCommandBuffer() noexcept;
+        VkCommandPool GetCommandPool() noexcept;
+        VkCommandBuffer& GetCommandBuffer() noexcept;
 
     private:
-
+        VkCommandPool commandPool;
+        VkCommandBuffer commandBuffer;
     };
 }
 

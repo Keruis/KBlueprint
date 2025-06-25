@@ -1,6 +1,10 @@
 #ifndef BLUEPRINT_VULKANSYNC_H
 #define BLUEPRINT_VULKANSYNC_H
 
+#include <stdexcept>
+
+#include <vulkan/vulkan.h>
+
 namespace Vulkan::Init {
     class VulkanSync {
     public:
@@ -8,10 +12,16 @@ namespace Vulkan::Init {
 
         void Initialize() noexcept;
 
-        void createSyncObjects() noexcept;
+        void createSyncObjects(VkDevice device);
+
+        VkSemaphore& GetImageAvailableSemaphore() noexcept;
+        VkSemaphore& GetRenderFinishedSemaphore() noexcept;
+        VkFence& GetFlightFence() noexcept;
 
     private:
-
+        VkSemaphore imageAvailableSemaphore;
+        VkSemaphore renderFinishedSemaphore;
+        VkFence inFlightFence;
     };
 }
 
