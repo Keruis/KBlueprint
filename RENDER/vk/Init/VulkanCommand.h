@@ -5,6 +5,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include "config.h"
 #include "VulkanFuncUtils.h"
 
 namespace Vulkan::Init {
@@ -18,11 +19,11 @@ namespace Vulkan::Init {
         void createCommandBuffer(VkDevice device);
 
         VkCommandPool GetCommandPool() noexcept;
-        VkCommandBuffer& GetCommandBuffer() noexcept;
+        std::vector<VkCommandBuffer>& GetCommandBuffer() noexcept;
 
     private:
+        std::vector<VkCommandBuffer> m_commandBuffers;
         VkCommandPool commandPool;
-        VkCommandBuffer commandBuffer;
     };
 }
 

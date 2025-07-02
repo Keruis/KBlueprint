@@ -1,9 +1,12 @@
 #ifndef BLUEPRINT_VULKANSYNC_H
 #define BLUEPRINT_VULKANSYNC_H
 
+#include <vector>
 #include <stdexcept>
 
 #include <vulkan/vulkan.h>
+
+#include "config.h"
 
 namespace Vulkan::Init {
     class VulkanSync {
@@ -14,14 +17,14 @@ namespace Vulkan::Init {
 
         void createSyncObjects(VkDevice device);
 
-        VkSemaphore& GetImageAvailableSemaphore() noexcept;
-        VkSemaphore& GetRenderFinishedSemaphore() noexcept;
-        VkFence& GetFlightFence() noexcept;
+        std::vector<VkSemaphore>& GetImageAvailableSemaphore() noexcept;
+        std::vector<VkSemaphore>& GetRenderFinishedSemaphore() noexcept;
+        std::vector<VkFence>& GetFlightFence() noexcept;
 
     private:
-        VkSemaphore imageAvailableSemaphore;
-        VkSemaphore renderFinishedSemaphore;
-        VkFence inFlightFence;
+        std::vector<VkSemaphore> imageAvailableSemaphore;
+        std::vector<VkSemaphore> renderFinishedSemaphore;
+        std::vector<VkFence> inFlightFence;
     };
 }
 

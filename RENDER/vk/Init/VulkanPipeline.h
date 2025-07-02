@@ -8,6 +8,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../Vertex.h"
+
 namespace Vulkan::Init {
     class VulkanPipeline {
     public:

@@ -1,6 +1,6 @@
 #include "FrameLimiter.h"
 
-Render::utils::FrameLimiter::FrameLimiter(double target_fps, double sleep_precision_sec)
+inline Render::utils::FrameLimiter::FrameLimiter(double target_fps, double sleep_precision_sec)
     : frame_duration(1.0 / target_fps),
       sleep_precision(sleep_precision_sec),
       last_frame_time(clock::now())

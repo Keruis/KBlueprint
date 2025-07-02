@@ -99,7 +99,6 @@ public:
         genericEventCallbacks_.push_back(std::move(callback));
     }
 
-    // --- 绘制功能 (非Vulkan，用于调试) ---
     void drawRectangle(int x, int y, int width, int height, unsigned long color) {
         if (!gc_) return;
         // XLockDisplay(display_); // 如果在多线程中频繁使用Xlib绘制，可能需要加锁

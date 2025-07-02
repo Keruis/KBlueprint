@@ -22,13 +22,15 @@ void Vulkan::Init::VulkanCommand::createCommandPool(VkDevice device, VkPhysicalD
 }
 
 void Vulkan::Init::VulkanCommand::createCommandBuffer(VkDevice device) {
+    m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
+    allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
 
-    if (vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(device, &allocInfo, m_commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
@@ -37,6 +39,6 @@ VkCommandPool Vulkan::Init::VulkanCommand::GetCommandPool() noexcept {
     return commandPool;
 }
 
-VkCommandBuffer& Vulkan::Init::VulkanCommand::GetCommandBuffer() noexcept {
-    return commandBuffer;
+std::vector<VkCommandBuffer>& Vulkan::Init::VulkanCommand::GetCommandBuffer() noexcept {
+    return m_commandBuffers;
 }
