@@ -9,6 +9,8 @@
 #include <vulkan/vulkan.h>
 
 #include "../Vertex.h"
+#include "config.h"
+#include "../UniformBufferObject.h"
 
 namespace Vulkan::Init {
     class VulkanPipeline {
@@ -17,10 +19,15 @@ namespace Vulkan::Init {
 
         void Initialize() noexcept;
 
+        void createDescriptorSetLayout(VkDevice device);
         void createGraphicsPipeline(VkDevice device, VkRenderPass renderPass);
+        void createDescriptorPool(VkDevice device);
+        void createDescriptorSets(VkDevice device, std::vector<std::vector<VkBuffer>>& uniformBuffers);
 
         VkPipelineLayout GetPipelineLayout() noexcept;
         VkPipeline GetGraphicsPipeline() noexcept;
+        VkDescriptorSetLayout GetVkDescriptorSetLayout() noexcept;
+        std::vector<std::vector<VkDescriptorSet>>& GetDescriptorSets() noexcept;
 
     private:
         static std::vector<char> readFile(const std::string& filename) {
@@ -56,6 +63,9 @@ namespace Vulkan::Init {
         }
 
     private:
+        VkDescriptorPool descriptorPool;
+        std::vector<std::vector<VkDescriptorSet>> descriptorSets;
+        VkDescriptorSetLayout descriptorSetLayout;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
     };

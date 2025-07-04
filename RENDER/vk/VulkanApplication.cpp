@@ -88,6 +88,9 @@ void VulkanApplication::mainLoop() {
 
 void VulkanApplication::drawFrame() {
     vkWaitForFences(m_context.getDevice(), 1, &m_context.getFlightFence()[currentFrame], VK_TRUE, UINT64_MAX);
+
+    updateUniformBuffer(currentFrame);
+
     vkResetFences(m_context.getDevice(), 1, &m_context.getFlightFence()[currentFrame]);
 
     uint32_t imageIndex;
@@ -95,6 +98,7 @@ void VulkanApplication::drawFrame() {
                           &imageIndex);
 
     vkResetCommandBuffer(m_context.getCommandBuffer()[currentFrame], 0);
+
     recordCommandBuffer(m_context.getCommandBuffer()[currentFrame], imageIndex);
 
     VkSubmitInfo submitInfo{};
@@ -171,11 +175,41 @@ void VulkanApplication::recordCommandBuffer(VkCommandBuffer commandBuffer, uint3
     scissor.extent = m_context.getExtent2D();
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+    for (uint32_t i = 0; i < 2; i++) {
+        VkBuffer vertexBuffers[] = {m_context.getVertexBuffer(i)};
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+        vkCmdBindIndexBuffer(commandBuffer, m_context.getIndexBuffer(i), 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_context.getPipelineLayout(), 0, 1, &m_context.getDescriptorSets()[i][currentFrame], 0, nullptr);
+        vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_context.getIndexSize(i)), 1, 0, 0, 0);
+    }
 
     vkCmdEndRenderPass(commandBuffer);
 
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
+}
+
+#include <glm/gtc/matrix_transform.hpp>
+
+void VulkanApplication::updateUniformBuffer(uint32_t currentImage) {
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+    for (uint32_t i = 0; i < 2; i++) {
+        UniformBufferObject ubo{};
+
+        glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0, 0, 1));
+        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(i == 0 ? -0.5f : 0.5f, 0.0f, 0.0f));
+
+        ubo.model = rotate * translate;
+        ubo.view = glm::mat4(1.0f);
+        ubo.proj = glm::ortho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+
+        memcpy(m_context.getUniformBuffersMapped(i)[currentImage], &ubo, sizeof(ubo));
+    }
+
 }

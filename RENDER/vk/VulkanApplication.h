@@ -20,6 +20,7 @@ public:
 private:
     void mainLoop();
     void drawFrame();
+    void updateUniformBuffer(uint32_t currentImage);
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 private:

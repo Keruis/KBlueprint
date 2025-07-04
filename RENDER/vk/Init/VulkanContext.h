@@ -35,6 +35,14 @@ namespace Vulkan {
         [[nodiscard]] VkRenderPass getRenderPass() noexcept {return m_randerPass.GetRenderPass();};
         [[nodiscard]] std::vector<VkFramebuffer>& getSwapChainFrameBuffers() noexcept {return m_franeBuffer.GetSwapChainFrameBuffers();};
         [[nodiscard]] VkPipeline getGraphicsPipeline() noexcept {return m_pipeline.GetGraphicsPipeline();};
+        [[nodiscard]] VkPipelineLayout getPipelineLayout() noexcept {return m_pipeline.GetPipelineLayout();};
+        [[nodiscard]] std::vector<std::vector<VkDescriptorSet>>& getDescriptorSets() noexcept {return m_pipeline.GetDescriptorSets();};
+        [[nodiscard]] const Mesh& getMesh(uint32_t i) const noexcept { return m_mesh[i]; }
+        [[nodiscard]] VkBuffer getVertexBuffer(uint32_t i) const noexcept { return m_mesh[i].GetVertexBuffer(); }
+        [[nodiscard]] VkBuffer getIndexBuffer(uint32_t i) const noexcept { return m_mesh[i].GetIndexBuffer(); }
+        [[nodiscard]] uint32_t getVertexSize(uint32_t i) const noexcept { return m_mesh[i].GetVertexSize(); }
+        [[nodiscard]] uint32_t getIndexSize(uint32_t i) const noexcept { return m_mesh[i].GetIndexSize(); }
+        [[nodiscard]] std::vector<void*> getUniformBuffersMapped(uint32_t i) const noexcept {return m_mesh[i].uniformBuffersMapped;};
 
         void recreateSwapChain() noexcept;
         void cleanupSwapChain() noexcept;
@@ -53,7 +61,7 @@ namespace Vulkan {
         Vulkan::Init::VulkanCommand m_command;
         Vulkan::Init::VulkanSync m_sync;
 
-        Mesh m_mesh;
+        std::vector<Mesh> m_mesh;
     };
 }
 

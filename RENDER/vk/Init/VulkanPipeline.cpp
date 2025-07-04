@@ -8,6 +8,25 @@ void Vulkan::Init::VulkanPipeline::Initialize() noexcept {
 
 }
 
+void Vulkan::Init::VulkanPipeline::createDescriptorSetLayout(VkDevice device) {
+    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    VkDescriptorSetLayoutCreateInfo layoutInfo{};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 1;
+    layoutInfo.pBindings = &uboLayoutBinding;
+
+    if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create descriptor set layout!");
+    }
+}
+
+
 void Vulkan::Init::VulkanPipeline::createGraphicsPipeline(VkDevice device, VkRenderPass renderPass) {
     auto vertShaderCode = readFile("shaders/vert.spv");
     auto fragShaderCode = readFile("shaders/frag.spv");
@@ -34,12 +53,10 @@ void Vulkan::Init::VulkanPipeline::createGraphicsPipeline(VkDevice device, VkRen
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-//    vertexInputInfo.vertexBindingDescriptionCount = 1;
-//    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-//    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-//    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -92,8 +109,8 @@ void Vulkan::Init::VulkanPipeline::createGraphicsPipeline(VkDevice device, VkRen
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
@@ -123,6 +140,79 @@ void Vulkan::Init::VulkanPipeline::createGraphicsPipeline(VkDevice device, VkRen
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
+void Vulkan::Init::VulkanPipeline::createDescriptorPool(VkDevice device) {
+    VkDescriptorPoolSize poolSize{};
+    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * 2);
+
+    VkDescriptorPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.poolSizeCount = 1;
+    poolInfo.pPoolSizes = &poolSize;
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * 2);
+
+    if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create descriptor pool!");
+    }
+}
+#include <iostream>
+void Vulkan::Init::VulkanPipeline::createDescriptorSets(
+        VkDevice device,
+        std::vector<std::vector<VkBuffer>>& uniformBuffers
+) {
+    std::cout << "ggg" <<std::endl;
+    size_t modelCount = uniformBuffers.size();
+    size_t frameCount = MAX_FRAMES_IN_FLIGHT;
+
+    std::vector<VkDescriptorSetLayout> layouts(modelCount * frameCount, descriptorSetLayout);
+
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = descriptorPool;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(layouts.size());
+    allocInfo.pSetLayouts = layouts.data();
+
+    std::vector<VkDescriptorSet> flatDescriptorSets(modelCount * frameCount);
+    if (vkAllocateDescriptorSets(device, &allocInfo, flatDescriptorSets.data()) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate descriptor sets!");
+    }
+
+    descriptorSets.resize(modelCount);
+    for (size_t model = 0; model < modelCount; ++model) {
+        descriptorSets[model].resize(frameCount);
+    }
+
+    for (size_t model = 0; model < modelCount; ++model) {
+        for (size_t frame = 0; frame < frameCount; ++frame) {
+            size_t idx = model * frameCount + frame;
+            descriptorSets[model][frame] = flatDescriptorSets[idx];
+        }
+    }
+    std::cout << "nnnnn" <<std::endl;
+    for (size_t model = 0; model < modelCount; ++model) {
+        for (size_t frame = 0; frame < frameCount; ++frame) {
+            std::cout << uniformBuffers.size() << uniformBuffers[0].size() << std::endl;
+            VkDescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = uniformBuffers[model][frame];
+            bufferInfo.offset = 0;
+            bufferInfo.range = sizeof(UniformBufferObject);
+
+            VkWriteDescriptorSet descriptorWrite{};
+            descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrite.dstSet = descriptorSets[model][frame];
+            descriptorWrite.dstBinding = 0;
+            descriptorWrite.dstArrayElement = 0;
+            descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrite.descriptorCount = 1;
+            descriptorWrite.pBufferInfo = &bufferInfo;
+
+            vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+            std::cout << model << frame << std::endl;
+        }
+    }
+    std::cout << "lllll" <<std::endl;
+}
+
 VkPipeline Vulkan::Init::VulkanPipeline::GetGraphicsPipeline() noexcept {
     return graphicsPipeline;
 }
@@ -130,3 +220,16 @@ VkPipeline Vulkan::Init::VulkanPipeline::GetGraphicsPipeline() noexcept {
 VkPipelineLayout Vulkan::Init::VulkanPipeline::GetPipelineLayout() noexcept {
     return pipelineLayout;
 }
+
+VkDescriptorSetLayout Vulkan::Init::VulkanPipeline::GetVkDescriptorSetLayout() noexcept {
+    return descriptorSetLayout;
+}
+
+std::vector<std::vector<VkDescriptorSet>> &Vulkan::Init::VulkanPipeline::GetDescriptorSets() noexcept {
+    return descriptorSets;
+}
+
+
+
+
+
