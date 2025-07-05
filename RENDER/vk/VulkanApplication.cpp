@@ -1,6 +1,8 @@
 #include "VulkanApplication.h"
 
-VulkanApplication::VulkanApplication() {
+VulkanApplication::VulkanApplication()
+    : cameraController(&camera)
+{
 
 }
 
@@ -26,24 +28,44 @@ void VulkanApplication::Cleanup() {
 }
 
 void VulkanApplication::mainLoop() {
-    Render::utils::FrameLimiter limiter(7000.0);
+    Render::utils::FrameLimiter limiter(60.0);
     Render::utils::AsyncFrameRateCounter fps;
     Input input;
     input.Initialize(static_cast<void*>(&window->getWindowHandle()), window->getWidth(), window->getHeight());
 
     window->show();
-    window->addKeyPressCallback([](const XKeyEvent& keyEvent) {
+    window->addKeyPressCallback([&](const XKeyEvent& keyEvent) {
         char buffer[32];
         KeySym keysym;
-        XComposeStatus composeStatus;
-        int len = XLookupString(const_cast<XKeyEvent*>(&keyEvent), buffer, sizeof(buffer), &keysym, &composeStatus);
-        if (len > 0) {
-            std::cout << "Callback: Key pressed: " << buffer[0] << " (Keysym: " << XKeysymToString(keysym) << ")" << std::endl;
-        }
+        XComposeStatus status;
+
+        int len = XLookupString(const_cast<XKeyEvent*>(&keyEvent), buffer, sizeof(buffer), &keysym, &status);
+        std::cout << "Key pressed: " << XKeysymToString(keysym) << "\n";
+
+//        auto tmp = camera.GetPosition();
+//
+//        if (keysym == XK_w || keysym == XK_W) {
+//            std::cout << "Moving camera up\n";
+//            camera.SetPosition(tmp.x, tmp.y - 0.05f, tmp.z);
+//        }
+//        if (keysym == XK_s || keysym == XK_S) {
+//            std::cout << "Moving camera down\n";
+//            camera.SetPosition(tmp.x, tmp.y + 0.05f, tmp.z);
+//        }
+//        if (keysym == XK_a || keysym == XK_A) {
+//            std::cout << "Moving camera left\n";
+//            camera.SetPosition(tmp.x - 0.05f, tmp.y, tmp.z);
+//        }
+//        if (keysym == XK_d || keysym == XK_D) {
+//            std::cout << "Moving camera right\n";
+//            camera.SetPosition(tmp.x + 0.05f, tmp.y, tmp.z);
+//        }
+
         if (keysym == XK_Escape) {
-            std::cout << "Callback: Escape key detected!" << std::endl;
+            std::cout << "Escape pressed\n";
         }
     });
+
     window->startEventThread();
 
     bool appRunning = true;
@@ -58,6 +80,8 @@ void VulkanApplication::mainLoop() {
             }
 
             input.Frame();
+            cameraController.Update(input, limiter.GetDeltaTime());
+            camera.Render();
             fps.notify_frame();
             drawFrame();
 
@@ -206,7 +230,12 @@ void VulkanApplication::updateUniformBuffer(uint32_t currentImage) {
         glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(i == 0 ? -0.5f : 0.5f, 0.0f, 0.0f));
 
         ubo.model = rotate * translate;
-        ubo.view = glm::mat4(1.0f);
+        Math::Mat::MatF44 tmp;
+        camera.GetViewMatrix(tmp);
+        ubo.view = glm::mat4(tmp[0][0], tmp[0][1], tmp[0][2], tmp[0][3],
+                             tmp[1][0], tmp[1][1], tmp[1][2], tmp[1][3],
+                             tmp[2][0], tmp[2][1], tmp[2][2], tmp[2][3],
+                             tmp[3][0], tmp[3][1], tmp[3][2], tmp[3][3]);
         ubo.proj = glm::ortho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
 
         memcpy(m_context.getUniformBuffersMapped(i)[currentImage], &ubo, sizeof(ubo));

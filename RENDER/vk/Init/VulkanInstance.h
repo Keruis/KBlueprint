@@ -1,3 +1,23 @@
+/*
+ * File:    VulkanInstance.h
+ * Author:  Keruis
+ * Date:    2025-07-05
+ * Project: Blueprint Vulkan Renderer
+ * Brief:   封装 Vulkan 实例（VkInstance）与调试工具的初始化与管理。
+ *
+ * Description:
+ *   This header defines the VulkanInstance class, which handles the
+ *   creation and destruction of the Vulkan instance (VkInstance), as well
+ *   as the setup of the debug messenger (VkDebugUtilsMessengerEXT) for
+ *   validation and debugging during development.
+ *
+ *   本类是 Vulkan 初始化的第一步，负责创建 Vulkan 实例和调试消息回调，
+ *   包括验证层支持检测、所需扩展获取、调试回调函数注册等关键步骤。
+ *
+ * License: MIT License
+ */
+
+
 #ifndef BLUEPRINT_VULKANINSTANCE_H
 #define BLUEPRINT_VULKANINSTANCE_H
 

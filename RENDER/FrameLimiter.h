@@ -18,10 +18,13 @@ namespace Render::utils {
 
         ALWAYS_INLINE void SetFPS(double fps) noexcept;
         ALWAYS_INLINE double GetFPS() const noexcept;
+        ALWAYS_INLINE double GetDeltaTime() const noexcept;
 
     private:
         double frame_duration;
         double sleep_precision;
+        clock::time_point current_frame_time;
+        double delta_time = 0.0f;
         clock::time_point last_frame_time;
     };
 }

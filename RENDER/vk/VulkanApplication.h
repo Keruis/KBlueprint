@@ -4,9 +4,11 @@
 #include "System.h"
 #include "Init/VulkanContext.h"
 
-#include "../inputclass.h"
+#include "../Input.h"
 #include "../FrameRateCounter.h"
 #include "../FrameLimiter.h"
+#include "../Camera.h"
+#include "../CameraController.h"
 
 class VulkanApplication {
 public:
@@ -25,6 +27,9 @@ private:
 
 private:
     uint32_t currentFrame = 0;
+
+    Camera camera;
+    CameraController cameraController;
 
     X11Window* window;
     Vulkan::VulkanContext m_context;

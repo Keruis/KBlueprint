@@ -229,6 +229,10 @@ std::vector<std::vector<VkDescriptorSet>> &Vulkan::Init::VulkanPipeline::GetDesc
     return descriptorSets;
 }
 
+VkDescriptorPool Vulkan::Init::VulkanPipeline::GetDescriptorPool() noexcept {
+    return descriptorPool;
+}
+
 
 
 

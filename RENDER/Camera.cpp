@@ -1,4 +1,4 @@
-#include "cameraclass.h"
+#include "Camera.h"
 
 Camera::Camera() {
 	m_positionX = 0.0f;

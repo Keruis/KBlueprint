@@ -127,7 +127,7 @@ private:
     std::string title_;
 
     std::thread eventThread_;
-    std::atomic_bool eventThreadRunning_;
+    std::atomic_bool eventThreadRunning_ = true;
     std::atomic_bool quitRequested_;
 
     std::vector<ExposeCallback> exposeCallbacks_;

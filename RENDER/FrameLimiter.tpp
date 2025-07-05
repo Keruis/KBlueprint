@@ -9,19 +9,23 @@ inline Render::utils::FrameLimiter::FrameLimiter(double target_fps, double sleep
 }
 
 inline void Render::utils::FrameLimiter::beginFrame() noexcept {
-    last_frame_time = clock::now();
+    auto now = clock::now();
+    delta_time = std::chrono::duration<double>(now - last_frame_time).count();
+    current_frame_time = now;
 }
 
 inline void Render::utils::FrameLimiter::endFrame() noexcept {
+    last_frame_time = current_frame_time;
+
     auto now = clock::now();
-    duration elapsed = now - last_frame_time;
+    duration elapsed = now - current_frame_time;
     double time_left = frame_duration - elapsed.count();
 
     if (time_left > sleep_precision) {
         std::this_thread::sleep_for(duration(time_left - sleep_precision));
     }
 
-    while ((clock::now() - last_frame_time).count() < frame_duration) {
+    while ((clock::now() - current_frame_time).count() < frame_duration) {
 
     }
 }
@@ -32,4 +36,8 @@ inline void Render::utils::FrameLimiter::SetFPS(double fps) noexcept {
 
 inline double Render::utils::FrameLimiter::GetFPS() const noexcept {
     return 1.0 / frame_duration;
+}
+
+inline double Render::utils::FrameLimiter::GetDeltaTime() const noexcept {
+    return delta_time;
 }

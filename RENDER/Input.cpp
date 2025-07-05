@@ -1,4 +1,4 @@
-#include "inputclass.h"
+#include "Input.h"
 
 
 Input::Input()
@@ -175,7 +175,6 @@ bool Input::ReadMouse() {
 #endif
 }
 
-
 void Input::ProcessInput() {
 #ifdef _WIN32
     m_mouseX += m_mouseState.lX;
@@ -189,13 +188,45 @@ void Input::ProcessInput() {
         m_mouseX = winX;
         m_mouseY = winY;
     }
+
+    m_pressedKeys.clear();
+    for (int keycode = 0; keycode < 256; ++keycode) {
+        if (m_keyboardState[keycode / 8] & (1 << (keycode % 8))) {
+            KeySym keysym = XkbKeycodeToKeysym(m_display, keycode, 0, 0);
+            if (keysym != NoSymbol) {
+                m_pressedKeys.insert(keysym);
+            }
+        }
+    }
 #endif
 
+    // 屏幕边界限制
     if (m_mouseX < 0) m_mouseX = 0;
     if (m_mouseY < 0) m_mouseY = 0;
     if (m_mouseX > m_screenWidth)  m_mouseX = m_screenWidth;
     if (m_mouseY > m_screenHeight) m_mouseY = m_screenHeight;
 }
+
+//void Input::ProcessInput() {
+//#ifdef _WIN32
+//    m_mouseX += m_mouseState.lX;
+//    m_mouseY += m_mouseState.lY;
+//#else
+//    Window root, child;
+//    int rootX, rootY, winX, winY;
+//    unsigned int mask;
+//
+//    if (XQueryPointer(m_display, m_window, &root, &child, &rootX, &rootY, &winX, &winY, &mask)) {
+//        m_mouseX = winX;
+//        m_mouseY = winY;
+//    }
+//#endif
+//
+//    if (m_mouseX < 0) m_mouseX = 0;
+//    if (m_mouseY < 0) m_mouseY = 0;
+//    if (m_mouseX > m_screenWidth)  m_mouseX = m_screenWidth;
+//    if (m_mouseY > m_screenHeight) m_mouseY = m_screenHeight;
+//}
 
 
 bool Input::IsEscapePressed() {

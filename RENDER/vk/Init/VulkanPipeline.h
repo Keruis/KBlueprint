@@ -26,6 +26,7 @@ namespace Vulkan::Init {
 
         VkPipelineLayout GetPipelineLayout() noexcept;
         VkPipeline GetGraphicsPipeline() noexcept;
+        VkDescriptorPool GetDescriptorPool() noexcept;
         VkDescriptorSetLayout GetVkDescriptorSetLayout() noexcept;
         std::vector<std::vector<VkDescriptorSet>>& GetDescriptorSets() noexcept;
 

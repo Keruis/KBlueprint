@@ -9,9 +9,9 @@
 namespace Vulkan::Utils {
 
 #ifndef NDEBUG
-#define KDEBUG_ENABLED 1
+    #define KDEBUG_ENABLED 1
 #else
-#define KDEBUG_ENABLED 0
+    #define KDEBUG_ENABLED 0
 #endif
 
     class KDebugStream {
@@ -29,10 +29,10 @@ namespace Vulkan::Utils {
         }
 
     private:
-        std::ostringstream m_stream;
-        const char *m_file;
-        int m_line;
-        const char *m_func;
+        std::ostringstream  m_stream;
+        const char *        m_file;
+        int                 m_line;
+        const char *        m_func;
     };
 }
 #if KDEBUG_ENABLED
